@@ -1,9 +1,3 @@
-import PlaceholderSection from "@/features/dashboard/overview/components/sections/PlaceholderSection";
-import { placeholderRoutes } from "@/features/dashboard/overview/data/data";
+import SettingsPage from "@/features/dashboard/settings/page/SettingsPage";
 
-const IntegrationsPage = () => (
-  <PlaceholderSection route={placeholderRoutes.integrations} />
-);
-
-export default IntegrationsPage;
-
+export default SettingsPage;

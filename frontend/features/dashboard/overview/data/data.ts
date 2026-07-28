@@ -29,7 +29,7 @@ export const dashboardNavItems: DashboardNavItem[] = [
   { key: "reports", label: "Reports", href: "/dashboard/reports" },
   {
     key: "integrations",
-    label: "Integrations",
+    label: "Settings",
     href: "/dashboard/integrations",
   },
 ];

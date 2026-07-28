@@ -1,9 +1,3 @@
-import PlaceholderSection from "@/features/dashboard/overview/components/sections/PlaceholderSection";
-import { placeholderRoutes } from "@/features/dashboard/overview/data/data";
-
-const ReportsPage = () => (
-  <PlaceholderSection route={placeholderRoutes.reports} />
-);
+import ReportsPage from "@/features/dashboard/reports/page/ReportsPage";
 
 export default ReportsPage;
-
