@@ -1,0 +1,243 @@
+{
+  "header": {
+    "nav": {
+      "features": "Tính năng",
+      "howItWorks": "Cách hoạt động",
+      "pricing": "Bảng giá",
+      "faq": "Hỏi đáp"
+    },
+    "signUp": "Đăng ký dùng thử sớm"
+  },
+  "footer": {
+    "tagline": "Lễ tân AI dành riêng cho Nails và Hair Salon. Giúp bạn quản lý lịch hẹn, nhớ sở thích từng khách và tăng doanh thu dễ dàng hơn.",
+    "columns": {
+      "product": "Sản phẩm",
+      "company": "Công ty",
+      "legal": "Pháp lý"
+    },
+    "productLinks": {
+      "features": "Tính năng",
+      "pricing": "Bảng giá",
+      "faq": "Hỏi đáp"
+    },
+    "companyLinks": {
+      "contact": "Liên hệ",
+      "about": "Giới thiệu"
+    },
+    "legalLinks": {
+      "privacyPolicy": "Chính sách bảo mật",
+      "termsOfServices": "Điều khoản dịch vụ"
+    },
+    "copyright": "© 2026 MaiAI. Giữ mọi quyền.",
+    "designedFor": "Dành cho tiệm Nail và tiệm Tóc"
+  },
+  "hero": {
+    "badge": "Giải pháp mới dành cho tiệm Nail",
+    "titleLine1": "MaiAI – Trợ lý lễ tân AI cho",
+    "titleHighlight": "Nails và Hair Salon",
+    "description": "Tự động nhận đặt lịch, ghi nhớ sở thích của từng khách và khéo léo gợi ý thêm dịch vụ. Cứ để AI lo phần lễ tân, bạn chỉ cần tập trung làm đẹp cho khách.",
+    "form": {
+      "title": "Đăng ký trải nghiệm sớm",
+      "subtitle": "Đăng ký ngay hôm nay để được dùng miễn phí 30 ngày khi ra mắt.",
+      "firstName": "Tên",
+      "firstNamePlaceholder": "Lan",
+      "lastName": "Họ",
+      "lastNamePlaceholder": "Nguyễn",
+      "workEmail": "Email liên hệ",
+      "workEmailPlaceholder": "lan@luxurynails.com",
+      "salonName": "Tên tiệm",
+      "salonNamePlaceholder": "Luxury Nails & Spa",
+      "submitting": "Đang gửi...",
+      "signUp": "Đăng ký dùng thử sớm",
+      "watchDemo": "Xem demo",
+      "validationError": "Bạn vui lòng điền đầy đủ thông tin nhé",
+      "errors": {
+        "firstNameRequired": "Bạn vui lòng nhập tên",
+        "lastNameRequired": "Bạn vui lòng nhập họ",
+        "emailRequired": "Bạn vui lòng nhập email liên hệ",
+        "emailInvalid": "Email chưa đúng định dạng, bạn kiểm tra lại nhé",
+        "salonNameRequired": "Bạn vui lòng nhập tên tiệm"
+      },
+      "successMessage": "✅ Thành công! {{message}}",
+      "errorMessage": "❌ Có lỗi xảy ra: {{message}}",
+      "thankYouTitle": "Cảm ơn bạn đã đăng ký!",
+      "thankYouDescription": "Chúng tôi đã nhận được thông tin của bạn và sẽ sớm liên hệ lại với bạn.",
+      "thankYouClose": "Đã hiểu",
+      "badge": "Số lượng có hạn",
+      "formHeading": "Tạo tài khoản của bạn",
+      "formSubheading": "Điền thông tin để giữ chỗ ngay hôm nay.",
+      "perk1": "Miễn phí 30 ngày khi ra mắt",
+      "perk2": "Hỗ trợ onboarding ưu tiên",
+      "perk3": "Giữ nguyên giá ưu đãi cho người dùng sớm",
+      "noSpam": "Không spam. Hủy đăng ký bất cứ lúc nào."
+    },
+    "imageAlt": "Hình ảnh minh họa MaiAI"
+  },
+  "features": {
+    "title": "Được thiết kế riêng cho tiệm Nail thời nay",
+    "description": "Cùng khám phá những tính năng sắp ra mắt, giúp quầy lễ tân bớt bận rộn và khách hàng có trải nghiệm thoải mái hơn.",
+    "items": {
+      "voiceChatBooking": {
+        "title": "Nhận cuộc gọi & tin nhắn đặt lịch 24/7",
+        "description": "MaiAI trả lời điện thoại và tin nhắn ngay tức thì, đặt lịch cho khách tự nhiên như một lễ tân thật sự, dù là nửa đêm hay giờ cao điểm."
+      },
+      "smartUpsell": {
+        "title": "Gợi ý bán thêm thông minh",
+        "description": "Tự động gợi ý thêm dịch vụ như vẽ móng nghệ thuật hay dưỡng da cao cấp, dựa trên sở thích và lịch sử của từng khách."
+      },
+      "posIntegration": {
+        "title": "Kết nối liền mạch với máy POS",
+        "description": "Liên kết trực tiếp với hệ thống bán hàng bạn đang dùng để theo dõi doanh thu, quản lý kho hàng và thanh toán nhanh gọn."
+      }
+    }
+  },
+  "benefits": {
+    "title": "Vì sao chủ tiệm Nails và Hair Salon chọn MaiAI",
+    "description": "Vận hành tiệm nhẹ nhàng hơn và tăng lợi nhuận nhờ tự động hóa thông minh.",
+    "items": {
+      "saveTime": {
+        "imageAlt": "Tiết kiệm thời gian ở quầy lễ tân",
+        "title": "Tiết kiệm hơn 20 giờ mỗi tuần cho việc lễ tân",
+        "description": "Không còn phải dừng tay làm khách để bắt máy. MaiAI thay bạn trả lời đặt lịch, đổi lịch và các câu hỏi thường gặp suốt 24/7, để thợ có thêm thời gian chăm chút cho từng bộ nail.",
+        "features": {
+          "0": "Tự động trả lời tin nhắn",
+          "1": "Chuyển cuộc gọi thông minh",
+          "2": "Đồng bộ lịch tức thì"
+        }
+      },
+      "increaseRevenue": {
+        "imageAlt": "Tăng doanh thu trên mỗi khách hàng",
+        "title": "Tăng thêm doanh thu từ mỗi khách hàng",
+        "description": "Tăng lợi nhuận mà không cần chèo kéo. MaiAI khéo léo gợi ý thêm dịch vụ phù hợp ngay trong lúc khách đặt lịch, dựa trên dịch vụ họ đã chọn.",
+        "features": {
+          "0": "Gợi ý dịch vụ đi kèm phù hợp",
+          "1": "Tự động đề xuất nâng cấp",
+          "2": "Lấp đầy lịch trống khi khách hủy"
+        }
+      },
+      "personalizedExperience": {
+        "imageAlt": "Mang lại trải nghiệm cá nhân hóa cho khách hàng",
+        "title": "Chăm sóc khách như những vị khách VIP",
+        "description": "MaiAI nhớ giúp bạn thợ nail khách yêu thích, màu sơn ưng ý và cả những điều khách cần lưu ý (như dị ứng), rồi nhắc nhân viên trước khi khách bước vào tiệm.",
+        "features": {
+          "0": "Hồ sơ khách hàng chi tiết",
+          "1": "Ưu tiên đúng thợ khách quen",
+          "2": "Tự động gửi lời chúc sinh nhật"
+        }
+      }
+    }
+  },
+  "allInOne": {
+    "title": "Mọi thứ gói gọn trong một nơi",
+    "description": "Một bộ công cụ đầy đủ, giúp bạn không còn phải dùng nhiều phần mềm rối rắm cùng lúc.",
+    "items": {
+      "booking": {
+        "title": "Trợ lý đặt lịch AI",
+        "description": "Trợ lý ảo hoạt động 24/7, nhận đặt lịch qua tin nhắn, cuộc gọi hay website, xử lý nhẹ nhàng cả những yêu cầu nhiều dịch vụ cùng lúc."
+      },
+      "preference": {
+        "title": "Hồ sơ sở thích khách hàng",
+        "description": "Tự động lưu lại và cập nhật thông tin từng khách—từ hãng sơn yêu thích, kiểu dáng móng ưa chuộng đến những điều cần lưu ý riêng."
+      },
+      "stylistMatching": {
+        "title": "Ghép đúng thợ cho từng khách",
+        "description": "Tự động xếp khách vào đúng thợ phù hợp nhất theo yêu cầu dịch vụ (ví dụ: vẽ 3D cầu kỳ hay gel đơn giản) và sở thích trước đó của khách."
+      },
+      "nudges": {
+        "title": "Nhắc lịch & gợi ý bán thêm tự động",
+        "description": "Gửi lời nhắc nhẹ nhàng và gợi ý dịch vụ thêm đúng lúc (như nâng cấp gói spa chân), với giọng điệu thân thiện, không hề gượng ép."
+      },
+      "dashboard": {
+        "title": "Bảng thống kê tổng quan",
+        "description": "Biến những tương tác hằng ngày thành số liệu dễ hiểu, giúp bạn nắm rõ xu hướng khách hàng, hiệu suất nhân viên và nhu cầu dịch vụ mới chỉ trong một cái nhìn."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "MaiAI hoạt động như thế nào",
+    "description": "Chỉ mất vài phút để bắt đầu, không cần chờ đợi lâu.",
+    "steps": {
+      "0": {
+        "title": "Tạo hồ sơ cho tiệm của bạn",
+        "description": "Thiết lập hồ sơ riêng cho tiệm, khai báo dịch vụ, tay nghề từng thợ và quy tắc đặt lịch. MaiAI sẽ tạo một CRM riêng cho tiệm bạn, lưu lại sở thích và lịch sử của khách, đồng thời đồng bộ với lịch làm việc của nhân viên để xếp lịch trơn tru."
+      },
+      "1": {
+        "title": "Khách đặt lịch dễ dàng",
+        "description": "Khách chỉ cần nhắn tin với MaiAI qua số điện thoại của tiệm. MaiAI trả lời câu hỏi, gợi ý thêm dịch vụ, tìm khung giờ trống phù hợp và nhận cọc an toàn."
+      },
+      "2": {
+        "title": "Giữ chân khách quay lại tự động",
+        "description": "Sau khi làm xong, MaiAI tự động hỏi thăm đánh giá, nhắc khách quay lại đúng lúc cần làm mới bộ nail, và không quên gửi lời chúc mừng sinh nhật."
+      }
+    }
+  },
+  "roles": {
+    "title": "Dành cho mọi vị trí trong tiệm",
+    "description": "MaiAI mang lại lợi ích thiết thực cho tất cả những ai góp phần vào sự thành công của tiệm bạn.",
+    "items": {
+      "owners": {
+        "title": "Dành cho chủ tiệm",
+        "subtitle": "Nắm rõ mọi thứ, chủ động quản lý hơn.",
+        "description": "Giảm bớt chi phí vận hành nhờ tự động hóa các việc hành chính lặp đi lặp lại. Dễ dàng nhìn ra dịch vụ và thợ nào đang mang lại doanh thu tốt, đồng thời hạn chế khách đặt lịch rồi không đến.",
+        "benefits": {
+          "0": "Giảm chi phí vận hành",
+          "1": "Báo cáo tập trung, dễ theo dõi",
+          "2": "Dễ dàng mở rộng khi tiệm phát triển"
+        }
+      },
+      "managers": {
+        "title": "Dành cho quản lý",
+        "subtitle": "Vận hành mỗi ngày nhẹ nhàng hơn.",
+        "description": "Không còn lo lỡ cuộc gọi trong lúc đang tính tiền cho khách. Để MaiAI lo phần sắp xếp lịch rối rắm, bạn dành thời gian đào tạo nhân viên và chăm sóc khách hàng tốt hơn.",
+        "benefits": {
+          "0": "Tự động xếp lịch",
+          "1": "Giảm áp lực ở quầy lễ tân",
+          "2": "Cảnh báo sự cố ngay lập tức"
+        }
+      },
+      "nailArtists": {
+        "title": "Dành cho thợ nail",
+        "subtitle": "Chỉ cần tập trung vào tay nghề.",
+        "description": "Biết ngay khách muốn gì trước khi họ ngồi xuống ghế. Xem lại công thức pha màu và sở thích của khách chỉ với vài chạm trên điện thoại hoặc máy tính bảng tại chỗ làm.",
+        "benefits": {
+          "0": "Xem nhanh lịch sử khách hàng",
+          "1": "Lịch làm việc được sắp xếp hợp lý",
+          "2": "Tăng thêm tiền tip nhờ gợi ý bán thêm"
+        }
+      }
+    }
+  },
+  "cta": {
+    "title": "Sẵn sàng nâng tầm tiệm của bạn chưa?",
+    "description": "MaiAI sắp ra mắt. Đăng ký trải nghiệm sớm ngay hôm nay để được hưởng giá ưu đãi đầu tiên và cùng chúng tôi định hình tương lai quản lý tiệm.",
+    "signUp": "Đăng ký dùng thử sớm",
+    "priority": "Ưu tiên cho 50 tiệm đăng ký đầu tiên + miễn phí 30 ngày"
+  },
+  "faq": {
+    "title": "Câu hỏi thường gặp",
+    "description": "Những điều bạn nên biết trước khi bắt đầu với MaiAI.",
+    "items": {
+      "0": {
+        "question": "MaiAI có thay thế hoàn toàn phần mềm đặt lịch tôi đang dùng không?",
+        "answer": "Có thể, nhưng không bắt buộc! MaiAI có thể đóng vai trò như một hệ thống CRM và đặt lịch trọn gói, hoặc chỉ đơn giản là một lớp thông minh hoạt động cùng các phần mềm quen thuộc như Square, Mindbody hay Phorest."
+      },
+      "1": {
+        "question": "Huấn luyện AI hiểu quy tắc riêng của tiệm mình có khó không?",
+        "answer": "Không khó chút nào. Chúng tôi sẽ trò chuyện đơn giản với bạn về dịch vụ, thời gian làm, tay nghề thợ và những lưu ý riêng của tiệm. MaiAI sẽ học từ đó và tự xử lý cả những tình huống phức tạp, như cần thêm thời gian tháo bộ cũ trước khi làm bộ mới."
+      },
+      "2": {
+        "question": "Khách hàng vẫn gọi điện đặt lịch như bình thường được không?",
+        "answer": "Dĩ nhiên rồi! MaiAI trả lời điện thoại tự nhiên và đặt lịch y như một lễ tân thật. Khách cũng có thể nhắn tin hoặc đặt qua website, tùy theo cách nào khách thấy tiện hơn."
+      },
+      "3": {
+        "question": "Thông tin khách hàng có được bảo mật không?",
+        "answer": "Có. Chúng tôi mã hóa dữ liệu theo tiêu chuẩn doanh nghiệp, tuân thủ đầy đủ các quy định bảo vệ dữ liệu và không bao giờ chia sẻ thông tin khách hàng của bạn cho bên thứ ba. Dữ liệu luôn thuộc về tiệm bạn."
+      }
+    }
+  },
+  "languageSwitcher": {
+    "label": "Ngôn ngữ",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  }
+}

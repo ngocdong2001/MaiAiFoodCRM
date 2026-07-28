@@ -1,0 +1,243 @@
+{
+  "header": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it Works",
+      "pricing": "Pricing",
+      "faq": "FAQ"
+    },
+    "signUp": "Sign up for early access"
+  },
+  "footer": {
+    "tagline": "The AI receptionist designed specifically for nail salons. Manage bookings, remember preferences, and increase revenue.",
+    "columns": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "productLinks": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "faq": "FAQ"
+    },
+    "companyLinks": {
+      "contact": "Contact",
+      "about": "About"
+    },
+    "legalLinks": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfServices": "Terms of Services"
+    },
+    "copyright": "© 2026 MaiAI. All rights reserved.",
+    "designedFor": "Designed for Nails and Hair Salons"
+  },
+  "hero": {
+    "badge": "Revolutionizing Nail Salon Management",
+    "titleLine1": "MaiAI - The AI Receptionist for",
+    "titleHighlight": "Nails and Hair Salons",
+    "description": "Automate bookings, manage customer preferences effortlessly, and suggest smart upsells. Let AI handle the front desk while you focus on the art.",
+    "form": {
+      "title": "Get Early Access",
+      "subtitle": "Join the waitlist and get 30 days free when we launch.",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Jane",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Doe",
+      "workEmail": "Work Email",
+      "workEmailPlaceholder": "jane@luxurynails.com",
+      "salonName": "Salon Name",
+      "salonNamePlaceholder": "Luxury Nails & Spa",
+      "submitting": "Submitting...",
+      "signUp": "Sign up for early access",
+      "watchDemo": "Watch demo",
+      "validationError": "Please fill in all fields",
+      "errors": {
+        "firstNameRequired": "Please enter your first name",
+        "lastNameRequired": "Please enter your last name",
+        "emailRequired": "Please enter your work email",
+        "emailInvalid": "Please enter a valid email address",
+        "salonNameRequired": "Please enter your salon name"
+      },
+      "successMessage": "✅ Success! {{message}}",
+      "errorMessage": "❌ Error: {{message}}",
+      "thankYouTitle": "Thank you for signing up!",
+      "thankYouDescription": "We’ve received your information and will get in touch with you shortly.",
+      "thankYouClose": "Got it",
+      "badge": "Limited Early Access",
+      "formHeading": "Create your account",
+      "formSubheading": "Fill in your details to reserve your spot.",
+      "perk1": "30 days free when we launch",
+      "perk2": "Priority onboarding support",
+      "perk3": "Locked-in early-adopter pricing",
+      "noSpam": "No spam. Unsubscribe anytime."
+    },
+    "imageAlt": "Hero Image"
+  },
+  "features": {
+    "title": "Built for the Modern Salon",
+    "description": "Discover the upcoming features designed specifically to eliminate front-desk friction and elevate the guest experience.",
+    "items": {
+      "voiceChatBooking": {
+        "title": "24/7 Voice & Chat Booking",
+        "description": "MaiAI answers calls and texts instantly, booking appointments naturally just like a human receptionist would."
+      },
+      "smartUpsell": {
+        "title": "Smart Upsell Engine",
+        "description": "Automatically suggest add-ons like nail art or premium lotions based on the guest's history and current trends."
+      },
+      "posIntegration": {
+        "title": "Seamless POS Integration",
+        "description": "Connects directly with your existing Point of Sale system to track revenue, manage inventory, and handle checkout."
+      }
+    }
+  },
+  "benefits": {
+    "title": "Why nails & hair salon owners choose MaiAI",
+    "description": "Transform your operations and boost your bottom line with intelligent automation.",
+    "items": {
+      "saveTime": {
+        "imageAlt": "Save time at the front desk",
+        "title": "Save 20+ Hours a Week at the Front Desk",
+        "description": "Stop interrupting services to answer the phone. MaiAI handles booking inquiries, reschedules, and basic questions 24/7, giving your staff more time to focus on delivering amazing nail art.",
+        "features": {
+          "0": "Automated SMS replies",
+          "1": "Intelligent call routing",
+          "2": "Instant calendar sync"
+        }
+      },
+      "increaseRevenue": {
+        "imageAlt": "Increase revenue per guest",
+        "title": "Increase Revenue Per Guest",
+        "description": "Maximize your profit margins without being pushy. MaiAI politely suggests relevant add-ons during the booking process based on the service selected.",
+        "features": {
+          "0": "Smart service pairings",
+          "1": "Automated upgrade suggestions",
+          "2": "Fill-in last-minute cancellations"
+        }
+      },
+      "personalizedExperience": {
+        "imageAlt": "Deliver personalized guest experiences",
+        "title": "Deliver Personalized Guest Experiences",
+        "description": "Make every client feel like a VIP. MaiAI remembers their favorite nail tech, preferred polish colors, and even allergies, prompting your staff before the client walks in.",
+        "features": {
+          "0": "Detailed client profiles",
+          "1": "Favorite technician routing",
+          "2": "Automated birthday messages"
+        }
+      }
+    }
+  },
+  "allInOne": {
+    "title": "Everything You Need in One Place",
+    "description": "A comprehensive suite of tools designed to replace multiple clunky softwares.",
+    "items": {
+      "booking": {
+        "title": "AI Booking Assistant",
+        "description": "A 24/7 intelligent concierge that handles conversational booking across text, voice, and web, effortlessly navigating complex requests and multi-service appointments."
+      },
+      "preference": {
+        "title": "Preference Profiles",
+        "description": "Automatically builds and maintains detailed profiles—tracking favorite polish brands, preferred nail shapes, and specific sensitivities for every client."
+      },
+      "stylistMatching": {
+        "title": "Stylist Matching",
+        "description": "Smartly routes clients to the ideal technician based on requested services (e.g., intricate 3D art vs. classic gel) and historical preferences."
+      },
+      "nudges": {
+        "title": "Automated Nudges & Upsells",
+        "description": "Sends gentle, customized reminders and suggests perfectly timed add-ons (like a spa pedicure upgrade) in a conversational, non-pushy tone."
+      },
+      "dashboard": {
+        "title": "Executive Dashboard",
+        "description": "Translates daily interactions into actionable insights, helping you understand client trends, staff utilization, and emerging service demands at a glance."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "description": "Get up and running in minutes, not days.",
+    "steps": {
+      "0": {
+        "title": "Create Your Salon Profile",
+        "description": "Set up a custom profile for your salon and define services, stylist skills, and booking rules. MaiAI creates a dedicated CRM per salon that stores guest preferences and history, and syncs with your calendar and staff availability for seamless scheduling."
+      },
+      "1": {
+        "title": "Guests Book Effortlessly",
+        "description": "Clients chat with MaiAI via your phone. It answers questions, suggests add-ons, finds the perfect time slot, and securely takes a deposit."
+      },
+      "2": {
+        "title": "Grow Loyalty Automatically",
+        "description": "After the service, MaiAI automatically follows up for reviews, sends rebooking reminders exactly when they need a fill, and wishes them happy birthday."
+      }
+    }
+  },
+  "roles": {
+    "title": "Tailored for Every Role",
+    "description": "MaiAI brings value to everyone involved in making your salon a success.",
+    "items": {
+      "owners": {
+        "title": "For Salon Owners",
+        "subtitle": "Regain control and visibility.",
+        "description": "Reduce overhead costs by automating administrative tasks. Get clear visibility into which services and technicians are driving revenue, and decrease costly no-shows.",
+        "benefits": {
+          "0": "Lower operating costs",
+          "1": "Centralized reporting",
+          "2": "Scalable infrastructure"
+        }
+      },
+      "managers": {
+        "title": "For Managers",
+        "subtitle": "Simplify day-to-day operations.",
+        "description": "Never worry about a missed call while checking out a client. Let MaiAI handle the schedule jigsaw puzzle so you can focus on staff training and guest satisfaction.",
+        "benefits": {
+          "0": "Automated scheduling",
+          "1": "Less front-desk stress",
+          "2": "Instant issue flagging"
+        }
+      },
+      "nailArtists": {
+        "title": "For Nail Artists",
+        "subtitle": "Focus on the art.",
+        "description": "Know exactly what your client wants before they sit down. Access their formula history and preferences instantly on your phone or station tablet.",
+        "benefits": {
+          "0": "Client history access",
+          "1": "Optimized bookings",
+          "2": "More tips via upsells"
+        }
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to Upgrade Your Salon?",
+    "description": "We're launching soon. Join the early access list to lock in introductory pricing and shape the future of salon management.",
+    "signUp": "Sign up for early access",
+    "priority": "Priority for first 50 salons + 30 days free"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Everything you need to know about getting started with MaiAI.",
+    "items": {
+      "0": {
+        "question": "Does MaiAI replace my current booking system?",
+        "answer": "It can, but it doesn't have to! MaiAI can act as your complete all-in-one CRM and booking system, or it can integrate as a smart layer on top of popular systems like Square, Mindbody, or Phorest."
+      },
+      "1": {
+        "question": "How hard is it to train the AI on my salon's rules?",
+        "answer": "Not hard at all. Our onboarding process involves a simple interview where we ask about your services, timing, staff skills, and preferences. MaiAI learns from this and handles complex scenarios—like requiring extra time for removal before a new set—automatically."
+      },
+      "2": {
+        "question": "Can clients still call to book?",
+        "answer": "Absolutely! MaiAI answers phone calls naturally and books appointments just like a human receptionist would. Clients can also text or use your website—whatever they prefer."
+      },
+      "3": {
+        "question": "Is client data secure?",
+        "answer": "Yes. We use enterprise-grade encryption, comply with all data protection regulations, and never share your client information with third parties. Your data stays yours."
+      }
+    }
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  }
+}
