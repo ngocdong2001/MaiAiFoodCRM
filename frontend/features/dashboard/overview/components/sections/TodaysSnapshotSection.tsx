@@ -18,7 +18,7 @@ const TodaysSnapshotSection = () => {
             className="flex items-center justify-between gap-3"
           >
             <div className="flex items-center gap-3">
-              <span className="h-2 w-2 shrink-0 rounded-full bg-[#F04CAC]" />
+              <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span className="w-16 shrink-0 text-sm font-medium text-[#8D95A5]">
                 {item.time}
               </span>

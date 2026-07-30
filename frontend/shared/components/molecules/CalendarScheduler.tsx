@@ -50,6 +50,7 @@ type TimeColumn = {
   subtitle?: string;
   avatarName?: string;
   highlight?: boolean;
+  date?: Date;
   onHeaderClick?: () => void;
   events: SchedulerEvent[];
 };
@@ -73,7 +74,6 @@ type MonthViewProps = {
 
 const VIEW_OPTIONS: { value: SchedulerView; label: string }[] = [
   { value: "day", label: "Day" },
-  { value: "week", label: "Week" },
   { value: "month", label: "Month" },
 ];
 
@@ -94,49 +94,61 @@ const MONTHS = [
   "December",
 ];
 
-const HOUR_HEIGHT = 64;
-const TIME_COL_WIDTH = 72;
+const HOUR_HEIGHT = 72;
+const TIME_COL_WIDTH = 68;
 const DEFAULT_DAY_START = 9;
 const DEFAULT_DAY_END = 18;
 
 const toneStyles: Record<
   SchedulerTone,
-  { block: string; accent: string; dot: string; ring: string; text: string }
+  {
+    block: string;
+    accent: string;
+    dot: string;
+    ring: string;
+    text: string;
+    chip: string;
+  }
 > = {
   primary: {
-    block: "border-[#F7C6E4] bg-gradient-to-br from-[#FEEDF6] to-[#FDE0F0]",
-    accent: "bg-[#F04CAC]",
-    dot: "bg-[#F04CAC]",
-    ring: "ring-[#F04CAC]",
-    text: "text-[#B01374]",
+    block: "border-[#EEF0F3] bg-white",
+    accent: "bg-primary",
+    dot: "bg-primary",
+    ring: "ring-primary",
+    text: "text-primary",
+    chip: "bg-primary/10 text-primary",
   },
   danger: {
-    block: "border-[#F5B7C4] bg-gradient-to-br from-[#FDE7EB] to-[#FBD6DD]",
+    block: "border-[#EEF0F3] bg-white",
     accent: "bg-[#E5484D]",
     dot: "bg-[#E5484D]",
     ring: "ring-[#E5484D]",
-    text: "text-[#B4262B]",
+    text: "text-[#D3383D]",
+    chip: "bg-[#FDECEE] text-[#D3383D]",
   },
   muted: {
-    block: "border-[#E2E5EA] bg-gradient-to-br from-[#F6F7F9] to-[#EEF0F3]",
+    block: "border-[#EEF0F3] bg-white",
     accent: "bg-[#8D95A5]",
     dot: "bg-[#8D95A5]",
     ring: "ring-[#8D95A5]",
     text: "text-[#5B6472]",
+    chip: "bg-[#F1F2F4] text-[#5B6472]",
   },
   success: {
-    block: "border-[#BBE9C6] bg-gradient-to-br from-[#EBFBF0] to-[#DCF6E4]",
+    block: "border-[#EEF0F3] bg-white",
     accent: "bg-[#2FA35C]",
     dot: "bg-[#2FA35C]",
     ring: "ring-[#2FA35C]",
-    text: "text-[#1E7A42]",
+    text: "text-[#238049]",
+    chip: "bg-[#E9F8EE] text-[#238049]",
   },
   info: {
-    block: "border-[#BBD5F5] bg-gradient-to-br from-[#EDF4FD] to-[#DCEAFB]",
+    block: "border-[#EEF0F3] bg-white",
     accent: "bg-[#3B7DE0]",
     dot: "bg-[#3B7DE0]",
     ring: "ring-[#3B7DE0]",
-    text: "text-[#2660B4]",
+    text: "text-[#2E6BC4]",
+    chip: "bg-[#EBF3FD] text-[#2E6BC4]",
   },
 };
 
@@ -200,6 +212,13 @@ const formatTime = (hour: number) => {
 
 const appointmentCountLabel = (count: number) =>
   `${count} appointment${count === 1 ? "" : "s"}`;
+
+const getNowOffsetTop = (dayStartHour: number, dayEndHour: number) => {
+  const now = new Date();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  if (hour < dayStartHour || hour > dayEndHour) return null;
+  return (hour - dayStartHour) * HOUR_HEIGHT;
+};
 
 type PositionedEvent = SchedulerEvent & { lane: number; lanes: number };
 
@@ -265,188 +284,230 @@ const TimeGrid = ({
     (_, index) => dayStartHour + index,
   );
   const bodyHeight = (dayEndHour - dayStartHour) * HOUR_HEIGHT;
-  const minColWidth = compact ? 140 : 200;
+  const minColWidth = compact ? 96 : 132;
   const totalEventCount = columns.reduce(
     (sum, column) => sum + column.events.length,
     0,
   );
+  const today = new Date();
+  const nowTop = getNowOffsetTop(dayStartHour, dayEndHour);
 
   return (
-    <div className="overflow-x-auto">
-      <div
-        style={{ minWidth: TIME_COL_WIDTH + columns.length * minColWidth }}
-        className="min-w-full"
-      >
-        {/* Column headers */}
-        <div className="sticky top-0 z-20 flex border-b border-[#EAEDF1] bg-white/95 backdrop-blur">
-          <div className="shrink-0" style={{ width: TIME_COL_WIDTH }} />
-          {columns.map((column) => (
-            <button
-              key={column.key}
-              type="button"
-              onClick={column.onHeaderClick}
-              disabled={!column.onHeaderClick}
-              className={cn(
-                "flex flex-1 flex-col items-center gap-1.5 border-l border-[#EAEDF1] px-2 py-3.5 transition-colors",
-                column.onHeaderClick && "cursor-pointer hover:bg-[#FCFBFE]",
-                column.highlight && "bg-[#FEF1F8]",
-              )}
-            >
-              {column.avatarName && (
-                <InitialsAvatar
-                  name={column.avatarName}
+    <div className="relative">
+      <div className="scrollbar-thin overflow-x-auto">
+        <div
+          style={{ minWidth: TIME_COL_WIDTH + columns.length * minColWidth }}
+          className="min-w-full"
+        >
+          <div className="max-h-[70vh] overflow-y-auto">
+            {/* Column headers */}
+            <div className="sticky top-0 z-20 flex border-b border-[#EAEDF1] bg-white">
+              <div className="shrink-0" style={{ width: TIME_COL_WIDTH }} />
+              {columns.map((column) => (
+                <button
+                  key={column.key}
+                  type="button"
+                  onClick={column.onHeaderClick}
+                  disabled={!column.onHeaderClick}
                   className={cn(
-                    "h-10 w-10 ring-2 ring-white",
-                    column.highlight && "ring-[#FBD3E9]",
+                    "relative flex flex-1 flex-col items-center gap-1.5 border-l border-[#EAEDF1] px-2 py-3 transition-colors",
+                    column.onHeaderClick && "cursor-pointer hover:bg-[#FAFAFB]",
+                    column.highlight && "bg-[#FEF6FB]",
                   )}
-                />
-              )}
-              <span
-                className={cn(
-                  "text-sm font-semibold leading-tight",
-                  column.highlight ? "text-[#F04CAC]" : "text-[#171A21]",
-                )}
-              >
-                {column.title}
-              </span>
-              {column.subtitle && (
-                <span className="text-[11px] font-medium text-[#8D95A5]">
-                  {column.subtitle}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Grid body */}
-        <div className="flex">
-          {/* Hour rail */}
-          <div
-            className="relative shrink-0 bg-[#FCFDFE]"
-            style={{ width: TIME_COL_WIDTH, height: bodyHeight }}
-          >
-            {hours.slice(0, -1).map((hour) => (
-              <div
-                key={hour}
-                className="absolute right-3 flex -translate-y-2 items-center gap-1 text-[11px] font-medium text-[#9AA1AE]"
-                style={{ top: (hour - dayStartHour) * HOUR_HEIGHT }}
-              >
-                {formatHourLabel(hour)}
-              </div>
-            ))}
-          </div>
-
-          {/* Day columns */}
-          {columns.map((column) => (
-            <div
-              key={column.key}
-              className={cn(
-                "relative flex-1 border-l border-[#EAEDF1]",
-                column.highlight ? "bg-[#FFFCFE]" : "bg-white",
-              )}
-              style={{ height: bodyHeight }}
-            >
-              {/* Hour lines + half-hour guides */}
-              {hours.slice(0, -1).map((hour) => (
-                <div
-                  key={hour}
-                  className="absolute inset-x-0 border-t border-[#EEF1F5]"
-                  style={{ top: (hour - dayStartHour) * HOUR_HEIGHT }}
                 >
-                  <div
-                    className="border-t border-dashed border-[#F3F5F8]"
-                    style={{ marginTop: HOUR_HEIGHT / 2 }}
-                  />
-                </div>
-              ))}
-              <div
-                className="absolute inset-x-0 border-t border-[#EEF1F5]"
-                style={{ top: bodyHeight }}
-              />
-
-              {column.events.length === 0 && (
-                <div className="pointer-events-none absolute inset-x-4 top-1/2 -translate-y-1/2 rounded-xl border border-dashed border-[#E7EAF0] bg-[#FCFDFE]/80 px-3 py-2 text-center text-[11px] font-medium text-[#B2B8C5]">
-                  No appointments
-                </div>
-              )}
-
-              {layoutColumnEvents(column.events).map((event) => {
-                const tone = toneStyles[event.tone ?? "primary"];
-                const top = (event.startHour - dayStartHour) * HOUR_HEIGHT + 2;
-                const height = Math.max(
-                  (event.endHour - event.startHour) * HOUR_HEIGHT - 4,
-                  30,
-                );
-                const widthPct = 100 / event.lanes;
-                const leftPct = event.lane * widthPct;
-                const isNarrow = event.lanes > 1;
-                const isSelected = selectedEventKey === event.key;
-                const isShort = height < 52;
-
-                return (
-                  <button
-                    key={event.key}
-                    type="button"
-                    onClick={(clickEvent) =>
-                      onEventSelect?.(
-                        event.key,
-                        clickEvent.currentTarget.getBoundingClientRect(),
-                      )
-                    }
-                    className={cn(
-                      "group absolute flex gap-2 overflow-hidden rounded-xl border p-2 text-left shadow-[0px_1px_2px_0px_#0000000d] transition-all duration-150 hover:z-10 hover:-translate-y-0.5 hover:shadow-[0px_6px_16px_0px_#00000014]",
-                      tone.block,
-                      isSelected &&
-                        cn(
-                          "z-10 ring-2 ring-offset-1 shadow-[0px_6px_16px_0px_#00000014]",
-                          tone.ring,
-                        ),
-                    )}
-                    style={{
-                      top,
-                      height,
-                      left: `calc(${leftPct}% + 6px)`,
-                      width: `calc(${widthPct}% - ${isNarrow ? 8 : 12}px)`,
-                    }}
-                  >
-                    <span
-                      className={cn("w-1 shrink-0 rounded-full", tone.accent)}
-                    />
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-xs font-semibold text-[#171A21]">
-                        {event.title}
-                      </span>
-                      {event.subtitle && !compact && !isShort && !isNarrow && (
-                        <span className="truncate text-[11px] text-[#6B7280]">
-                          {event.subtitle}
-                        </span>
+                  {column.highlight && (
+                    <span className="absolute inset-x-0 top-0 h-0.5 bg-primary" />
+                  )}
+                  {column.avatarName && (
+                    <InitialsAvatar
+                      name={column.avatarName}
+                      className={cn(
+                        "h-9 w-9 shrink-0 ring-2 ring-white",
+                        column.highlight && "ring-[#FBD3E9]",
                       )}
-                      {!isShort && (
+                    />
+                  )}
+                  <span
+                    className={cn(
+                      "line-clamp-2 w-full wrap-break-word px-1 text-sm font-semibold leading-tight",
+                      column.highlight ? "text-primary" : "text-[#171A21]",
+                    )}
+                    title={column.title}
+                  >
+                    {column.title}
+                  </span>
+                  {column.subtitle && (
+                    <span
+                      className={cn(
+                        "line-clamp-1 w-full wrap-break-word rounded-full px-1.5 py-0.5 text-[11px] font-medium",
+                        column.highlight
+                          ? "bg-white text-primary"
+                          : "text-[#8D95A5]",
+                      )}
+                    >
+                      {column.subtitle}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Grid body */}
+            <div className="flex">
+              {/* Hour rail */}
+              <div
+                className="relative shrink-0 bg-[#FCFDFE]"
+                style={{ width: TIME_COL_WIDTH, height: bodyHeight }}
+              >
+                {hours.slice(0, -1).map((hour) => (
+                  <div
+                    key={hour}
+                    className={cn(
+                      "absolute right-3 flex items-center gap-1 text-[11px] font-medium text-[#9AA1AE]",
+                      hour === dayStartHour
+                        ? "translate-y-0.5"
+                        : "-translate-y-2",
+                    )}
+                    style={{ top: (hour - dayStartHour) * HOUR_HEIGHT }}
+                  >
+                    {formatHourLabel(hour)}
+                  </div>
+                ))}
+              </div>
+
+              {/* Day columns */}
+              {columns.map((column) => (
+                <div
+                  key={column.key}
+                  className={cn(
+                    "relative flex-1 border-l border-[#EAEDF1]",
+                    column.highlight ? "bg-[#FFFCFE]" : "bg-white",
+                  )}
+                  style={{ height: bodyHeight }}
+                >
+                  {/* Hour lines + half-hour guides */}
+                  {hours.slice(0, -1).map((hour) => (
+                    <div
+                      key={hour}
+                      className="absolute inset-x-0 border-t border-[#EEF1F5]"
+                      style={{ top: (hour - dayStartHour) * HOUR_HEIGHT }}
+                    >
+                      <div
+                        className="border-t border-dashed border-[#F3F5F8]"
+                        style={{ marginTop: HOUR_HEIGHT / 2 }}
+                      />
+                    </div>
+                  ))}
+                  <div
+                    className="absolute inset-x-0 border-t border-[#EEF1F5]"
+                    style={{ top: bodyHeight }}
+                  />
+
+                  {column.date &&
+                    isSameDay(column.date, today) &&
+                    nowTop !== null && (
+                      <div
+                        className="pointer-events-none absolute inset-x-0 z-10 flex items-center"
+                        style={{ top: nowTop }}
+                      >
+                        <span className="-ml-1 h-2 w-2 shrink-0 rounded-full bg-[#E5484D]" />
+                        <span className="h-px flex-1 bg-[#E5484D]" />
+                      </div>
+                    )}
+
+                  {column.events.length === 0 && (
+                    <div className="pointer-events-none absolute inset-x-4 top-1/2 -translate-y-1/2 rounded-xl border border-dashed border-[#E7EAF0] bg-[#FCFDFE]/80 px-3 py-2 text-center text-[11px] font-medium text-[#B2B8C5]">
+                      No appointments
+                    </div>
+                  )}
+
+                  {layoutColumnEvents(column.events).map((event) => {
+                    const tone = toneStyles[event.tone ?? "primary"];
+                    const top =
+                      (event.startHour - dayStartHour) * HOUR_HEIGHT + 2;
+                    const height = Math.max(
+                      (event.endHour - event.startHour) * HOUR_HEIGHT - 4,
+                      30,
+                    );
+                    const widthPct = 100 / event.lanes;
+                    const leftPct = event.lane * widthPct;
+                    const isNarrow = event.lanes > 1;
+                    const isSelected = selectedEventKey === event.key;
+                    const isShort = height < 52;
+
+                    return (
+                      <button
+                        key={event.key}
+                        type="button"
+                        onClick={(clickEvent) =>
+                          onEventSelect?.(
+                            event.key,
+                            clickEvent.currentTarget.getBoundingClientRect(),
+                          )
+                        }
+                        className={cn(
+                          "group absolute flex gap-2 overflow-hidden rounded-lg border p-2 text-left shadow-[0px_1px_2px_0px_#0000000d] transition-all duration-150 hover:z-10 hover:-translate-y-0.5 hover:border-[#E4E7EC] hover:shadow-[0px_6px_16px_0px_#00000014]",
+                          tone.block,
+                          isSelected &&
+                            cn(
+                              "z-10 ring-2 ring-offset-1 shadow-[0px_6px_16px_0px_#00000014]",
+                              tone.ring,
+                            ),
+                        )}
+                        style={{
+                          top,
+                          height,
+                          left: `calc(${leftPct}% + 6px)`,
+                          width: `calc(${widthPct}% - ${isNarrow ? 8 : 12}px)`,
+                        }}
+                      >
                         <span
                           className={cn(
-                            "mt-auto flex items-center gap-1 truncate text-[11px] font-medium",
-                            tone.text,
+                            "w-1 shrink-0 rounded-full",
+                            tone.accent,
                           )}
-                        >
-                          <Clock className="h-3 w-3 shrink-0" />
-                          {formatTime(event.startHour)} -{" "}
-                          {formatTime(event.endHour)}
+                        />
+                        <span className="flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-xs font-semibold text-[#171A21]">
+                            {event.title}
+                          </span>
+                          {event.subtitle &&
+                            !compact &&
+                            !isShort &&
+                            !isNarrow && (
+                              <span className="truncate text-[11px] text-[#6B7280]">
+                                {event.subtitle}
+                              </span>
+                            )}
+                          {!isShort && (
+                            <span
+                              className={cn(
+                                "mt-auto flex w-fit items-center gap-1 truncate rounded-full px-1.5 py-0.5 text-[11px] font-medium",
+                                tone.chip,
+                              )}
+                            >
+                              <Clock className="h-3 w-3 shrink-0" />
+                              {formatTime(event.startHour)} -{" "}
+                              {formatTime(event.endHour)}
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        {totalEventCount === 0 && (
-          <div className="border-t border-[#EAEDF1] px-4 py-3 text-center text-sm text-[#8D95A5]">
-            No events scheduled in this range.
           </div>
-        )}
+
+          {totalEventCount === 0 && (
+            <div className="border-t border-[#EAEDF1] px-4 py-3 text-center text-sm text-[#8D95A5]">
+              No events scheduled in this range.
+            </div>
+          )}
+        </div>
       </div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-6 bg-linear-to-l from-white to-transparent sm:block" />
     </div>
   );
 };
@@ -485,6 +546,7 @@ const MonthView = ({
         {cells.map((cell, index) => {
           const inMonth = cell.getMonth() === currentDate.getMonth();
           const isSelected = isSameDay(cell, currentDate);
+          const isToday = isSameDay(cell, new Date());
           const dayEvents = eventsByDay.get(getDateKey(cell)) ?? [];
           const isTopRow = index < 7;
           const isFirstCol = index % 7 === 0;
@@ -505,21 +567,23 @@ const MonthView = ({
                 }
               }}
               className={cn(
-                "flex min-h-28 cursor-pointer flex-col gap-1.5 p-2 text-left transition-colors hover:bg-[#FCFBFE] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7C6E4] focus-visible:ring-offset-1",
+                "flex min-h-28 cursor-pointer flex-col gap-1.5 p-2 text-left transition-colors hover:bg-[#FAFAFB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7C6E4] focus-visible:ring-offset-1",
                 !isTopRow && "border-t border-[#EAEDF1]",
                 !isFirstCol && "border-l border-[#EAEDF1]",
                 !inMonth && "bg-[#FBFBFC]",
-                isSelected && "bg-[#FFF7FB]",
+                isSelected && !isToday && "bg-[#FFF7FB]",
               )}
             >
               <span
                 className={cn(
-                  "flex h-6 w-6 items-center justify-center self-end rounded-full text-xs transition-colors",
-                  isSelected
-                    ? "bg-[#F04CAC] font-semibold text-white"
-                    : inMonth
-                      ? "text-[#171A21]"
-                      : "text-[#C3C8D1]",
+                  "flex h-6 w-6 items-center justify-center self-end rounded-full text-xs font-medium transition-colors",
+                  isToday
+                    ? "bg-primary font-semibold text-white"
+                    : isSelected
+                      ? "ring-2 ring-primary text-primary font-semibold"
+                      : inMonth
+                        ? "text-[#171A21]"
+                        : "text-[#C3C8D1]",
                 )}
               >
                 {cell.getDate()}
@@ -663,6 +727,7 @@ const CalendarScheduler = ({
       title: resource.name,
       subtitle: resource.role,
       avatarName: resource.name,
+      date: currentDate,
       events: sortEventsByTime(
         dayEvents.filter(
           (event) =>
@@ -679,6 +744,7 @@ const CalendarScheduler = ({
         title: WEEKDAYS_MIN[date.getDay()],
         subtitle: `${MONTHS[date.getMonth()].slice(0, 3)} ${date.getDate()}`,
         highlight: isSameDay(date, currentDate),
+        date,
         onHeaderClick: () => {
           setCurrentDate(date);
           setView("day");

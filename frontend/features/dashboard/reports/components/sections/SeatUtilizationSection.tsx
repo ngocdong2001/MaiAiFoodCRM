@@ -66,7 +66,7 @@ const SeatUtilizationSection = ({ data }: SeatUtilizationSectionProps) => {
               {data.map((entry) => (
                 <Cell
                   key={entry.day}
-                  fill={entry.utilization >= 90 ? "#F04CAC" : "#A17DE8"}
+                  fill={entry.utilization >= 90 ? "var(--primary)" : "#A17DE8"}
                   fillOpacity={entry.utilization >= 90 ? 1 : 0.75}
                 />
               ))}

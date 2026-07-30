@@ -18,7 +18,7 @@ const StaffFilters = () => {
               className={cn(
                 "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
                 member.active
-                  ? "border-[#F04CAC] bg-[#F04CAC] text-white"
+                  ? "border-primary bg-primary text-white"
                   : "border-[#C3C8D1] bg-white",
               )}
             >

@@ -66,7 +66,7 @@ const CRMGuestProfileSection = ({
           >
             Message
           </Button>
-          <Button className="h-8 bg-[#F04CAC] px-3 text-xs hover:bg-[#E03B9C]">
+          <Button className="h-8 bg-primary px-3 text-xs hover:bg-primary/90">
             <CalendarPlus className="mr-1 h-3.5 w-3.5" />
             Book Appointment
           </Button>
@@ -116,7 +116,7 @@ const CRMGuestProfileSection = ({
           <div className="rounded-xl border border-[#EEF1F5] p-3">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#171A21]">
-                <Pencil className="h-3.5 w-3.5 text-[#F04CAC]" />
+                <Pencil className="h-3.5 w-3.5 text-primary" />
                 Owner Notes
               </h3>
               <button
@@ -134,12 +134,12 @@ const CRMGuestProfileSection = ({
           <div className="rounded-xl border border-[#EEF1F5] p-3">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#171A21]">
-                <CalendarDays className="h-3.5 w-3.5 text-[#F04CAC]" />
+                <CalendarDays className="h-3.5 w-3.5 text-primary" />
                 Booking History
               </h3>
               <button
                 type="button"
-                className="text-xs font-medium text-[#F04CAC] hover:underline"
+                className="text-xs font-medium text-primary hover:underline"
               >
                 View All
               </button>
@@ -153,7 +153,7 @@ const CRMGuestProfileSection = ({
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[#F5A8D4] text-[#F04CAC]">
+                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[#F5A8D4] text-primary">
                         <Dot className="h-4 w-4" />
                       </span>
                       <p className="text-sm font-medium text-[#171A21]">

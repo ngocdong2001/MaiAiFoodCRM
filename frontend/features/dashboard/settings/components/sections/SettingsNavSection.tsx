@@ -40,7 +40,7 @@ const SettingsNavSection = ({
             onClick={() => onChange(item.key)}
             className={`flex w-full items-center gap-3 rounded-[10px] px-4 py-2.5 text-sm font-medium transition-colors ${
               isActive
-                ? "bg-[#F04CAC]/10 text-[#F04CAC]"
+                ? "bg-primary/10 text-primary"
                 : "text-[#8D95A5] hover:bg-[#F3F4F7] hover:text-[#171A21]"
             }`}
           >

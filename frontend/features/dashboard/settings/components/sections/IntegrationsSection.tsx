@@ -12,7 +12,7 @@ interface IntegrationsSectionProps {
 const categoryColors: Record<string, string> = {
   Calendar: "bg-[#A17DE8]/10 text-[#A17DE8]",
   Payments: "bg-[#37D278]/10 text-[#37D278]",
-  Marketing: "bg-[#F04CAC]/10 text-[#F04CAC]",
+  Marketing: "bg-primary/10 text-primary",
   Accounting: "bg-[#3B9FF7]/10 text-[#3B9FF7]",
   Communications: "bg-[#F6AA28]/10 text-[#F6AA28]",
   Social: "bg-[#EB5656]/10 text-[#EB5656]",

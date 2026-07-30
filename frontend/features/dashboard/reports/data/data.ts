@@ -52,7 +52,7 @@ export const revenueData: RevenueDataPoint[] = [
 ];
 
 export const bookingServiceData: BookingServiceDataPoint[] = [
-  { name: "Haircut & Styling", value: 45, color: "#F04CAC" },
+  { name: "Haircut & Styling", value: 45, color: "var(--primary)" },
   { name: "Coloring", value: 30, color: "#A17DE8" },
   { name: "Treatments", value: 15, color: "#3B9FF7" },
   { name: "Extensions", value: 10, color: "#F6AA28" },

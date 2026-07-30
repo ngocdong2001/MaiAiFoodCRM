@@ -22,8 +22,8 @@ const AIRecsStatCard = ({ stat }: AIRecsStatCardProps) => {
     <div className="flex flex-col gap-3 rounded-xl bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between">
         <span className="text-sm font-medium text-[#8D95A5]">{stat.label}</span>
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FEF1F8]">
-          <Icon className="h-6 w-6 text-[#F04CAC]" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+          <Icon className="h-6 w-6 text-primary" />
         </div>
       </div>
       <span className="text-3xl font-bold tracking-tight text-[#171A21]">

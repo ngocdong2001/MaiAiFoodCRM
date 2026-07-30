@@ -36,7 +36,7 @@ const AIRecsPage = () => {
       {/* Page Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3">
-          <Sparkles className="mt-1 h-6 w-6 text-[#F04CAC]" />
+          <Sparkles className="mt-1 h-6 w-6 text-primary" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#171A21]">
               AI Recommendations &amp; Upsell
@@ -46,7 +46,7 @@ const AIRecsPage = () => {
             </p>
           </div>
         </div>
-        <Button className="flex items-center gap-2 bg-[#F04CAC] text-white shadow hover:bg-[#d93d98]">
+        <Button className="flex items-center gap-2 bg-primary text-white shadow hover:bg-primary/90">
           <Plus className="h-4 w-4" />
           New Campaign
         </Button>

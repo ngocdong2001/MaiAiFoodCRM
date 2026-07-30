@@ -71,7 +71,7 @@ const StaffDetailSection = ({ member }: StaffDetailSectionProps) => {
           <Drawer modal swipeDirection="right">
             <DrawerTrigger
               render={
-                <Button className="h-8 bg-[#F04CAC] px-3 text-xs hover:bg-[#E03B9C]" />
+                <Button className="h-8 bg-primary px-3 text-xs hover:bg-primary/90" />
               }
             >
               View Details
@@ -206,7 +206,7 @@ const StaffDetailSection = ({ member }: StaffDetailSectionProps) => {
                 >
                   Close
                 </DrawerClose>
-                <Button className="h-9 bg-[#F04CAC] px-4 hover:bg-[#E03B9C]">
+                <Button className="h-9 bg-primary px-4 hover:bg-primary/90">
                   Save Changes
                 </Button>
               </DrawerFooter>

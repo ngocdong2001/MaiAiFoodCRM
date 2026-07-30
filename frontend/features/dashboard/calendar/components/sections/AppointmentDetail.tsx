@@ -44,8 +44,8 @@ const AppointmentDetail = ({ detail, onClose }: AppointmentDetailProps) => {
 
           <div className="mt-4 space-y-3 px-5">
             <div className="flex items-start gap-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FEF1F8]">
-                <Scissors className="h-4 w-4 text-[#F04CAC]" />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                <Scissors className="h-4 w-4 text-primary" />
               </span>
               <div>
                 <p className="text-sm font-medium text-[#171A21]">
@@ -122,7 +122,7 @@ const AppointmentDetail = ({ detail, onClose }: AppointmentDetailProps) => {
             </button>
             <button
               type="button"
-              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-[#F04CAC] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#E03A9B]"
+              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
             >
               <Scissors className="h-4 w-4" />
               Checkout

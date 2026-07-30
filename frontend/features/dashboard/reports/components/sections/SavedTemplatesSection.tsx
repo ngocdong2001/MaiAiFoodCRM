@@ -56,7 +56,7 @@ const SavedTemplatesSection = ({ templates }: SavedTemplatesSectionProps) => {
       </div>
 
       <div className="border-t border-[#DEE1E7] px-6 py-4">
-        <button className="w-full text-center text-sm font-medium text-[#F04CAC] hover:opacity-80">
+        <button className="w-full text-center text-sm font-medium text-primary hover:opacity-80">
           Manage Templates
         </button>
       </div>

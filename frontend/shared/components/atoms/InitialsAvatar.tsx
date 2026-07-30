@@ -7,7 +7,7 @@ type InitialsAvatarProps = {
 };
 
 const palette = [
-  "bg-[#FDE7F3] text-[#F04CAC]",
+  "bg-[#FDE7F3] text-primary",
   "bg-[#E8FBE7] text-[#2FA35C]",
   "bg-[#E7F0FD] text-[#3B7DE0]",
   "bg-[#FDF3E7] text-[#D98A2B]",

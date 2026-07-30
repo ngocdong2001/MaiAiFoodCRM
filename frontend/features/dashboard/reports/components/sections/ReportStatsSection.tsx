@@ -12,7 +12,7 @@ import {
 import type { ReportStatMetric } from "../../types/reports.types";
 
 const iconMap = {
-  revenue: { Icon: DollarSign, bg: "bg-[#F04CAC]/10", color: "text-[#F04CAC]" },
+  revenue: { Icon: DollarSign, bg: "bg-primary/10", color: "text-primary" },
   bookings: {
     Icon: CalendarDays,
     bg: "bg-[#A17DE8]/10",

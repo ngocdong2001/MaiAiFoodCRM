@@ -33,7 +33,7 @@ const RecentGuestsSection = () => {
 
       <a
         href="#"
-        className="mt-4 block text-center text-sm font-medium text-[#F04CAC] hover:underline"
+        className="mt-4 block text-center text-sm font-medium text-primary hover:underline"
       >
         View All Guests
       </a>

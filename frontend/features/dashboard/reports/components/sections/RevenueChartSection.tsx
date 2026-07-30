@@ -43,8 +43,8 @@ const RevenueChartSection = ({ data }: RevenueChartSectionProps) => {
           >
             <defs>
               <linearGradient id="colorCurrent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#F04CAC" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#F04CAC" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorPrevious" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#A17DE8" stopOpacity={0.15} />
@@ -99,11 +99,11 @@ const RevenueChartSection = ({ data }: RevenueChartSectionProps) => {
             <Area
               type="monotone"
               dataKey="current"
-              stroke="#F04CAC"
+              stroke="var(--primary)"
               strokeWidth={2.5}
               fill="url(#colorCurrent)"
               dot={false}
-              activeDot={{ r: 5, fill: "#F04CAC" }}
+              activeDot={{ r: 5, fill: "var(--primary)" }}
             />
           </AreaChart>
         </ResponsiveContainer>

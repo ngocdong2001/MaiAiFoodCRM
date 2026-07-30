@@ -6,10 +6,10 @@ const DashboardFooter = () => {
       <DashboardContainer className="flex flex-col items-center justify-between gap-2 py-5 text-sm text-[#8D95A5] sm:flex-row">
         <p>© 2026 MaiAI Systems. All rights reserved.</p>
         <div className="flex items-center gap-6">
-          <a href="#" className="transition-colors hover:text-[#F04CAC]">
+          <a href="#" className="transition-colors hover:text-primary">
             Support
           </a>
-          <a href="#" className="transition-colors hover:text-[#F04CAC]">
+          <a href="#" className="transition-colors hover:text-primary">
             Terms of Service
           </a>
         </div>

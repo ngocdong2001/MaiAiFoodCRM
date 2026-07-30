@@ -12,7 +12,7 @@ const LiveQueuePanel = () => {
             <h2 className="text-base font-semibold text-[#171A21]">
               Live Queue
             </h2>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F04CAC] px-1.5 text-xs font-semibold text-white">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-white">
               {queueRequests.length}
             </span>
           </div>
@@ -59,7 +59,7 @@ const LiveQueuePanel = () => {
               </button>
               <button
                 type="button"
-                className="flex-1 rounded-lg bg-[#F04CAC] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#E03A9B]"
+                className="flex-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary/90"
               >
                 Accept
               </button>

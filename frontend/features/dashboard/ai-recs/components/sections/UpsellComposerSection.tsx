@@ -65,7 +65,7 @@ const PhonePreview = ({
 
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-[#DEE1E7] px-4 pb-3 pt-10">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F04CAC]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
             <span className="text-xs font-bold text-white">M</span>
           </div>
           <div>
@@ -99,7 +99,7 @@ const PhonePreview = ({
                             {preview}
                           </p>
                           <div className="mt-3 flex flex-col gap-2">
-                            <button className="w-full rounded-full bg-[#F04CAC] py-2 text-xs font-medium text-white">
+                            <button className="w-full rounded-full bg-primary py-2 text-xs font-medium text-white">
                               Yes, add for $45
                             </button>
                             <button className="w-full rounded-full border border-[#DEE1E7] bg-[#F9FAFB] py-2 text-xs font-medium text-[#171A21]">
@@ -121,7 +121,7 @@ const PhonePreview = ({
           <div className="flex-1 rounded-full border border-[#DEE1E7] bg-[#F9FAFB] px-4 py-2">
             <span className="text-xs text-[#8D95A5]">Type a message...</span>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F04CAC]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
             <Send className="h-4 w-4 text-white" />
           </div>
         </div>
@@ -252,7 +252,7 @@ const UpsellComposerSection = ({
             <button
               onClick={() => update("aiAutoOptimize", !campaign.aiAutoOptimize)}
               className={`relative h-6 w-10 rounded-full transition-colors ${
-                campaign.aiAutoOptimize ? "bg-[#F04CAC]" : "bg-[#DEE1E7]"
+                campaign.aiAutoOptimize ? "bg-primary" : "bg-[#DEE1E7]"
               }`}
             >
               <div
@@ -271,7 +271,7 @@ const UpsellComposerSection = ({
             <Button variant="outline" className="ml-auto">
               Save as Draft
             </Button>
-            <Button className="flex items-center gap-2 bg-[#F04CAC] text-white hover:bg-[#d93d98]">
+            <Button className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90">
               Activate Campaign
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>

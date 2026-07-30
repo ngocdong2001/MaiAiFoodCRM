@@ -19,7 +19,7 @@ const LiveQueueSection = () => {
               <span
                 className={cn(
                   "h-2 w-2 shrink-0 rounded-full",
-                  guest.urgent ? "bg-[#F04CAC]" : "bg-transparent",
+                  guest.urgent ? "bg-primary" : "bg-transparent",
                 )}
               />
               <div>
@@ -35,7 +35,7 @@ const LiveQueueSection = () => {
                 guest.status === "Ready"
                   ? "text-[#2FA35C]"
                   : guest.status === "New"
-                    ? "text-[#F04CAC]"
+                    ? "text-primary"
                     : "text-[#8D95A5]",
               )}
             >
@@ -47,7 +47,7 @@ const LiveQueueSection = () => {
 
       <a
         href="#"
-        className="mt-4 block text-center text-sm font-medium text-[#F04CAC] hover:underline"
+        className="mt-4 block text-center text-sm font-medium text-primary hover:underline"
       >
         View Full Queue
       </a>

@@ -44,8 +44,8 @@ const MiniCalendar = () => {
               className={cn(
                 "mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs transition-colors",
                 selected
-                  ? "bg-[#F04CAC] font-semibold text-white"
-                  : "text-[#171A21] hover:bg-[#FEF1F8]",
+                  ? "bg-primary font-semibold text-white"
+                  : "text-[#171A21] hover:bg-primary/10",
               )}
             >
               {day}

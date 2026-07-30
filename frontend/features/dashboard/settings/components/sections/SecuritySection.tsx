@@ -33,14 +33,14 @@ const SecuritySection = () => {
                   <input
                     id={id}
                     type="password"
-                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-[#F04CAC]"
+                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
                   />
                 </div>
               ))}
             </div>
           </div>
           <div className="flex justify-end border-t border-[#DEE1E7] bg-[#F3F4F7]/30 px-6 py-3">
-            <button className="rounded-[10px] bg-[#F04CAC] px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90">
+            <button className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90">
               Update Password
             </button>
           </div>
@@ -60,7 +60,7 @@ const SecuritySection = () => {
                 {
                   name: "Owner",
                   desc: "Full access to all features",
-                  badge: "bg-[#F04CAC]/10 text-[#F04CAC]",
+                  badge: "bg-primary/10 text-primary",
                 },
                 {
                   name: "Manager",

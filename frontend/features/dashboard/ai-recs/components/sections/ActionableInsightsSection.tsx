@@ -27,7 +27,7 @@ const SuggestionCard = ({
       }`}
     >
       {highlighted && (
-        <div className="absolute left-0 top-0 h-full w-1 bg-[#F04CAC]" />
+        <div className="absolute left-0 top-0 h-full w-1 bg-primary" />
       )}
       <div className="p-6">
         <div className="flex items-start justify-between">
@@ -48,13 +48,13 @@ const SuggestionCard = ({
               </div>
             </div>
           </div>
-          <span className="rounded-full bg-[#FEF1F8] px-3 py-0.5 text-xs font-semibold text-[#7F0A4F]">
+          <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-semibold text-primary">
             {suggestion.matchScore}% Match
           </span>
         </div>
 
         <div className="mt-3 flex items-center gap-2">
-          <WandSparkles className="h-4 w-4 shrink-0 text-[#F04CAC]" />
+          <WandSparkles className="h-4 w-4 shrink-0 text-primary" />
           <span className="text-sm font-medium text-[#171A21]">
             {suggestion.recommendation}
           </span>
@@ -78,7 +78,7 @@ const SuggestionCard = ({
             </Button>
             <Button
               size="sm"
-              className="bg-[#F04CAC] text-white hover:bg-[#d93d98]"
+              className="bg-primary text-white hover:bg-primary/90"
               onClick={() => onApprove(suggestion.key)}
             >
               Approve
@@ -113,7 +113,7 @@ const ActionableInsightsSection = ({
         </h2>
         <button
           onClick={onApproveAll}
-          className="text-sm font-medium text-[#F04CAC] hover:underline"
+          className="text-sm font-medium text-primary hover:underline"
         >
           Approve All
         </button>

@@ -54,7 +54,7 @@ const BusinessProfileSection = () => {
                     type="text"
                     value={form.salonName}
                     onChange={(e) => handleChange("salonName", e.target.value)}
-                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-[#F04CAC]"
+                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
                   />
                 </div>
 
@@ -68,7 +68,7 @@ const BusinessProfileSection = () => {
                     onChange={(e) =>
                       handleChange("businessType", e.target.value)
                     }
-                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-[#F04CAC]"
+                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
                   >
                     <option>Hair Salon</option>
                     <option>Nail Salon</option>
@@ -83,7 +83,7 @@ const BusinessProfileSection = () => {
                   <label className="text-sm font-medium text-[#171A21]">
                     Contact Email
                   </label>
-                  <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-[#F04CAC]">
+                  <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-primary">
                     <Mail className="h-4 w-4 shrink-0 text-[#8D95A5]" />
                     <input
                       type="email"
@@ -99,7 +99,7 @@ const BusinessProfileSection = () => {
                   <label className="text-sm font-medium text-[#171A21]">
                     Primary Phone
                   </label>
-                  <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-[#F04CAC]">
+                  <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-primary">
                     <Phone className="h-4 w-4 shrink-0 text-[#8D95A5]" />
                     <input
                       type="tel"
@@ -116,7 +116,7 @@ const BusinessProfileSection = () => {
                 <label className="text-sm font-medium text-[#171A21]">
                   Physical Address
                 </label>
-                <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-[#F04CAC]">
+                <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-primary">
                   <MapPin className="h-4 w-4 shrink-0 text-[#8D95A5]" />
                   <input
                     type="text"
@@ -132,7 +132,7 @@ const BusinessProfileSection = () => {
 
         {/* Footer */}
         <div className="flex justify-end border-t border-[#DEE1E7] bg-[#F3F4F7]/30 px-6 py-3">
-          <button className="rounded-[10px] bg-[#F04CAC] px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90">
+          <button className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90">
             Save Changes
           </button>
         </div>
