@@ -37,7 +37,7 @@ export const authService = {
     }
 
     try {
-      const { data } = await apiClient.get<{ user: AuthUser }> ("/auth/me", {
+      const { data } = await apiClient.get<{ user: AuthUser }>("/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

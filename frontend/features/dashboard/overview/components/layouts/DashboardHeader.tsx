@@ -66,14 +66,20 @@ const DashboardHeader = () => {
             >
               <Menu className="h-5 w-5" />
             </DrawerTrigger>
-            <DrawerContent className="bg-[#F9FAFB]" aria-describedby="dashboard-mobile-nav-description">
+            <DrawerContent
+              className="bg-[#F9FAFB]"
+              aria-describedby="dashboard-mobile-nav-description"
+            >
               <DrawerHeader className="border-b border-[#DEE1E7] px-5 py-4 text-left">
                 <div className="flex items-center justify-between gap-4">
                   <div className="space-y-1">
                     <DrawerTitle className="text-lg font-bold text-primary">
                       MaiAI Owner Dashboard
                     </DrawerTitle>
-                    <DrawerDescription id="dashboard-mobile-nav-description" className="text-sm text-[#8D95A5]">
+                    <DrawerDescription
+                      id="dashboard-mobile-nav-description"
+                      className="text-sm text-[#8D95A5]"
+                    >
                       Quick navigation and account actions.
                     </DrawerDescription>
                   </div>
@@ -113,9 +119,15 @@ const DashboardHeader = () => {
 
                 <div className="mt-auto rounded-[16px] border border-[#DEE1E7] bg-white p-4 shadow-[0px_2px_4px_0px_#00000012]">
                   <div className="flex items-center gap-3">
-                    <InitialsAvatar name="Sarah Lee" className="h-10 w-10" online />
+                    <InitialsAvatar
+                      name="Sarah Lee"
+                      className="h-10 w-10"
+                      online
+                    />
                     <div>
-                      <p className="text-sm font-semibold text-[#171A21]">Sarah Lee</p>
+                      <p className="text-sm font-semibold text-[#171A21]">
+                        Sarah Lee
+                      </p>
                       <p className="text-xs text-[#8D95A5]">Owner account</p>
                     </div>
                   </div>

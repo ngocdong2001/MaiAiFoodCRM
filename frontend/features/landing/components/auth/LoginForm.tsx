@@ -68,13 +68,18 @@ const LoginForm = () => {
     <>
       <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">{t("auth.login.title")}</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            {t("auth.login.title")}
+          </h1>
           <p className="text-sm text-slate-600">{t("auth.login.subtitle")}</p>
         </div>
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-slate-700"
+            >
               {t("auth.login.email")}
             </Label>
             <Input
@@ -91,7 +96,10 @@ const LoginForm = () => {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-slate-700"
+            >
               {t("auth.login.password")}
             </Label>
             <Input
@@ -112,7 +120,9 @@ const LoginForm = () => {
             className="h-11 w-full rounded-lg bg-slate-900 text-white hover:bg-slate-800"
             disabled={loginMutation.isPending}
           >
-            {loginMutation.isPending ? t("auth.login.signingIn") : t("auth.login.submit")}
+            {loginMutation.isPending
+              ? t("auth.login.signingIn")
+              : t("auth.login.submit")}
           </Button>
         </form>
       </div>
