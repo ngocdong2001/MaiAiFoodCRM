@@ -60,7 +60,7 @@ const SeatUtilizationSection = ({ data }: SeatUtilizationSectionProps) => {
                 border: "1px solid #DEE1E7",
                 fontSize: 13,
               }}
-              formatter={(value: number) => [`${value}%`, "Utilization"]}
+              formatter={(value) => [`${Number(value ?? 0)}%`, "Utilization"]}
             />
             <Bar dataKey="utilization" radius={[6, 6, 0, 0]} maxBarSize={40}>
               {data.map((entry) => (

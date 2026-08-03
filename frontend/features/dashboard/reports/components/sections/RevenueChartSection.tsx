@@ -75,8 +75,8 @@ const RevenueChartSection = ({ data }: RevenueChartSectionProps) => {
                 boxShadow: "0px 2px 4px #00000012",
                 fontSize: 13,
               }}
-              formatter={(value: number, name: string) => [
-                `$${value.toLocaleString()}`,
+              formatter={(value, name) => [
+                `$${Number(value ?? 0).toLocaleString()}`,
                 name === "current" ? "This Period" : "Previous Period",
               ]}
             />

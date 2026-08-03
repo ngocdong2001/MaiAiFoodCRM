@@ -31,6 +31,24 @@
     "copyright": "© 2026 MaiAI. Giữ mọi quyền.",
     "designedFor": "Dành cho tiệm Nail và tiệm Tóc"
   },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "subtitle": "Truy cập bảng điều khiển MaiAI",
+      "email": "Email",
+      "emailPlaceholder": "ban@congty.com",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu của bạn",
+      "submit": "Đăng nhập",
+      "signingIn": "Đang đăng nhập...",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng",
+      "serverError": "Máy chủ chưa thể xử lý đăng nhập lúc này. Bạn thử lại sau nhé.",
+      "networkError": "Không kết nối được tới máy chủ. Bạn kiểm tra mạng rồi thử lại nhé.",
+      "unexpectedError": "Có lỗi xảy ra khi đăng nhập. Bạn thử lại giúp tôi.",
+      "errorTitle": "Đăng nhập thất bại",
+      "errorAcknowledge": "Thử lại"
+    }
+  },
   "hero": {
     "badge": "Giải pháp mới dành cho tiệm Nail",
     "titleLine1": "MaiAI – Trợ lý lễ tân AI cho",

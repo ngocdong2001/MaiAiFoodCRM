@@ -2,6 +2,18 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
+const normalizeUrl = (url: string) => {
+  const baseUrl = BASE_URL.replace(/\/+$/, "");
+  const path = url.startsWith("/") ? url : `/${url}`;
+
+  if (baseUrl.endsWith("/api")) {
+    const apiPath = path.startsWith("/api/") ? path.slice(4) : path;
+    return `${baseUrl}${apiPath}`;
+  }
+
+  return `${baseUrl}${path}`;
+};
+
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
@@ -64,7 +76,7 @@ export const apiClient = {
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.get<T>(url, config);
+    return axiosInstance.get<T>(normalizeUrl(url), config);
   },
 
   post: <T = any>(
@@ -72,7 +84,7 @@ export const apiClient = {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.post<T>(url, data, config);
+    return axiosInstance.post<T>(normalizeUrl(url), data, config);
   },
 
   put: <T = any>(
@@ -80,7 +92,7 @@ export const apiClient = {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.put<T>(url, data, config);
+    return axiosInstance.put<T>(normalizeUrl(url), data, config);
   },
 
   patch: <T = any>(
@@ -88,14 +100,14 @@ export const apiClient = {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.patch<T>(url, data, config);
+    return axiosInstance.patch<T>(normalizeUrl(url), data, config);
   },
 
   delete: <T = any>(
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.delete<T>(url, config);
+    return axiosInstance.delete<T>(normalizeUrl(url), config);
   },
 };
 

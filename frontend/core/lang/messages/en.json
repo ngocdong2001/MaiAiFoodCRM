@@ -31,6 +31,24 @@
     "copyright": "© 2026 MaiAI. All rights reserved.",
     "designedFor": "Designed for Nails and Hair Salons"
   },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Access your MaiAI dashboard",
+      "email": "Email",
+      "emailPlaceholder": "you@company.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign in",
+      "signingIn": "Signing in...",
+      "invalidCredentials": "Invalid email or password",
+      "serverError": "The server could not process your sign-in right now. Please try again.",
+      "networkError": "Cannot reach the server. Please check your connection and try again.",
+      "unexpectedError": "Something went wrong while signing in. Please try again.",
+      "errorTitle": "Sign-in failed",
+      "errorAcknowledge": "Try again"
+    }
+  },
   "hero": {
     "badge": "Revolutionizing Nail Salon Management",
     "titleLine1": "MaiAI - The AI Receptionist for",

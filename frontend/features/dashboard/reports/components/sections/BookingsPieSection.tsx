@@ -49,7 +49,7 @@ const BookingsPieSection = ({ data }: BookingsPieSectionProps) => {
                 border: "1px solid #DEE1E7",
                 fontSize: 13,
               }}
-              formatter={(value: number) => [`${value}%`]}
+              formatter={(value) => [`${value ?? 0}%`]}
             />
           </PieChart>
         </ResponsiveContainer>
