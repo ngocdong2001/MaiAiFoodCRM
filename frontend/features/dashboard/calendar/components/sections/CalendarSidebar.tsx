@@ -5,7 +5,7 @@ import StaffFilters from "./StaffFilters";
 
 const CalendarSidebar = () => {
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-6 border-b border-[#DEE1E7] bg-[#F9FAFB] p-6 lg:w-72 lg:border-b-0 lg:border-r">
+    <aside className="flex w-full flex-col gap-6 rounded-xl border border-[#DEE1E7] bg-[#F9FAFB] p-6 shadow-[0px_1px_2px_0px_#0000000a]">
       <button
         type="button"
         className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-primary px-8 text-sm font-semibold text-white shadow-[0px_2px_4px_0px_#00000012] transition-colors hover:bg-primary/90"

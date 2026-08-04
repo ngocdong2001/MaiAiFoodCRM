@@ -28,6 +28,11 @@ export const dashboardNavItems: DashboardNavItem[] = [
   { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
   { key: "reports", label: "Reports", href: "/dashboard/reports" },
   {
+    key: "revenue",
+    label: "Revenue",
+    href: "/dashboard/revenue",
+  },
+  {
     key: "integrations",
     label: "Settings",
     href: "/dashboard/integrations",

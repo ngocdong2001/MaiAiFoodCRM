@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "visily": {
+      "type": "http",
+      "url": "https://app.visily.ai/api/mcp"
+    }
+  },
+  "inputs": []
+}

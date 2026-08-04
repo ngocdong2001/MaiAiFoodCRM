@@ -38,6 +38,11 @@ export const schedulerAnchorDate = { year: 2023, month: 9, day: 14 };
 
 export const schedulerDayRange = { startHour: 9, endHour: 18 };
 
+export const dailyScheduleHours = Array.from(
+  { length: schedulerDayRange.endHour - schedulerDayRange.startHour + 1 },
+  (_, index) => schedulerDayRange.startHour + index,
+);
+
 const createDetail = (
   detail: CalendarAppointment["detail"],
 ): CalendarAppointment["detail"] => detail;
@@ -510,6 +515,27 @@ export const schedulerEvents: CalendarAppointment[] = [
     }),
   },
 ];
+
+export const dailyStaffSlots = scheduleColumns
+  .map((column) => {
+    const events = schedulerEvents.filter(
+      (event) =>
+        event.resourceKey === column.key &&
+        event.day === schedulerAnchorDate.day,
+    );
+
+    if (events.length === 0) {
+      return null;
+    }
+
+    return {
+      staffKey: column.key,
+      startHour: Math.min(...events.map((event) => event.startHour)),
+      endHour: Math.max(...events.map((event) => event.endHour)),
+      appointmentCount: events.length,
+    };
+  })
+  .filter((slot): slot is NonNullable<typeof slot> => slot !== null);
 
 export const queueRequests: QueueRequest[] = [
   {

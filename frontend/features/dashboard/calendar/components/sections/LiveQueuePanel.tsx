@@ -5,7 +5,7 @@ import { queueRequests } from "@/features/dashboard/calendar/data/data";
 
 const LiveQueuePanel = () => {
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-4 border-t border-[#DEE1E7] bg-[#F9FAFB] p-6 lg:w-80 lg:border-l lg:border-t-0">
+    <aside className="flex w-full flex-col gap-4 rounded-xl border border-[#DEE1E7] bg-[#F9FAFB] p-6 shadow-[0px_1px_2px_0px_#0000000a]">
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
