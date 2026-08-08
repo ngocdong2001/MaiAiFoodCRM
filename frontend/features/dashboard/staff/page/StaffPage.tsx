@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import StaffGridSection from "../components/sections/StaffGridSection";
 import StaffToolbarSection from "../components/sections/StaffToolbarSection";
@@ -9,6 +10,7 @@ import { staffMembers } from "../data/data";
 import type { StaffStatus } from "../types/staff.types";
 
 const StaffPage = () => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | StaffStatus>("All");
 
@@ -41,7 +43,7 @@ const StaffPage = () => {
 
       <WeeklyScheduleSection
         members={staffMembers}
-        weekLabel="Oct 12 - Oct 18, 2023"
+        weekLabel={t("dashboard.staff.weekLabel")}
       />
     </div>
   );

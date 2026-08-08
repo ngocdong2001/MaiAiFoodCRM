@@ -1,14 +1,19 @@
+"use client";
+import { useTranslation } from "react-i18next";
+
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import { todaysSnapshot } from "@/features/dashboard/overview/data/data";
 
 const TodaysSnapshotSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]">
       <h2 className="text-base font-semibold text-[#171A21]">
-        Today&apos;s Snapshot
+        {t("dashboard.overview.snapshot.title")}
       </h2>
       <p className="mt-0.5 text-sm text-[#8D95A5]">
-        Upcoming appointments and staff shifts
+        {t("dashboard.overview.snapshot.subtitle")}
       </p>
 
       <ul className="mt-4 space-y-4">
@@ -22,7 +27,11 @@ const TodaysSnapshotSection = () => {
               <span className="w-16 shrink-0 text-sm font-medium text-[#8D95A5]">
                 {item.time}
               </span>
-              <span className="text-sm text-[#171A21]">{item.title}</span>
+              <span className="text-sm text-[#171A21]">
+                {t(`dashboard.overview.snapshot.items.${item.key}.title`, {
+                  defaultValue: item.title,
+                })}
+              </span>
             </div>
             {item.assignee && (
               <div className="flex items-center gap-2">
@@ -40,4 +49,3 @@ const TodaysSnapshotSection = () => {
 };
 
 export default TodaysSnapshotSection;
-

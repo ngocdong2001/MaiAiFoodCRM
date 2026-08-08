@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   defaultOperatingHours,
@@ -16,13 +17,16 @@ import SecuritySection from "../components/sections/SecuritySection";
 import SettingsNavSection from "../components/sections/SettingsNavSection";
 
 const SettingsPage = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<SettingsTab>("business-profile");
 
   return (
     <div className="flex min-h-full px-8 py-8">
       {/* Left sidebar nav */}
       <aside className="w-64 shrink-0 pr-6">
-        <h1 className="mb-4 text-lg font-semibold text-[#171A21]">Settings</h1>
+        <h1 className="mb-4 text-lg font-semibold text-[#171A21]">
+          {t("dashboard.settings.title")}
+        </h1>
         <SettingsNavSection
           items={settingsNavItems}
           active={activeTab}

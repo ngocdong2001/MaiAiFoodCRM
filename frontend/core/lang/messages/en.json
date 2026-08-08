@@ -253,6 +253,239 @@
       }
     }
   },
+  "dashboard": {
+    "shared": {
+      "sampleDate": "Tuesday, October 14, 2023"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "calendar": "Calendar",
+      "crm": "CRM",
+      "staff": "Staff",
+      "ai-recs": "AI Recs",
+      "reports": "Reports",
+      "revenue": "Revenue",
+      "integrations": "Settings"
+    },
+    "header": {
+      "title": "MaiAI Owner Dashboard",
+      "mobileDescription": "Quick navigation and account actions.",
+      "openNavigationMenu": "Open navigation menu",
+      "closeNavigationMenu": "Close navigation menu",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "accountMenu": "Account menu",
+      "profile": "Profile",
+      "logout": "Log out",
+      "ownerAccount": "Owner account",
+      "userName": "Sarah Lee"
+    },
+    "footer": {
+      "copyright": "© 2026 MaiAI Systems. All rights reserved.",
+      "support": "Support",
+      "termsOfService": "Terms of Service"
+    },
+    "overview": {
+      "welcome": {
+        "title": "Welcome, {{name}}!",
+        "subtitle": "Here's your salon's overview for today, September 24, 2023.",
+        "newBooking": "New Booking",
+        "addWalkIn": "Add Walk-in"
+      },
+      "alerts": {
+        "title": "Important Alerts",
+        "message": "Your calendar integration with Google Calendar is out of sync. Please check settings to resolve.",
+        "reviewSettings": "Review settings"
+      },
+      "stats": {
+        "upcoming-bookings": {
+          "label": "Upcoming Bookings",
+          "hint": "+5 today"
+        },
+        "seat-utilization": {
+          "label": "Today's Seat Utilization",
+          "hint": "Up 12% from avg"
+        },
+        "active-waitlist": {
+          "label": "Active Waitlist",
+          "hint": "No change"
+        },
+        "guest-activity": {
+          "label": "Recent Guest Activity",
+          "hint": "Last 24h"
+        }
+      },
+      "snapshot": {
+        "title": "Today's Snapshot",
+        "subtitle": "Upcoming appointments and staff shifts",
+        "items": {
+          "haircut-style": {
+            "title": "Haircut & Style with Emily"
+          },
+          "mani-pedi": {
+            "title": "Manicure & Pedicure with Sophia"
+          },
+          "lunch-break": {
+            "title": "Lunch Break (Emily)!"
+          },
+          "color-treatment": {
+            "title": "Color Treatment with Emily"
+          },
+          "stylist-arrives": {
+            "title": "Stylist Sophia arrives"
+          }
+        }
+      },
+      "queue": {
+        "title": "Live Queue",
+        "subtitle": "Guests waiting or recently checked-in",
+        "viewFullQueue": "View Full Queue",
+        "items": {
+          "oliver-chen": {
+            "service": "Walk-in Haircut",
+            "status": "10 min"
+          },
+          "chloe-davis": {
+            "service": "Color Consult",
+            "status": "5 min"
+          },
+          "liam-white": {
+            "service": "Shampoo & Blowout",
+            "status": "Ready"
+          },
+          "ava-martinez": {
+            "service": "Deep Conditioning",
+            "status": "15 min"
+          },
+          "noah-brown": {
+            "service": "Walk-in Trim",
+            "status": "New"
+          }
+        }
+      },
+      "recentGuests": {
+        "title": "Recent Guests",
+        "subtitle": "Latest guest interactions",
+        "viewAll": "View All Guests",
+        "items": {
+          "emily-chen": {
+            "meta": "2 hours ago"
+          },
+          "david-kim": {
+            "meta": "Yesterday"
+          },
+          "sophia-miller": {
+            "meta": "3 days ago"
+          },
+          "michael-lee": {
+            "meta": "Last week"
+          }
+        }
+      },
+      "aiRecommendations": {
+        "title": "AI Recommendations",
+        "subtitle": "Intelligent suggestions for your business",
+        "action": "Action",
+        "manage": "Manage Recommendations",
+        "items": {
+          "upsell-conditioning": {
+            "title": "Upsell: Conditioning Treatment",
+            "description": "Recommend deep conditioning to guests booking hair color services."
+          },
+          "rebook-vip": {
+            "title": "Rebook: VIP Client Discount",
+            "description": "Offer 15% off next visit for clients who haven't booked in 60 days."
+          },
+          "upsell-bundle": {
+            "title": "Upsell: Product Bundle",
+            "description": "Suggest styling product bundles based on past purchases."
+          },
+          "rebook-new-service": {
+            "title": "Rebook: New Service Introduction",
+            "description": "Promote new keratin treatment to loyal clients."
+          }
+        }
+      }
+    },
+    "crm": {
+      "title": "Guest CRM",
+      "subtitle": "Track guest profile, booking history, and personalized opportunities.",
+      "createCampaign": "Create Campaign",
+      "addGuest": "Add Guest",
+      "totalGuests": "Total Guests: {{count}}",
+      "vip": "VIP: {{count}}",
+      "atRisk": "At Risk: {{count}}",
+      "emptyState": "No guest matched your filter. Try changing search or segment."
+    },
+    "reports": {
+      "title": "Reports & Exports",
+      "filters": "Filters",
+      "exportData": "Export Data"
+    },
+    "revenue": {
+      "title": "Daily Revenue Summary",
+      "reportFilters": "Report Filters",
+      "exportExcel": "Export Excel",
+      "loading": "Loading revenue data...",
+      "errors": {
+        "loadSummary": "Failed to load revenue summary",
+        "exportExcel": "Failed to export Excel report"
+      },
+      "filters": {
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "staff": "Staff",
+        "allStaff": "All Staff",
+        "paymentMethod": "Payment Method",
+        "allMethods": "All Methods",
+        "apply": "Apply Filters",
+        "reset": "Reset"
+      },
+      "metrics": {
+        "total-daily-revenue": "Total Daily Revenue",
+        "service-revenue": "Service Revenue",
+        "product-revenue": "Product Revenue",
+        "total-orders": "Total Orders"
+      },
+      "paymentMethodLabels": {
+        "cash": "Cash",
+        "transfer": "Bank Transfer",
+        "card": "Card (POS)",
+        "ewallet": "E-Wallet",
+        "loyalty_points": "Loyalty Points"
+      },
+      "activity": {
+        "walkInGuest": "Walk-in Guest",
+        "paymentVia": "Payment via {{method}}"
+      },
+      "revenueByStaff": "Revenue by Staff",
+      "viewDetails": "View details",
+      "table": {
+        "staff": "Staff",
+        "services": "Services",
+        "tips": "Tips",
+        "totalRevenue": "Total Revenue"
+      },
+      "paymentMethods": "Payment Methods",
+      "paymentDistribution": "Daily payment distribution",
+      "total": "Total",
+      "latestActivity": "Latest Activity",
+      "readyForExport": "Ready for export",
+      "systemSynced": "System synced",
+      "versionInfo": "© 2023 MaiAI Salon Management System • Version 2.4.0"
+    },
+    "aiRecs": {
+      "title": "AI Recommendations & Upsell",
+      "subtitle": "Review automated suggestions and configure proactive campaigns.",
+      "newCampaign": "New Campaign"
+    },
+    "settings": {
+      "title": "Settings"
+    },
+    "staff": {
+      "weekLabel": "Oct 12 - Oct 18, 2023"
+    }
+  },
   "languageSwitcher": {
     "label": "Language",
     "en": "English",

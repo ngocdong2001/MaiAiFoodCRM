@@ -2,6 +2,7 @@
 
 import { Megaphone, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/shared/components/ui/button";
 
@@ -13,6 +14,7 @@ import type { GuestSegment } from "../types/crm.types";
 const segments: GuestSegment[] = ["All", "VIP", "Loyal", "At Risk"];
 
 const CRMPage = () => {
+  const { t } = useTranslation();
   const [segment, setSegment] = useState<GuestSegment>("All");
   const [query, setQuery] = useState("");
   const [selectedGuestKey, setSelectedGuestKey] = useState(
@@ -62,10 +64,11 @@ const CRMPage = () => {
       <div className="border-b border-[#EEF1F5] px-4 py-3 sm:px-5">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-lg font-semibold text-[#171A21]">Guest CRM</h1>
+            <h1 className="text-lg font-semibold text-[#171A21]">
+              {t("dashboard.crm.title")}
+            </h1>
             <p className="text-xs text-[#8D95A5]">
-              Track guest profile, booking history, and personalized
-              opportunities.
+              {t("dashboard.crm.subtitle")}
             </p>
           </div>
 
@@ -75,24 +78,24 @@ const CRMPage = () => {
               className="h-8 border-[#DEE1E7] bg-white text-[#374357]"
             >
               <Megaphone className="mr-1 h-3.5 w-3.5" />
-              Create Campaign
+              {t("dashboard.crm.createCampaign")}
             </Button>
             <Button variant="default" className="h-8">
               <UserPlus className="mr-1 h-3.5 w-3.5" />
-              Add Guest
+              {t("dashboard.crm.addGuest")}
             </Button>
           </div>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="rounded-md border border-[#E7EBF2] bg-[#F8FAFC] px-2.5 py-1 text-xs font-medium text-[#566074]">
-            Total Guests: {totalGuests}
+            {t("dashboard.crm.totalGuests", { count: totalGuests })}
           </span>
           <span className="rounded-md border border-[#E7EBF2] bg-[#F8FAFC] px-2.5 py-1 text-xs font-medium text-[#566074]">
-            VIP: {vipGuests}
+            {t("dashboard.crm.vip", { count: vipGuests })}
           </span>
           <span className="rounded-md border border-[#E7EBF2] bg-[#F8FAFC] px-2.5 py-1 text-xs font-medium text-[#566074]">
-            At Risk: {atRiskGuests}
+            {t("dashboard.crm.atRisk", { count: atRiskGuests })}
           </span>
         </div>
       </div>
@@ -116,7 +119,7 @@ const CRMPage = () => {
           />
         ) : (
           <section className="rounded-xl border border-dashed border-[#DEE1E7] bg-white p-8 text-center text-sm text-[#8D95A5]">
-            No guest matched your filter. Try changing search or segment.
+            {t("dashboard.crm.emptyState")}
           </section>
         )}
       </div>
