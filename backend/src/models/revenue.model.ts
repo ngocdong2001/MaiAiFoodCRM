@@ -259,9 +259,7 @@ export const RevenueModel = {
       where: { group: SETTING_GROUP },
       select: { key: true, value: true },
     });
-    const settingMap = new Map(
-      settingRows.map((row) => [row.key, row.value]),
-    );
+    const settingMap = new Map(settingRows.map((row) => [row.key, row.value]));
 
     const totalRevenue = decimalToNumber(currentAggregate._sum.finalAmount);
     const serviceRevenue = decimalToNumber(currentAggregate._sum.amount);

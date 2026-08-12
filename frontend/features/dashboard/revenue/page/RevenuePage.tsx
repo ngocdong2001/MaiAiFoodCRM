@@ -516,7 +516,10 @@ const RevenuePage = () => {
                             className="h-10 w-10 rounded-full object-cover"
                           />
                         ) : (
-                          <InitialsAvatar name={row.staffName} className="h-10 w-10" />
+                          <InitialsAvatar
+                            name={row.staffName}
+                            className="h-10 w-10"
+                          />
                         )}
                         <span className="text-sm font-medium text-[#1D1F23]">
                           {row.staffName}
