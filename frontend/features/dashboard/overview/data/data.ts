@@ -21,7 +21,7 @@ import type {
 } from "../types/dashboard.types";
 
 export const dashboardNavItems: DashboardNavItem[] = [
-  { key: "dashboard", label: "Dashboard", href: "/" },
+  { key: "dashboard", label: "Dashboard", href: "/dashboard/overview" },
   { key: "calendar", label: "Calendar", href: "/dashboard/calendar" },
   { key: "crm", label: "CRM", href: "/dashboard/crm" },
   { key: "staff", label: "Staff", href: "/dashboard/staff" },

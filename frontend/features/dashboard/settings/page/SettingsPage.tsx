@@ -15,10 +15,11 @@ import IntegrationsSection from "../components/sections/IntegrationsSection";
 import OperatingHoursSection from "../components/sections/OperatingHoursSection";
 import SecuritySection from "../components/sections/SecuritySection";
 import SettingsNavSection from "../components/sections/SettingsNavSection";
+import UserProfileSection from "../components/sections/UserProfileSection";
 
 const SettingsPage = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<SettingsTab>("business-profile");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("user-profile");
 
   return (
     <div className="flex min-h-full px-8 py-8">
@@ -36,6 +37,7 @@ const SettingsPage = () => {
 
       {/* Main content */}
       <main className="flex-1">
+        {activeTab === "user-profile" && <UserProfileSection />}
         {activeTab === "business-profile" && <BusinessProfileSection />}
         {activeTab === "operating-hours" && (
           <OperatingHoursSection initialHours={defaultOperatingHours} />

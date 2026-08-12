@@ -1,30 +1,15 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import WeeklySchedule, {
   type WeeklyScheduleViewMode,
 } from "@/shared/components/molecules/WeeklySchedule";
 
-import {
-  dailyScheduleHours,
-  schedulerAnchorDate,
-  schedulerEvents,
-  staffMembers,
-} from "../../data/data";
+import { useCalendarData } from "../../context/CalendarDataContext";
+import WeeklyAppointmentBoard from "./WeeklyAppointmentBoard";
 
-const monthShort = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const DEFAULT_START_HOUR = 8;
+const DEFAULT_END_HOUR = 18;
 
 const getWeekStart = (date: Date) => {
   const copy = new Date(date);
@@ -36,79 +21,112 @@ const getWeekStart = (date: Date) => {
 };
 
 const StaffDailyScheduleSection = () => {
+  const { appointments: schedulerEvents, staffMembers, cursorDate, setCursorDate } =
+    useCalendarData();
   const [viewMode, setViewMode] = useState<WeeklyScheduleViewMode>("day");
-  const [cursorDate, setCursorDate] = useState(
-    new Date(
-      schedulerAnchorDate.year,
-      schedulerAnchorDate.month,
-      schedulerAnchorDate.day,
-    ),
-  );
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.startsWith("vi") ? "vi-VN" : "en-US";
 
   const rangeLabel = useMemo(() => {
     if (viewMode === "day") {
-      return `${monthShort[cursorDate.getMonth()]} ${cursorDate.getDate()}, ${cursorDate.getFullYear()}`;
+      return cursorDate.toLocaleDateString(locale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
     }
 
     const weekStart = getWeekStart(cursorDate);
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
 
-    if (weekStart.getMonth() === weekEnd.getMonth()) {
-      return `${monthShort[weekStart.getMonth()]} ${weekStart.getDate()} - ${weekEnd.getDate()}, ${weekStart.getFullYear()}`;
-    }
+    return `${weekStart.toLocaleDateString(locale, { month: "short", day: "numeric" })} - ${weekEnd.toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })}`;
+  }, [cursorDate, locale, viewMode]);
 
-    return `${monthShort[weekStart.getMonth()]} ${weekStart.getDate()} - ${monthShort[weekEnd.getMonth()]} ${weekEnd.getDate()}, ${weekStart.getFullYear()}`;
-  }, [cursorDate, viewMode]);
-
-  const slots = useMemo(() => {
+  const visibleEvents = useMemo(() => {
     const dayStart = new Date(cursorDate);
     dayStart.setHours(0, 0, 0, 0);
     const dayEnd = new Date(dayStart);
     dayEnd.setHours(23, 59, 59, 999);
 
+    return schedulerEvents.filter((event) => {
+        const eventDate = new Date(event.year, event.month, event.day);
+        return Boolean(event.resourceKey) && eventDate >= dayStart && eventDate <= dayEnd;
+      });
+  }, [cursorDate, schedulerEvents]);
+
+  const resources = useMemo(() => {
+    return staffMembers.map((member) => ({
+      key: member.key,
+      name: member.name,
+      subtitle: member.role,
+    }));
+  }, [staffMembers]);
+
+  const slots = useMemo(
+    () =>
+      visibleEvents.map((event) => ({
+        resourceKey: event.resourceKey!,
+        startHour: event.startHour,
+        endHour: event.endHour,
+        label: `${event.title} · ${event.detail.timeRange}`,
+        sublabel: event.subtitle,
+      })),
+    [visibleEvents],
+  );
+
+  const hours = useMemo(() => {
+    const firstHour = Math.min(
+      DEFAULT_START_HOUR,
+      ...slots.map((slot) => Math.floor(slot.startHour)),
+    );
+    const lastHour = Math.max(
+      DEFAULT_END_HOUR,
+      ...slots.map((slot) => Math.ceil(slot.endHour)),
+    );
+
+    return Array.from(
+      { length: lastHour - firstHour + 1 },
+      (_, index) => firstHour + index,
+    );
+  }, [slots]);
+
+  if (viewMode === "week") {
     const weekStart = getWeekStart(cursorDate);
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     weekEnd.setHours(23, 59, 59, 999);
+    const weekEvents = schedulerEvents.filter((event) => {
+      const eventDate = new Date(event.year, event.month, event.day);
+      return eventDate >= weekStart && eventDate <= weekEnd;
+    });
 
-    return staffMembers
-      .map((member) => {
-        const memberEvents = schedulerEvents.filter((event) => {
-          if (event.resourceKey !== member.key) {
-            return false;
-          }
-
-          const eventDate = new Date(event.year, event.month, event.day);
-          return viewMode === "day"
-            ? eventDate >= dayStart && eventDate <= dayEnd
-            : eventDate >= weekStart && eventDate <= weekEnd;
-        });
-
-        if (memberEvents.length === 0) {
-          return null;
-        }
-
-        return {
-          resourceKey: member.key,
-          startHour: Math.min(...memberEvents.map((event) => event.startHour)),
-          endHour: Math.max(...memberEvents.map((event) => event.endHour)),
-          sublabel: `${memberEvents.length} appt${memberEvents.length > 1 ? "s" : ""}`,
-        };
-      })
-      .filter((slot): slot is NonNullable<typeof slot> => slot !== null);
-  }, [cursorDate, viewMode]);
+    return (
+      <WeeklyAppointmentBoard
+        rangeLabel={rangeLabel}
+        weekStart={weekStart}
+        events={weekEvents}
+        onDayView={() => setViewMode("day")}
+        onPrevious={() => setCursorDate((current) => {
+          const next = new Date(current);
+          next.setDate(current.getDate() - 7);
+          return next;
+        })}
+        onNext={() => setCursorDate((current) => {
+          const next = new Date(current);
+          next.setDate(current.getDate() + 7);
+          return next;
+        })}
+      />
+    );
+  }
 
   return (
     <WeeklySchedule
-      title="Staff Daily Schedule"
+      title={t("dashboard.calendar.dailyTitle")}
       rangeLabel={rangeLabel}
-      hours={dailyScheduleHours}
-      resources={staffMembers.map((member) => ({
-        key: member.key,
-        name: member.name,
-        subtitle: member.role,
-      }))}
+      hours={hours}
+      resources={resources}
       slots={slots}
       activeViewMode={viewMode}
       viewModes={["day", "week"]}

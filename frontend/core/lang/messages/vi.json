@@ -278,12 +278,71 @@
       "profile": "Hồ sơ",
       "logout": "Đăng xuất",
       "ownerAccount": "Tài khoản chủ tiệm",
-      "userName": "Sarah Lee"
+      "userName": "Sarah Lee",
+      "userFallback": "Tài khoản"
     },
     "footer": {
       "copyright": "© 2026 MaiAI Systems. Bảo lưu mọi quyền.",
       "support": "Hỗ trợ",
       "termsOfService": "Điều khoản dịch vụ"
+    },
+    "calendar": {
+      "day": "Ngày",
+      "week": "Tuần",
+      "dailyTitle": "Lịch làm việc hằng ngày",
+      "weeklyTitle": "Lịch làm việc theo tuần",
+      "staffMember": "Nhân viên",
+      "newBooking": "Tạo lịch hẹn",
+      "previousWeek": "Tuần trước",
+      "nextWeek": "Tuần sau",
+      "previousMonth": "Tháng trước",
+      "nextMonth": "Tháng sau",
+      "noAppointments": "Không có lịch hẹn",
+      "filtersAndStaff": "Bộ lọc và nhân viên",
+      "filterStaff": "Lọc theo {{name}}",
+      "queue": {
+        "title": "Hàng chờ trực tiếp",
+        "subtitle": "Khách vãng lai và danh sách chờ",
+        "add": "Thêm vào hàng chờ",
+        "message": "Nhắn tin",
+        "accept": "Tiếp nhận",
+        "emptyTitle": "Hàng chờ đang ổn!",
+        "emptyDescription": "Yêu cầu mới sẽ xuất hiện ngay tại đây."
+      },
+      "booking": {
+        "title": "Tạo lịch hẹn",
+        "description": "Tạo lịch từ dữ liệu khách hàng, nhân viên và dịch vụ hiện có.",
+        "guest": "Khách hàng",
+        "selectGuest": "Chọn khách hàng",
+        "staff": "Nhân viên",
+        "selectStaff": "Chọn nhân viên",
+        "date": "Ngày",
+        "startTime": "Giờ bắt đầu",
+        "status": "Trạng thái",
+        "priority": "Ưu tiên",
+        "pending": "Chờ xác nhận",
+        "confirmed": "Đã xác nhận",
+        "normal": "Bình thường",
+        "high": "Cao",
+        "services": "Dịch vụ",
+        "minutes": "{{count}} phút",
+        "total": "Tổng: {{duration}} phút · ${{price}}",
+        "notes": "Ghi chú lịch hẹn",
+        "notesPlaceholder": "Sở thích, dị ứng hoặc lưu ý chuẩn bị",
+        "loadOptionsError": "Không tải được dữ liệu đặt lịch.",
+        "cancel": "Hủy",
+        "create": "Tạo lịch hẹn",
+        "creating": "Đang tạo...",
+        "errors": {
+          "required": "Vui lòng chọn khách hàng, nhân viên và ít nhất một dịch vụ.",
+          "invalidDate": "Vui lòng chọn ngày và giờ hợp lệ.",
+          "unknown": "Không thể tạo lịch hẹn.",
+          "conflict": "Nhân viên đã có lịch trong khung giờ này. Hãy chọn giờ khác hoặc đổi nhân viên.",
+          "outsideHours": "Khung giờ đã chọn nằm ngoài giờ làm việc của nhân viên.",
+          "breakOverlap": "Khung giờ đã chọn trùng với giờ nghỉ của nhân viên.",
+          "dayOff": "Nhân viên nghỉ vào ngày đã chọn. Hãy chọn ngày hoặc nhân viên khác."
+        }
+      }
     },
     "overview": {
       "welcome": {
@@ -480,7 +539,32 @@
       "newCampaign": "Chiến dịch mới"
     },
     "settings": {
-      "title": "Cài đặt"
+      "title": "Cài đặt",
+      "tabs": {
+        "profile": "Hồ sơ của tôi",
+        "businessProfile": "Thông tin doanh nghiệp",
+        "operatingHours": "Giờ hoạt động",
+        "integrations": "Tích hợp",
+        "communications": "Liên lạc",
+        "security": "Bảo mật và truy cập"
+      },
+      "profile": {
+        "title": "Hồ sơ của tôi",
+        "description": "Quản lý thông tin và ảnh đại diện hiển thị trên tài khoản.",
+        "name": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "role": "Vai trò",
+        "avatarUrl": "Đường dẫn ảnh đại diện",
+        "avatarPlaceholder": "https://example.com/avatar.jpg",
+        "avatarHint": "Sử dụng đường dẫn ảnh công khai. Hệ thống sẽ hiện chữ viết tắt nếu ảnh không tải được.",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "saved": "Đã cập nhật hồ sơ.",
+        "emailInUse": "Email này đã được sử dụng.",
+        "saveError": "Không thể cập nhật hồ sơ.",
+        "loading": "Đang tải hồ sơ..."
+      }
     },
     "staff": {
       "weekLabel": "12 Th10 - 18 Th10, 2023"

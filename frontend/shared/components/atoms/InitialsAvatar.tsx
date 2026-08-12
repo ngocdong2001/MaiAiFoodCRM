@@ -1,9 +1,14 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
 import { cn } from "@/shared/lib/utils";
 
 type InitialsAvatarProps = {
   name: string;
   className?: string;
   online?: boolean;
+  src?: string;
 };
 
 const palette = [
@@ -26,10 +31,13 @@ const getPaletteIndex = (name: string) =>
   name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
   palette.length;
 
-const InitialsAvatar = ({ name, className, online }: InitialsAvatarProps) => {
+const InitialsAvatar = ({ name, className, online, src }: InitialsAvatarProps) => {
+  const [imageFailed, setImageFailed] = useState(false);
   return (
     <span className="relative inline-flex shrink-0">
-      <span
+      {src && !imageFailed ? (
+        <Image src={src} alt={name} width={80} height={80} unoptimized onError={() => setImageFailed(true)} className={cn("rounded-full object-cover", className)} />
+      ) : <span
         className={cn(
           "inline-flex items-center justify-center rounded-full text-xs font-semibold",
           palette[getPaletteIndex(name)],
@@ -37,7 +45,7 @@ const InitialsAvatar = ({ name, className, online }: InitialsAvatarProps) => {
         )}
       >
         {getInitials(name)}
-      </span>
+      </span>}
       {online && (
         <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-[#37D278]" />
       )}

@@ -1,4 +1,4 @@
-import { Filter, Plus, Search } from "lucide-react";
+import { CalendarDays, Filter, Plus, Search } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -10,20 +10,33 @@ type StaffToolbarSectionProps = {
   onQueryChange: (value: string) => void;
   statusFilter: "All" | StaffStatus;
   onStatusFilterChange: (value: "All" | StaffStatus) => void;
+  selectedDate: string;
+  onSelectedDateChange: (value: string) => void;
+  onAdd: () => void;
 };
 
 const filters: Array<"All" | StaffStatus> = [
   "All",
-  "Active",
-  "Busy",
-  "On Leave",
+  "active",
+  "busy",
+  "on_leave",
 ];
+
+const filterLabels: Record<"All" | StaffStatus, string> = {
+  All: "All",
+  active: "Active",
+  busy: "Busy",
+  on_leave: "On Leave",
+};
 
 const StaffToolbarSection = ({
   query,
   onQueryChange,
   statusFilter,
   onStatusFilterChange,
+  selectedDate,
+  onSelectedDateChange,
+  onAdd,
 }: StaffToolbarSectionProps) => {
   return (
     <div className="flex flex-col gap-4">
@@ -49,6 +62,16 @@ const StaffToolbarSection = ({
           </div>
 
           <div className="relative">
+            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D95A5]" />
+            <Input
+              type="date"
+              value={selectedDate}
+              onChange={(event) => onSelectedDateChange(event.target.value)}
+              className="h-10 rounded-lg border-[#DEE1E7] bg-[#F9FAFB] pl-9"
+            />
+          </div>
+
+          <div className="relative">
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -58,14 +81,18 @@ const StaffToolbarSection = ({
             >
               {filters.map((item) => (
                 <option key={item} value={item}>
-                  {item}
+                  {filterLabels[item]}
                 </option>
               ))}
             </select>
             <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D95A5]" />
           </div>
 
-          <Button className="h-10 gap-2 bg-primary px-4 hover:bg-primary/90">
+          <Button
+            type="button"
+            onClick={onAdd}
+            className="h-10 gap-2 bg-primary px-4 hover:bg-primary/90"
+          >
             <Plus className="h-4 w-4" />
             Add Staff
           </Button>

@@ -1,4 +1,6 @@
-import DashboardPage from "@/features/dashboard/overview/page/DashboardPage";
+import { redirect } from "next/navigation";
 
-export default DashboardPage;
+export default function DashboardPage() {
+	redirect("/dashboard/overview");
+}
 

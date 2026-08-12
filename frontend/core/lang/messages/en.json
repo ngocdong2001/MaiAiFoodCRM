@@ -278,12 +278,71 @@
       "profile": "Profile",
       "logout": "Log out",
       "ownerAccount": "Owner account",
-      "userName": "Sarah Lee"
+      "userName": "Sarah Lee",
+      "userFallback": "Account"
     },
     "footer": {
       "copyright": "© 2026 MaiAI Systems. All rights reserved.",
       "support": "Support",
       "termsOfService": "Terms of Service"
+    },
+    "calendar": {
+      "day": "Day",
+      "week": "Week",
+      "dailyTitle": "Staff Daily Schedule",
+      "weeklyTitle": "Staff Weekly Schedule",
+      "staffMember": "Staff Member",
+      "newBooking": "New Booking",
+      "previousWeek": "Previous week",
+      "nextWeek": "Next week",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "noAppointments": "No appointments",
+      "filtersAndStaff": "Filters & Staff",
+      "filterStaff": "Filter {{name}}",
+      "queue": {
+        "title": "Live Queue",
+        "subtitle": "Walk-ins & Waitlist",
+        "add": "Add to queue",
+        "message": "Message",
+        "accept": "Accept",
+        "emptyTitle": "Queue is looking good!",
+        "emptyDescription": "New requests will appear here instantly."
+      },
+      "booking": {
+        "title": "New booking",
+        "description": "Create an appointment using live guest, staff, and service availability.",
+        "guest": "Guest",
+        "selectGuest": "Select guest",
+        "staff": "Staff member",
+        "selectStaff": "Select staff",
+        "date": "Date",
+        "startTime": "Start time",
+        "status": "Status",
+        "priority": "Priority",
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "normal": "Normal",
+        "high": "High",
+        "services": "Services",
+        "minutes": "{{count}} min",
+        "total": "Total: {{duration}} minutes · ${{price}}",
+        "notes": "Booking notes",
+        "notesPlaceholder": "Preferences, allergies, or preparation notes",
+        "loadOptionsError": "Unable to load booking options.",
+        "cancel": "Cancel",
+        "create": "Create booking",
+        "creating": "Creating...",
+        "errors": {
+          "required": "Guest, staff, and at least one service are required.",
+          "invalidDate": "Choose a valid booking date and time.",
+          "unknown": "Unable to create booking.",
+          "conflict": "This staff member already has an appointment in that time range. Choose another time or staff member.",
+          "outsideHours": "The selected time is outside this staff member's working hours.",
+          "breakOverlap": "The selected time overlaps this staff member's break.",
+          "dayOff": "This staff member is off on the selected date. Choose another date or staff member."
+        }
+      }
     },
     "overview": {
       "welcome": {
@@ -480,7 +539,32 @@
       "newCampaign": "New Campaign"
     },
     "settings": {
-      "title": "Settings"
+      "title": "Settings",
+      "tabs": {
+        "profile": "My Profile",
+        "businessProfile": "Business Profile",
+        "operatingHours": "Operating Hours",
+        "integrations": "Integrations",
+        "communications": "Communications",
+        "security": "Security & Access"
+      },
+      "profile": {
+        "title": "My Profile",
+        "description": "Manage the information and avatar shown across your account.",
+        "name": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "avatarUrl": "Avatar URL",
+        "avatarPlaceholder": "https://example.com/avatar.jpg",
+        "avatarHint": "Use a public image URL. Initials are shown if the image cannot load.",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "saved": "Profile updated successfully.",
+        "emailInUse": "This email is already in use.",
+        "saveError": "Unable to update your profile.",
+        "loading": "Loading your profile..."
+      }
     },
     "staff": {
       "weekLabel": "Oct 12 - Oct 18, 2023"

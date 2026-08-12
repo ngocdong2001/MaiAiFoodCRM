@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.me = exports.login = void 0;
+exports.updateProfile = exports.me = exports.login = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = require("../lib/prisma");
@@ -14,6 +14,8 @@ const toAuthUser = (user) => ({
     name: user.name,
     email: user.email,
     role: user.role,
+    phone: user.phone,
+    avatarUrl: user.avatarUrl,
 });
 const login = async (req, res) => {
     const { email, password } = req.body || {};
@@ -63,3 +65,40 @@ const me = (req, res) => {
     return res.status(200).json({ user: req.user });
 };
 exports.me = me;
+const updateProfile = async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const phone = typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
+    const avatarUrl = typeof req.body?.avatarUrl === "string" ? req.body.avatarUrl.trim() : "";
+    if (!name || !email) {
+        return res.status(400).json({ message: "Name and email are required" });
+    }
+    try {
+        const emailOwner = await prisma_1.prisma.user.findFirst({
+            where: { email, id: { not: req.user.id } },
+            select: { id: true },
+        });
+        if (emailOwner) {
+            return res.status(409).json({ message: "Email is already in use" });
+        }
+        const user = await prisma_1.prisma.user.update({
+            where: { id: req.user.id },
+            data: {
+                name,
+                email,
+                phone: phone || null,
+                avatarUrl: avatarUrl || null,
+                updatedAt: new Date(),
+            },
+        });
+        return res.status(200).json({ user: toAuthUser(user) });
+    }
+    catch (error) {
+        console.error("Profile update failed", error);
+        return res.status(500).json({ message: "Unable to update profile" });
+    }
+};
+exports.updateProfile = updateProfile;

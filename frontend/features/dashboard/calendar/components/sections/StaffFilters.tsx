@@ -1,20 +1,27 @@
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/shared/lib/utils";
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
-import { staffMembers } from "@/features/dashboard/calendar/data/data";
+import { useCalendarData } from "../../context/CalendarDataContext";
 
 const StaffFilters = () => {
+  const { t } = useTranslation();
+  const { staffMembers, toggleStaff } = useCalendarData();
   return (
     <div>
       <h2 className="text-xs font-semibold uppercase tracking-wide text-[#8D95A5]">
-        Filters &amp; Staff
+        {t("dashboard.calendar.filtersAndStaff")}
       </h2>
 
       <ul className="mt-3 space-y-3">
         {staffMembers.map((member) => (
           <li key={member.key} className="flex items-center gap-3">
-            <span
+            <button
+              type="button"
+              aria-pressed={member.active}
+              aria-label={t("dashboard.calendar.filterStaff", { name: member.name })}
+              onClick={() => toggleStaff(Number(member.key))}
               className={cn(
                 "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
                 member.active
@@ -23,7 +30,7 @@ const StaffFilters = () => {
               )}
             >
               {member.active && <Check className="h-3 w-3" strokeWidth={3} />}
-            </span>
+            </button>
             <InitialsAvatar name={member.name} className="h-8 w-8" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-[#171A21]">

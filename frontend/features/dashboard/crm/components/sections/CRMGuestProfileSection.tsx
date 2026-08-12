@@ -1,32 +1,25 @@
-import {
-  CalendarDays,
-  CalendarHeart,
-  CalendarPlus,
-  Dot,
-  FlaskConical,
-  Mail,
-  MapPin,
-  MoreHorizontal,
-  Pencil,
-  Phone,
-  Sparkles,
-  Star,
-} from "lucide-react";
+import { CalendarDays, CalendarHeart, Cake, Dot, Mail, MoreHorizontal, Pencil, Phone, Sparkles, Star, Trash2, UserRoundPen } from "lucide-react";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
-import { Button } from "@/shared/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/components/ui/dropdown-menu";
 
-import { formatCurrency } from "../../data/data";
-import type { GuestActivity, GuestCard } from "../../types/crm.types";
+import type { GuestCard } from "../../types/crm.types";
 
 type CRMGuestProfileSectionProps = {
   guest: GuestCard;
-  activities: GuestActivity[];
+  onEdit: () => void;
+  onEditNotes: () => void;
+  onDelete: () => void;
 };
+
+const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+const formatDate = (value: string | null) => value ? new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not available";
 
 const CRMGuestProfileSection = ({
   guest,
-  activities,
+  onEdit,
+  onEditNotes,
+  onDelete,
 }: CRMGuestProfileSectionProps) => {
   return (
     <section className="border-t border-[#EEF1F5] p-4 sm:p-5 xl:border-l xl:border-t-0">
@@ -42,42 +35,22 @@ const CRMGuestProfileSection = ({
               <h2 className="truncate text-[30px] leading-none font-semibold text-[#171A21]">
                 {guest.name}
               </h2>
-              <span className="rounded-full bg-[#F2EEFF] px-2 py-0.5 text-[10px] font-semibold text-[#7A63B8]">
-                VIP Client
-              </span>
+              <span className="rounded-full bg-[#F2EEFF] px-2 py-0.5 text-[10px] font-semibold text-[#7A63B8]">{guest.segment}</span>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[#8D95A5]">
               <span className="inline-flex items-center gap-1">
                 <Phone className="h-3 w-3" />
-                {guest.phone}
+                {guest.phone ?? "No phone"}
               </span>
               <span className="inline-flex items-center gap-1">
                 <Mail className="h-3 w-3" />
-                {guest.email}
+                {guest.email ?? "No email"}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="h-8 border-[#DEE1E7] bg-white px-3 text-xs"
-          >
-            Message
-          </Button>
-          <Button className="h-8 bg-primary px-3 text-xs hover:bg-primary/90">
-            <CalendarPlus className="mr-1 h-3.5 w-3.5" />
-            Book Appointment
-          </Button>
-          <button
-            type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#DEE1E7] text-[#8D95A5]"
-            aria-label="More actions"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-        </div>
+        <DropdownMenu><DropdownMenuTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#DEE1E7] text-[#8D95A5]" aria-label="Guest actions"><MoreHorizontal className="h-4 w-4" /></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={onEdit}><UserRoundPen />Edit guest</DropdownMenuItem><DropdownMenuItem onClick={onDelete} className="text-destructive"><Trash2 />Delete guest</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
@@ -87,9 +60,8 @@ const CRMGuestProfileSection = ({
             <Sparkles className="h-3.5 w-3.5 text-[#A6B0C2]" />
           </div>
           <p className="mt-1 text-sm font-bold text-[#171A21]">
-            {formatCurrency(guest.lifetimeSpend)}
+            {formatCurrency(guest.totalSpend)}
           </p>
-          <p className="text-[10px] text-[#8D95A5]">{guest.ytdDelta} YTD</p>
         </div>
         <div className="rounded-xl border border-[#E7EBF2] bg-[#FAFBFE] p-3.5">
           <p className="text-[11px] text-[#8D95A5]">Total Visits</p>
@@ -121,13 +93,14 @@ const CRMGuestProfileSection = ({
               </h3>
               <button
                 type="button"
+                onClick={onEditNotes}
                 className="text-xs font-medium text-[#8D95A5] hover:underline"
               >
                 Edit Notes
               </button>
             </div>
             <p className="rounded-lg border border-[#EDEFF4] bg-[#F8FAFC] p-3 text-sm text-[#3A4354]">
-              {guest.notes}
+              {guest.notes || "No notes yet."}
             </p>
           </div>
 
@@ -137,18 +110,12 @@ const CRMGuestProfileSection = ({
                 <CalendarDays className="h-3.5 w-3.5 text-primary" />
                 Booking History
               </h3>
-              <button
-                type="button"
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                View All
-              </button>
             </div>
 
             <ul className="space-y-2">
-              {activities.map((activity) => (
+              {guest.activities.map((activity) => (
                 <li
-                  key={activity.key}
+                  key={activity.id}
                   className="flex items-start justify-between gap-3 rounded-lg border border-[#EEF1F5] bg-[#FAFBFD] p-2.5"
                 >
                   <div className="min-w-0 flex-1">
@@ -162,7 +129,7 @@ const CRMGuestProfileSection = ({
                     </div>
                     <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-[#8D95A5]">
                       <CalendarDays className="h-3 w-3" />
-                      {activity.date}
+                      {formatDate(activity.date)}
                       <span>•</span>
                       {activity.technician}
                     </p>
@@ -183,54 +150,34 @@ const CRMGuestProfileSection = ({
               Preferences
             </h3>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {guest.preferences.map((item) => (
+              {guest.tags.map((item) => (
                 <span
-                  key={item}
+                  key={item.id}
                   className="rounded-full bg-[#F3F5F9] px-2 py-0.5 text-[11px] text-[#566074]"
                 >
-                  {item}
+                  {item.name}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#EEF1F5] p-3">
-            <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#8A65D1]">
-              <FlaskConical className="h-3.5 w-3.5" />
-              Technical Formulas
-            </h3>
-            <div className="mt-2 space-y-2">
-              <div className="rounded-lg border border-[#EEF1F5] p-2">
-                <p className="text-[10px] font-semibold text-[#8D95A5]">
-                  BASE COLOR
-                </p>
-                <p className="text-xs text-[#374357]">{guest.baseColor}</p>
-              </div>
-              <div className="rounded-lg border border-[#EEF1F5] p-2">
-                <p className="text-[10px] font-semibold text-[#8D95A5]">
-                  TONER
-                </p>
-                <p className="text-xs text-[#374357]">{guest.toner}</p>
-              </div>
-            </div>
-          </div>
+          <div className="rounded-xl border border-[#EEF1F5] p-3"><h3 className="text-sm font-semibold text-[#171A21]">Loyalty</h3><p className="mt-2 text-2xl font-bold text-primary">{guest.loyaltyPoints.toLocaleString()}</p><p className="text-xs text-[#8D95A5]">points available</p></div>
 
           <div className="rounded-xl border border-[#EEF1F5] p-3">
             <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#171A21]">
-              <MapPin className="h-3.5 w-3.5 text-[#8D95A5]" />
+              <Cake className="h-3.5 w-3.5 text-[#8D95A5]" />
               Details
             </h3>
             <div className="mt-2 space-y-1">
               <p className="text-[10px] font-semibold text-[#8D95A5]">
-                Address
-              </p>
-              <p className="text-xs text-[#374357]">{guest.address}</p>
-              <p className="text-xs text-[#374357]">{guest.city}</p>
-              <p className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#8D95A5]">
-                <CalendarHeart className="h-3 w-3" />
                 Birthday
               </p>
-              <p className="text-xs text-[#374357]">{guest.birthday}</p>
+              <p className="text-xs text-[#374357]">{formatDate(guest.dateOfBirth)}</p>
+              <p className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#8D95A5]">
+                <CalendarHeart className="h-3 w-3" />
+                Next appointment
+              </p>
+              <p className="text-xs text-[#374357]">{formatDate(guest.nextAppointment)}</p>
             </div>
           </div>
         </div>

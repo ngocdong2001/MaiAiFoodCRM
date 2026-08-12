@@ -6,7 +6,9 @@ import {
   Clock,
   PhoneCall,
   ShieldCheck,
+  User,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { SettingsNavItem, SettingsTab } from "../../types/settings.types";
 
@@ -16,6 +18,7 @@ const iconMap = {
   "calendar-days": CalendarDays,
   "phone-call": PhoneCall,
   "shield-check": ShieldCheck,
+  user: User,
 };
 
 interface SettingsNavSectionProps {
@@ -29,6 +32,7 @@ const SettingsNavSection = ({
   active,
   onChange,
 }: SettingsNavSectionProps) => {
+  const { t } = useTranslation();
   return (
     <nav className="flex flex-col gap-1">
       {items.map((item) => {
@@ -45,7 +49,7 @@ const SettingsNavSection = ({
             }`}
           >
             <Icon className="h-4 w-4 shrink-0" />
-            {item.label}
+            {t(`dashboard.settings.tabs.${item.label}`)}
           </button>
         );
       })}

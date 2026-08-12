@@ -4,6 +4,9 @@ import cors from "cors";
 import infoRouter from "./routes/info.route";
 import authRouter from "./routes/auth.route";
 import revenueRouter from "./routes/revenue.route";
+import staffRouter from "./routes/staff.route";
+import crmRouter from "./routes/crm.route";
+import calendarRouter from "./routes/calendar.route";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,6 +19,9 @@ app.use(express.json());
 app.use("/api/info", infoRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/revenue", revenueRouter);
+app.use("/api/staff", staffRouter);
+app.use("/api/crm", crmRouter);
+app.use("/api/calendar", calendarRouter);
 
 // Health check
 app.get("/health", (_req, res) => {

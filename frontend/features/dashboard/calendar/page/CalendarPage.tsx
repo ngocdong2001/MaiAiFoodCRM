@@ -3,10 +3,12 @@
 import CalendarSidebar from "../components/sections/CalendarSidebar";
 import LiveQueuePanel from "../components/sections/LiveQueuePanel";
 import StaffDailyScheduleSection from "../components/sections/StaffDailyScheduleSection";
+import { CalendarDataProvider } from "../context/CalendarDataContext";
 
 const CalendarPage = () => {
   return (
-    <div className="flex flex-col gap-6">
+    <CalendarDataProvider>
+      <div className="flex flex-col gap-6">
       <div className="min-w-0">
         <StaffDailyScheduleSection />
       </div>
@@ -20,7 +22,8 @@ const CalendarPage = () => {
           <LiveQueuePanel />
         </div>
       </div>
-    </div>
+      </div>
+    </CalendarDataProvider>
   );
 };
 

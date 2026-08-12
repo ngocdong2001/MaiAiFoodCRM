@@ -11,6 +11,7 @@ import { cn } from "@/shared/lib/utils";
 import { dashboardNavItems } from "@/features/dashboard/overview/data/data";
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import LanguageSwitcher from "@/core/lang/components/LanguageSwitcher";
+import { useAuthStore } from "@/core/store/authStore";
 import {
   Drawer,
   DrawerContent,
@@ -45,6 +46,8 @@ const DashboardHeader = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const userName = user?.name ?? t("dashboard.header.userFallback");
 
   const handleLogout = () => {
     authService.logout();
@@ -125,16 +128,17 @@ const DashboardHeader = () => {
                 <div className="mt-auto rounded-[16px] border border-[#DEE1E7] bg-white p-4 shadow-[0px_2px_4px_0px_#00000012]">
                   <div className="flex items-center gap-3">
                     <InitialsAvatar
-                      name="Sarah Lee"
+                      name={userName}
+                      src={user?.avatarUrl ?? undefined}
                       className="h-10 w-10"
                       online
                     />
                     <div>
                       <p className="text-sm font-semibold text-[#171A21]">
-                        {t("dashboard.header.userName")}
+                        {userName}
                       </p>
                       <p className="text-xs text-[#8D95A5]">
-                        {t("dashboard.header.ownerAccount")}
+                        {user?.email ?? t("dashboard.header.ownerAccount")}
                       </p>
                     </div>
                   </div>
@@ -152,7 +156,10 @@ const DashboardHeader = () => {
             </DrawerContent>
           </Drawer>
 
-          <Link href="/" className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/dashboard/overview"
+            className="flex shrink-0 items-center gap-3"
+          >
             <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <Activity className="h-5 w-5 text-white" />
             </span>
@@ -195,6 +202,7 @@ const DashboardHeader = () => {
           <button
             type="button"
             aria-label={t("dashboard.header.settings")}
+            onClick={() => router.push("/dashboard/settings")}
             className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
           >
             <Settings className="h-5 w-5" />
@@ -204,19 +212,19 @@ const DashboardHeader = () => {
               className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               aria-label={t("dashboard.header.accountMenu")}
             >
-              <InitialsAvatar name="Sarah Lee" className="h-9 w-9" online />
+              <InitialsAvatar name={userName} src={user?.avatarUrl ?? undefined} className="h-9 w-9" online />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
                 <DropdownMenuLabel>
-                  {t("dashboard.header.userName")}
+                  {userName}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
                   <User />
                   {t("dashboard.header.profile")}
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
                   <Settings />
                   {t("dashboard.header.settings")}
                 </DropdownMenuItem>

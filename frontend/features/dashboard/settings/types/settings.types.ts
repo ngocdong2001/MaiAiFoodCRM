@@ -1,4 +1,5 @@
 export type SettingsTab =
+  | "user-profile"
   | "business-profile"
   | "operating-hours"
   | "integrations"

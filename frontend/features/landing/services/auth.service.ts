@@ -1,14 +1,5 @@
 import { apiClient } from "@/core/config/axios.config";
-
-const AUTH_TOKEN_KEY = "maiai-auth-token";
-const AUTH_USER_KEY = "maiai-auth-user";
-
-type AuthUser = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-};
+import { useAuthStore, type AuthUser } from "@/core/store/authStore";
 
 type LoginResponse = {
   token: string;
@@ -22,27 +13,18 @@ export const authService = {
       password,
     });
 
-    if (data?.token) {
-      localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
-    }
+    if (data?.token) useAuthStore.getState().setSession(data.token, data.user);
 
     return data;
   },
 
   async getCurrentUser() {
-    const token = this.getStoredToken();
-    if (!token) {
-      return null;
-    }
+    if (!useAuthStore.getState().token) return null;
 
     try {
-      const { data } = await apiClient.get<{ user: AuthUser }>("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await apiClient.get<{ user: AuthUser }>("/auth/me");
 
+      useAuthStore.getState().setUser(data.user);
       return data.user;
     } catch {
       this.logout();
@@ -51,34 +33,16 @@ export const authService = {
   },
 
   getStoredToken() {
-    if (typeof window === "undefined") {
-      return null;
-    }
-
-    return localStorage.getItem(AUTH_TOKEN_KEY);
+    return useAuthStore.getState().token;
   },
 
   getStoredUser() {
-    if (typeof window === "undefined") {
-      return null;
-    }
-
-    const storedUser = localStorage.getItem(AUTH_USER_KEY);
-    if (!storedUser) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(storedUser) as AuthUser;
-    } catch {
-      return null;
-    }
+    return useAuthStore.getState().user;
   },
 
   logout() {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
-    }
+    useAuthStore.getState().logout();
   },
+
+  refreshCurrentUser() { return this.getCurrentUser(); },
 };

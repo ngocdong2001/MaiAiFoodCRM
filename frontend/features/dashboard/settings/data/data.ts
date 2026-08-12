@@ -5,11 +5,12 @@ import type {
 } from "../types/settings.types";
 
 export const settingsNavItems: SettingsNavItem[] = [
-  { key: "business-profile", label: "Business Profile", icon: "building" },
-  { key: "operating-hours", label: "Operating Hours", icon: "clock" },
-  { key: "integrations", label: "Integrations", icon: "calendar-days" },
-  { key: "communications", label: "Communications", icon: "phone-call" },
-  { key: "security", label: "Security & Access", icon: "shield-check" },
+  { key: "user-profile", label: "profile", icon: "user" },
+  { key: "business-profile", label: "businessProfile", icon: "building" },
+  { key: "operating-hours", label: "operatingHours", icon: "clock" },
+  { key: "integrations", label: "integrations", icon: "calendar-days" },
+  { key: "communications", label: "communications", icon: "phone-call" },
+  { key: "security", label: "security", icon: "shield-check" },
 ];
 
 export const defaultOperatingHours: DayHours[] = [

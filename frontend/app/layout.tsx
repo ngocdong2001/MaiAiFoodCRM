@@ -3,6 +3,7 @@ import { Onest } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/core/providers/QueryProvider";
 import I18nProvider from "@/core/lang/components/I18nProvider";
+import { AuthProvider } from "@/core/providers/AuthProvider";
 
 const onest = Onest({
   variable: "--font-onest",
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="en" className={`${onest.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <I18nProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <AuthProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </AuthProvider>
         </I18nProvider>
       </body>
     </html>
