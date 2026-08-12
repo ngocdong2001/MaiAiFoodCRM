@@ -19,7 +19,7 @@ type StaffRevenueRow = {
   services: number;
   tips: number;
   totalRevenue: number;
-  avatarUrl: string;
+  avatarUrl: string | null;
 };
 
 type PaymentMethodItem = {
@@ -36,6 +36,7 @@ type RevenueActivity = {
   paymentMethod: string;
   amount: number;
   time: string;
+  isWalkIn: boolean;
 };
 
 export type RevenueSummaryResponse = {
@@ -53,21 +54,14 @@ export type RevenueSummaryFilters = {
   paymentMethod?: string;
 };
 
-const PAYMENT_METHOD_META: Record<string, { label: string; color: string }> = {
-  cash: { label: "Cash", color: "#F04CAC" },
-  transfer: { label: "Bank Transfer", color: "#00CBC3" },
-  card: { label: "Card (POS)", color: "#EEBC4A" },
-  ewallet: { label: "E-Wallet", color: "#4F8BFF" },
-  loyalty_points: { label: "Loyalty Points", color: "#8A4CE0" },
-};
-
-const STAFF_AVATARS = [
-  "https://cdn.visily.ai/text2design/agentic-codegen-output/images/1df13a07-bfae-4161-910e-1ba02692b49d.webp",
-  "https://cdn.visily.ai/text2design/agentic-codegen-output/images/05700ff1-710c-4e58-9ac7-ff8fa30660bb.webp",
-  "https://cdn.visily.ai/text2design/agentic-codegen-output/images/c10d42d4-7e9d-4424-9db1-aa83ead76e6c.webp",
-  "https://cdn.visily.ai/text2design/images/54d091efb71e3f93785bead0499f4c3709adf57976e7c7a675afd645b13fa98d.webp",
-  "https://cdn.visily.ai/text2design/images/2849a8c214643b5939440013ebcf351c6a210a4a47359e804b5f49bd5774f409.webp",
-];
+const SETTING_GROUP = "revenue";
+const PAYMENT_LABEL_PREFIX = "payment_method_label.";
+const PAYMENT_COLOR_PREFIX = "payment_method_color.";
+const PAYMENT_VIA_PREFIX_KEY = "activity.payment_via_prefix";
+const WALK_IN_GUEST_KEY = "activity.walk_in_guest";
+const DEFAULT_PAYMENT_VIA_PREFIX = "Payment via";
+const DEFAULT_WALK_IN_GUEST_LABEL = "Walk-in Guest";
+const DEFAULT_PAYMENT_COLOR = "#9DA1A7";
 
 const decimalToNumber = (value: unknown): number => {
   if (value === null || value === undefined) {
@@ -116,6 +110,12 @@ const endOfDay = (date: Date) => {
   normalized.setHours(23, 59, 59, 999);
   return normalized;
 };
+
+const buildReadableMethodLabel = (value: string) =>
+  value
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 
 export const RevenueModel = {
   async getSummary(
@@ -255,6 +255,14 @@ export const RevenueModel = {
         }),
       ]);
 
+    const settingRows = await prisma.setting.findMany({
+      where: { group: SETTING_GROUP },
+      select: { key: true, value: true },
+    });
+    const settingMap = new Map(
+      settingRows.map((row) => [row.key, row.value]),
+    );
+
     const totalRevenue = decimalToNumber(currentAggregate._sum.finalAmount);
     const serviceRevenue = decimalToNumber(currentAggregate._sum.amount);
     const productRevenue = decimalToNumber(currentAggregate._sum.tipAmount);
@@ -311,11 +319,7 @@ export const RevenueModel = {
           services: 0,
           tips: 0,
           totalRevenue: 0,
-          avatarUrl:
-            payment.staff.avatarUrl ??
-            STAFF_AVATARS[payment.staffId % STAFF_AVATARS.length] ??
-            STAFF_AVATARS[0] ??
-            "",
+          avatarUrl: payment.staff.avatarUrl ?? null,
         };
 
         existing.services += 1;
@@ -325,14 +329,17 @@ export const RevenueModel = {
       }
 
       const methodKey = payment.paymentMethod;
-      const methodMeta =
-        PAYMENT_METHOD_META[methodKey] ??
-        ({ label: methodKey.replace(/_/g, " "), color: "#9DA1A7" } as const);
+      const methodLabel =
+        settingMap.get(`${PAYMENT_LABEL_PREFIX}${methodKey}`) ??
+        buildReadableMethodLabel(methodKey);
+      const methodColor =
+        settingMap.get(`${PAYMENT_COLOR_PREFIX}${methodKey}`) ??
+        DEFAULT_PAYMENT_COLOR;
       const methodExisting = paymentMethodMap.get(methodKey) ?? {
         key: methodKey,
-        label: methodMeta.label,
+        label: methodLabel,
         amount: 0,
-        color: methodMeta.color,
+        color: methodColor,
       };
 
       methodExisting.amount += decimalToNumber(payment.finalAmount);
@@ -350,17 +357,23 @@ export const RevenueModel = {
     const recentRevenueActivities: RevenueActivity[] = currentPayments
       .slice(0, 6)
       .map((payment) => {
-        const methodMeta =
-          PAYMENT_METHOD_META[payment.paymentMethod] ??
-          ({ label: payment.paymentMethod.replace(/_/g, " ") } as const);
+        const methodLabel =
+          settingMap.get(`${PAYMENT_LABEL_PREFIX}${payment.paymentMethod}`) ??
+          buildReadableMethodLabel(payment.paymentMethod);
+        const paymentViaPrefix =
+          settingMap.get(PAYMENT_VIA_PREFIX_KEY) ?? DEFAULT_PAYMENT_VIA_PREFIX;
+        const walkInGuestLabel =
+          settingMap.get(WALK_IN_GUEST_KEY) ?? DEFAULT_WALK_IN_GUEST_LABEL;
+        const isWalkIn = !payment.appointment?.guest?.name;
 
         return {
           key: `${payment.id}`,
-          title: payment.appointment?.guest?.name ?? "Walk-in Guest",
-          subtitle: `Payment via ${methodMeta.label}`,
+          title: payment.appointment?.guest?.name ?? walkInGuestLabel,
+          subtitle: `${paymentViaPrefix} ${methodLabel}`,
           paymentMethod: payment.paymentMethod,
           amount: decimalToNumber(payment.finalAmount),
           time: payment.paidAt.toISOString(),
+          isWalkIn,
         };
       });
 

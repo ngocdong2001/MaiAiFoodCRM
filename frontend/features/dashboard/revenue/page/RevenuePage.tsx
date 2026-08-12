@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -508,11 +509,15 @@ const RevenuePage = () => {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <img
-                          src={row.avatarUrl}
-                          alt={row.staffName}
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
+                        {row.avatarUrl ? (
+                          <img
+                            src={row.avatarUrl}
+                            alt={row.staffName}
+                            className="h-10 w-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <InitialsAvatar name={row.staffName} className="h-10 w-10" />
+                        )}
                         <span className="text-sm font-medium text-[#1D1F23]">
                           {row.staffName}
                         </span>
@@ -595,7 +600,7 @@ const RevenuePage = () => {
                       </span>
                       <div>
                         <p className="text-sm font-medium text-[#1D1F23]">
-                          {activity.title === "Walk-in Guest"
+                          {activity.isWalkIn
                             ? t("dashboard.revenue.activity.walkInGuest")
                             : activity.title}
                         </p>

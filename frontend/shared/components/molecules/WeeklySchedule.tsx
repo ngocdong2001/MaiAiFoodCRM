@@ -100,7 +100,9 @@ const formatHour = (hour: number) => {
 };
 
 const positionSlots = (slots: WeeklyScheduleSlot[]): PositionedSlot[] => {
-  const sorted = [...slots].sort((left, right) => left.startHour - right.startHour);
+  const sorted = [...slots].sort(
+    (left, right) => left.startHour - right.startHour,
+  );
   const laneEnds: number[] = [];
   const positioned = sorted.map((slot) => {
     let lane = laneEnds.findIndex((endHour) => endHour <= slot.startHour);
@@ -155,7 +157,10 @@ const WeeklySchedule = ({
     month: "long",
     year: "numeric",
   });
-  const monthDays = useMemo(() => buildCalendarDays(monthCursor), [monthCursor]);
+  const monthDays = useMemo(
+    () => buildCalendarDays(monthCursor),
+    [monthCursor],
+  );
 
   return (
     <div className="rounded-xl border border-[#DEE1E7] bg-white shadow-[0px_2px_4px_0px_#00000012]">
@@ -242,7 +247,9 @@ const WeeklySchedule = ({
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </button>
-                    <p className="text-sm font-semibold text-[#171A21]">{monthLabel}</p>
+                    <p className="text-sm font-semibold text-[#171A21]">
+                      {monthLabel}
+                    </p>
                     <button
                       type="button"
                       onClick={() =>
@@ -292,7 +299,9 @@ const WeeklySchedule = ({
                               : isCurrentMonth
                                 ? "text-[#171A21] hover:bg-[#F3F4F7]"
                                 : "text-[#B7BDC9] hover:bg-[#F7F8FA]",
-                            isToday && !isSelected ? "ring-1 ring-primary/40" : "",
+                            isToday && !isSelected
+                              ? "ring-1 ring-primary/40"
+                              : "",
                           ].join(" ")}
                         >
                           {day.getDate()}
@@ -392,8 +401,12 @@ const WeeklySchedule = ({
                   {resourceSlots.map((slot) => {
                     const accent = slot.color ?? "#F04CAC";
                     const text = slot.textColor ?? "#C91D8F";
-                    const primary = slot.label ?? `${formatHour(slot.startHour)} - ${formatHour(slot.endHour)}`;
-                    const combinedText = slot.sublabel ? `${primary} • ${slot.sublabel}` : primary;
+                    const primary =
+                      slot.label ??
+                      `${formatHour(slot.startHour)} - ${formatHour(slot.endHour)}`;
+                    const combinedText = slot.sublabel
+                      ? `${primary} • ${slot.sublabel}`
+                      : primary;
 
                     return (
                       <Popover
@@ -411,12 +424,22 @@ const WeeklySchedule = ({
                             color: text,
                           }}
                         >
-                          <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold" style={{ color: text }}>
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
+                          <span
+                            className="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold"
+                            style={{ color: text }}
+                          >
+                            <span
+                              className="h-1.5 w-1.5 shrink-0 rounded-full"
+                              style={{ backgroundColor: accent }}
+                            />
                             <span className="truncate">{combinedText}</span>
                           </span>
                         </PopoverTrigger>
-                        <PopoverContent align="start" side="top" className="w-84">
+                        <PopoverContent
+                          align="start"
+                          side="top"
+                          className="w-84"
+                        >
                           <ScheduleSlotPopoverContent
                             staffName={resource.name}
                             staffRole={resource.subtitle}

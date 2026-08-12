@@ -72,7 +72,32 @@ const ensureNoConflict = async (transaction, input, excludeId) => {
 exports.CalendarModel = {
     async getAll(filters) {
         const appointments = await prisma_1.prisma.appointment.findMany({ where: { startTime: { gte: new Date(filters.startDate), lte: new Date(filters.endDate) }, ...(filters.staffIds?.length ? { staffId: { in: filters.staffIds } } : {}), ...(filters.status ? { status: filters.status } : {}) }, include, orderBy: { startTime: "asc" } });
-        return appointments.map(serialize);
+        const schedulePairs = Array.from(new Set(appointments.map((appointment) => `${appointment.staffId}::${appointment.startTime.toISOString().slice(0, 10)}`))).map((key) => {
+            const [staffIdRaw, dateRaw] = key.split("::");
+            return {
+                staffId: Number(staffIdRaw),
+                date: new Date(`${dateRaw}T00:00:00.000Z`),
+            };
+        });
+        const schedules = schedulePairs.length
+            ? await prisma_1.prisma.staffschedule.findMany({
+                where: { OR: schedulePairs },
+                select: { staffId: true, date: true, note: true },
+            })
+            : [];
+        const scheduleMap = new Map(schedules.map((schedule) => [
+            `${schedule.staffId}-${schedule.date.toISOString().slice(0, 10)}`,
+            schedule.note,
+        ]));
+        return appointments.map((appointment) => {
+            const payload = serialize(appointment);
+            const dateKey = appointment.startTime.toISOString().slice(0, 10);
+            const station = scheduleMap.get(`${appointment.staffId}-${dateKey}`) ?? null;
+            return {
+                ...payload,
+                station,
+            };
+        });
     },
     async getOptions() {
         const [guests, staff, services] = await Promise.all([

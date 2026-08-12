@@ -46,7 +46,11 @@ const WeeklyScheduleSection = ({
     return `${start} - ${end}`;
   };
 
-  const getSlotWorkItems = (staffId: number, startHour: number, endHour: number) => {
+  const getSlotWorkItems = (
+    staffId: number,
+    startHour: number,
+    endHour: number,
+  ) => {
     return appointments
       .filter((appointment) => {
         if (appointment.staffId !== staffId) {
@@ -64,11 +68,14 @@ const WeeklyScheduleSection = ({
       }));
   };
 
-  const rangeLabel = new Date(`${selectedDate}T00:00:00`).toLocaleDateString([], {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const rangeLabel = new Date(`${selectedDate}T00:00:00`).toLocaleDateString(
+    [],
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    },
+  );
 
   return (
     <WeeklySchedule

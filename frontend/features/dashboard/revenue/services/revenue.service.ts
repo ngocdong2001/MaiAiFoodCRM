@@ -18,7 +18,7 @@ export type StaffRevenueRow = {
   services: number;
   tips: number;
   totalRevenue: number;
-  avatarUrl: string;
+  avatarUrl: string | null;
 };
 
 export type PaymentMethodItem = {
@@ -35,6 +35,7 @@ export type RevenueActivity = {
   paymentMethod: string;
   amount: number;
   time: string;
+  isWalkIn: boolean;
 };
 
 export type RevenueSummaryResponse = {

@@ -60,7 +60,9 @@ const StaffPage = () => {
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<StaffMember | null>(null);
-  const [deletingMember, setDeletingMember] = useState<StaffMember | null>(null);
+  const [deletingMember, setDeletingMember] = useState<StaffMember | null>(
+    null,
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const deferredQuery = useDeferredValue(query.trim());
   const dayRange = useMemo(() => toDayQueryRange(selectedDate), [selectedDate]);
@@ -139,16 +141,29 @@ const StaffPage = () => {
       {staffQuery.isPending ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }, (_, index) => (
-            <div key={index} className="h-64 animate-pulse rounded-xl border border-[#DEE1E7] bg-white" />
+            <div
+              key={index}
+              className="h-64 animate-pulse rounded-xl border border-[#DEE1E7] bg-white"
+            />
           ))}
         </div>
       ) : staffQuery.isError ? (
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
           <p>Could not load staff from the database.</p>
-          <Button variant="outline" className="mt-3" onClick={() => staffQuery.refetch()}>Try again</Button>
+          <Button
+            variant="outline"
+            className="mt-3"
+            onClick={() => staffQuery.refetch()}
+          >
+            Try again
+          </Button>
         </div>
       ) : (
-        <StaffGridSection members={members} onEdit={openEdit} onDelete={setDeletingMember} />
+        <StaffGridSection
+          members={members}
+          onEdit={openEdit}
+          onDelete={setDeletingMember}
+        />
       )}
 
       <WeeklyScheduleSection
@@ -172,17 +187,25 @@ const StaffPage = () => {
         onSubmit={submitStaff}
       />
 
-      <AlertDialog open={Boolean(deletingMember)} onOpenChange={(open) => !open && setDeletingMember(null)}>
+      <AlertDialog
+        open={Boolean(deletingMember)}
+        onOpenChange={(open) => !open && setDeletingMember(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete staff member?</AlertDialogTitle>
             <AlertDialogDescription>
-              {deletingMember?.name}&apos;s profile, schedules, and specialty assignments will be removed permanently.
+              {deletingMember?.name}&apos;s profile, schedules, and specialty
+              assignments will be removed permanently.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={deleteStaff.isPending} className="bg-destructive text-white hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={deleteStaff.isPending}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
               {deleteStaff.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

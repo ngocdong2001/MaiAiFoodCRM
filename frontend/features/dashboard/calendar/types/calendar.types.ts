@@ -84,6 +84,7 @@ export type ApiAppointment = {
   status: string;
   priority: string;
   notes: string | null;
+  station: string | null;
   guest: CalendarOption & {
     totalVisits: number;
     loyaltyPoints: number;

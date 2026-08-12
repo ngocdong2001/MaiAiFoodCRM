@@ -16,7 +16,9 @@ const validateInput = (body) => {
     if (body.status && !staff_model_1.STAFF_STATUSES.includes(body.status)) {
         return "Invalid staff status";
     }
-    if (body.hourlyRate !== null && body.hourlyRate !== undefined && body.hourlyRate < 0) {
+    if (body.hourlyRate !== null &&
+        body.hourlyRate !== undefined &&
+        body.hourlyRate < 0) {
         return "Hourly rate cannot be negative";
     }
     if (body.commissionRate !== null &&
@@ -67,7 +69,9 @@ const handleError = (res, error, message) => {
             return;
         }
         if (error.code === "P2002") {
-            res.status(409).json({ success: false, message: "Staff data already exists" });
+            res
+                .status(409)
+                .json({ success: false, message: "Staff data already exists" });
             return;
         }
         if (error.code === "P2003") {
@@ -85,18 +89,26 @@ exports.StaffController = {
         try {
             const status = typeof req.query.status === "string" ? req.query.status : undefined;
             if (status && !staff_model_1.STAFF_STATUSES.includes(status)) {
-                res.status(400).json({ success: false, message: "Invalid staff status" });
+                res
+                    .status(400)
+                    .json({ success: false, message: "Invalid staff status" });
                 return;
             }
-            const date = typeof req.query.date === "string" ? req.query.date : new Date().toISOString().slice(0, 10);
+            const date = typeof req.query.date === "string"
+                ? req.query.date
+                : new Date().toISOString().slice(0, 10);
             if (!ISO_DATE_PATTERN.test(date)) {
-                res.status(400).json({ success: false, message: "Date must use YYYY-MM-DD format" });
+                res
+                    .status(400)
+                    .json({ success: false, message: "Date must use YYYY-MM-DD format" });
                 return;
             }
             const data = await staff_model_1.StaffModel.getAll({
                 date,
                 status: status,
-                search: typeof req.query.search === "string" ? req.query.search.trim() : undefined,
+                search: typeof req.query.search === "string"
+                    ? req.query.search.trim()
+                    : undefined,
             });
             res.status(200).json({ success: true, data });
         }
@@ -140,7 +152,9 @@ exports.StaffController = {
         }
         try {
             const data = await staff_model_1.StaffModel.create(input);
-            res.status(201).json({ success: true, data, message: "Staff created successfully" });
+            res
+                .status(201)
+                .json({ success: true, data, message: "Staff created successfully" });
         }
         catch (error) {
             handleError(res, error, "Failed to create staff");
@@ -160,7 +174,9 @@ exports.StaffController = {
         }
         try {
             const data = await staff_model_1.StaffModel.update(id, input);
-            res.status(200).json({ success: true, data, message: "Staff updated successfully" });
+            res
+                .status(200)
+                .json({ success: true, data, message: "Staff updated successfully" });
         }
         catch (error) {
             handleError(res, error, "Failed to update staff");
