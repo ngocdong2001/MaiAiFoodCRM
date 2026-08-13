@@ -29,7 +29,9 @@ export const getPrismaTenant = (
     databaseUrl || process.env.DATABASE_URL_TENANT || process.env.DATABASE_URL;
 
   if (!resolvedDatabaseUrl) {
-    throw new Error("Missing tenant database URL (DATABASE_URL_TENANT or DATABASE_URL)");
+    throw new Error(
+      "Missing tenant database URL (DATABASE_URL_TENANT or DATABASE_URL)",
+    );
   }
 
   const opts = parseDbUrl(resolvedDatabaseUrl);

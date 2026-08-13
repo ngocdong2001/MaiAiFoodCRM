@@ -23,7 +23,9 @@ const parseDbUrl = (url: string) => {
 const dbUrl = process.env.DATABASE_URL ?? process.env.DATABASE_URL_TENANT;
 
 if (!dbUrl) {
-  throw new Error("Missing DATABASE_URL (or DATABASE_URL_TENANT) for Prisma connection");
+  throw new Error(
+    "Missing DATABASE_URL (or DATABASE_URL_TENANT) for Prisma connection",
+  );
 }
 
 const parsed = parseDbUrl(dbUrl);
