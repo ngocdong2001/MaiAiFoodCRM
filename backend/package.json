@@ -2,30 +2,37 @@
   "name": "maiai-backend",
   "version": "1.0.0",
   "description": "MAIAI Backend API Server (Node.js/Express)",
+  "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "tsx --env-file=.env --watch src/server.ts",
     "build": "tsc",
-    "seed": "ts-node-dev --transpile-only --exit-child prisma/seed.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "prisma:generate": "npm run prisma:generate-master && npm run prisma:generate-tenant",
+    "prisma:generate-master": "prisma generate --schema ./prisma/schema.master.prisma --config ./prisma.config.ts",
+    "prisma:generate-tenant": "prisma generate --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts",
+    "migrate:deploy": "npm run migrate:deploy-master && npm run migrate:deploy-tenant",
+    "migrate:deploy-master": "prisma migrate deploy --schema ./prisma/schema.master.prisma --config ./prisma.config.ts",
+    "migrate:deploy-tenant": "prisma migrate deploy --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.1.0",
+    "@prisma/adapter-mariadb": "^7.0.0",
+    "@prisma/client": "^7.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "googleapis": "^144.0.0",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "mariadb": "^3.4.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20.14.0",
-    "prisma": "^6.1.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.5"
+    "@types/node": "^22.0.0",
+    "prisma": "^7.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.0"
   },
   "author": "",
   "license": "ISC"

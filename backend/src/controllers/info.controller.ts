@@ -1,9 +1,17 @@
 import { Request, Response } from "express";
-import { InfoModel, InfoFormData } from "../models/info.model";
+import { InfoModel, InfoFormData } from "../models/info.model.js";
 
 export const InfoController = {
   async create(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.user || !req.tenantClient) {
+        res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+        return;
+      }
+
       const { firstName, lastName, email, salonName }: InfoFormData = req.body;
 
       if (!firstName || !lastName || !email || !salonName) {
@@ -35,8 +43,16 @@ export const InfoController = {
     }
   },
 
-  async getAll(_req: Request, res: Response): Promise<void> {
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.user || !req.tenantClient) {
+        res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+        return;
+      }
+
       const data = await InfoModel.getAll();
       res.status(200).json(data);
     } catch (error) {

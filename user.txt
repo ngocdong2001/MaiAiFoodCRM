@@ -1,0 +1,19 @@
+Admin
+Email: admin@maiai.com
+Password: Admin@123
+Role: owner
+
+Manager
+Email: manager@maiai.com
+Password: Manager@123
+Role: manager
+
+Staff
+Email: staff@maiai.com
+Password: Staff@123
+Role: staff
+
+Reception
+Email: reception@maiai.com
+Password: Reception@123
+Role: staff

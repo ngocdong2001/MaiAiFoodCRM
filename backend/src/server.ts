@@ -7,6 +7,9 @@ import revenueRouter from "./routes/revenue.route";
 import staffRouter from "./routes/staff.route";
 import crmRouter from "./routes/crm.route";
 import calendarRouter from "./routes/calendar.route";
+import tenantRouter from "./routes/tenant.route.js";
+import { getPrismaMaster, disconnectPrismaMaster } from "./lib/prisma-master.js";
+import { disconnectAllTenants } from "./lib/prisma-tenant.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,6 +18,18 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Initialize Prisma Master connection on startup
+async function initializePrisma() {
+  try {
+    const prismaMaster = getPrismaMaster();
+    await prismaMaster.$connect();
+    console.log("✅ Prisma Master connected");
+  } catch (error) {
+    console.error("❌ Failed to connect Prisma Master:", error);
+    process.exit(1);
+  }
+}
+
 // Routes
 app.use("/api/info", infoRouter);
 app.use("/api/auth", authRouter);
@@ -22,12 +37,42 @@ app.use("/api/revenue", revenueRouter);
 app.use("/api/staff", staffRouter);
 app.use("/api/crm", crmRouter);
 app.use("/api/calendar", calendarRouter);
+app.use("/api/admin/tenants", tenantRouter);
 
 // Health check
 app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Graceful shutdown
+const gracefulShutdown = async () => {
+  console.log("\n🛑 Shutting down gracefully...");
+  try {
+    await disconnectPrismaMaster();
+    await disconnectAllTenants();
+    console.log("✅ All database connections closed");
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ Error during shutdown:", error);
+    process.exit(1);
+  }
+};
+
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
+
+// Start server
+const startServer = async () => {
+  await initializePrisma();
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  });
+};
+
+startServer().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
 });
+
