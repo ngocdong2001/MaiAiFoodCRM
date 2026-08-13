@@ -25,7 +25,14 @@ export const getPrismaTenant = (
   }
 
   // Create new client for this tenant
-  const opts = parseDbUrl(databaseUrl);
+  const resolvedDatabaseUrl =
+    databaseUrl || process.env.DATABASE_URL_TENANT || process.env.DATABASE_URL;
+
+  if (!resolvedDatabaseUrl) {
+    throw new Error("Missing tenant database URL (DATABASE_URL_TENANT or DATABASE_URL)");
+  }
+
+  const opts = parseDbUrl(resolvedDatabaseUrl);
   const adapter = new PrismaMariaDb({
     host: opts.host,
     port: opts.port,

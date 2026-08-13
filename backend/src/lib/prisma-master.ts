@@ -17,7 +17,10 @@ let prismaMaster: PrismaMaster | null = null;
 export const getPrismaMaster = (): PrismaMaster => {
   if (prismaMaster) return prismaMaster;
 
-  const dbUrl = process.env.DATABASE_URL_MASTER!;
+  const dbUrl = process.env.DATABASE_URL_MASTER ?? process.env.DATABASE_URL;
+  if (!dbUrl) {
+    throw new Error("Missing DATABASE_URL_MASTER (or DATABASE_URL) for Prisma master connection");
+  }
   const opts = parseDbUrl(dbUrl);
   const adapter = new PrismaMariaDb({
     host: opts.host,
