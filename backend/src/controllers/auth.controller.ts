@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
 import jwt, { type SignOptions } from "jsonwebtoken";
 
-import { prisma } from "../lib/prisma";
+import { getPrismaMaster } from "../lib/prisma-master.js";
 
 const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiresIn =
@@ -13,11 +13,13 @@ const toAuthUser = (user: {
   name: string;
   email: string;
   role: string;
+  tenantId: number;
 }) => ({
   id: user.id,
   name: user.name,
   email: user.email,
   role: user.role,
+  tenantId: user.tenantId,
 });
 
 export const login = async (req: Request, res: Response) => {
@@ -35,11 +37,16 @@ export const login = async (req: Request, res: Response) => {
   const candidatePassword = String(password);
 
   try {
-    const user = await prisma.user.findUnique({
+    const prismaMaster = getPrismaMaster();
+    
+    const user = await prismaMaster.user.findUnique({
       where: { email: normalizedEmail },
+      include: {
+        tenant: true,
+      },
     });
 
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || !user.tenant?.isActive) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -54,7 +61,8 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        sub: String(user.id),
+        sub: user.id,
+        tenantId: user.tenantId,
         email: user.email,
         role: user.role,
       },
@@ -62,7 +70,7 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: jwtExpiresIn },
     );
 
-    await prisma.user.update({
+    await prismaMaster.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
@@ -70,6 +78,11 @@ export const login = async (req: Request, res: Response) => {
     return res.status(200).json({
       token,
       user: toAuthUser(user),
+      tenant: {
+        id: user.tenant.id,
+        name: user.tenant.name,
+        slug: user.tenant.slug,
+      },
     });
   } catch (error) {
     console.error("Login failed", error);
@@ -82,5 +95,8 @@ export const me = (req: Request, res: Response) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  return res.status(200).json({ user: req.user });
+  return res.status(200).json({ 
+    user: req.user,
+    tenant: req.tenant,
+  });
 };

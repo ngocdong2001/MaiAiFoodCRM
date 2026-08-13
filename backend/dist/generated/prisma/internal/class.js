@@ -54,7 +54,7 @@ const config = {
             "value": "prisma-client"
         },
         "output": {
-            "value": "D:\\duanhientai\\danglam\\MAIAI\\test\\backend\\src\\generated\\prisma",
+            "value": "D:\\!Project\\MaiAI\\MaiAICRM\\backend\\src\\generated\\prisma",
             "fromEnvVar": null
         },
         "config": {
@@ -68,7 +68,7 @@ const config = {
             }
         ],
         "previewFeatures": [],
-        "sourceFilePath": "D:\\duanhientai\\danglam\\MAIAI\\test\\backend\\prisma\\schema.prisma",
+        "sourceFilePath": "D:\\!Project\\MaiAI\\MaiAICRM\\backend\\prisma\\schema.prisma",
         "isCustomOutput": true
     },
     "relativePath": "../../../prisma",

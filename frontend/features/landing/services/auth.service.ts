@@ -2,17 +2,26 @@ import { apiClient } from "@/core/config/axios.config";
 
 const AUTH_TOKEN_KEY = "maiai-auth-token";
 const AUTH_USER_KEY = "maiai-auth-user";
+const AUTH_TENANT_KEY = "maiai-auth-tenant";
 
 type AuthUser = {
   id: number;
+  tenantId: number;
   name: string;
   email: string;
   role: string;
 };
 
+type AuthTenant = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
 type LoginResponse = {
   token: string;
   user: AuthUser;
+  tenant: AuthTenant;
 };
 
 export const authService = {
@@ -25,6 +34,7 @@ export const authService = {
     if (data?.token) {
       localStorage.setItem(AUTH_TOKEN_KEY, data.token);
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+      localStorage.setItem(AUTH_TENANT_KEY, JSON.stringify(data.tenant));
     }
 
     return data;
@@ -37,13 +47,13 @@ export const authService = {
     }
 
     try {
-      const { data } = await apiClient.get<{ user: AuthUser }>("/auth/me", {
+      const { data } = await apiClient.get<{ user: AuthUser; tenant: AuthTenant }>("/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      return data.user;
+      return data;
     } catch {
       this.logout();
       return null;
@@ -75,10 +85,28 @@ export const authService = {
     }
   },
 
+  getStoredTenant() {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    const storedTenant = localStorage.getItem(AUTH_TENANT_KEY);
+    if (!storedTenant) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedTenant) as AuthTenant;
+    } catch {
+      return null;
+    }
+  },
+
   logout() {
     if (typeof window !== "undefined") {
       localStorage.removeItem(AUTH_TOKEN_KEY);
       localStorage.removeItem(AUTH_USER_KEY);
+      localStorage.removeItem(AUTH_TENANT_KEY);
     }
   },
 };
