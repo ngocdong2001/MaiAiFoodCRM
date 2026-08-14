@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx --env-file=.env --watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "tsx --env-file=.env src/server.ts",
     "prisma:generate": "npm run prisma:generate-master && npm run prisma:generate-tenant",
     "prisma:generate-master": "prisma generate --schema ./prisma/schema.master.prisma --config ./prisma.config.ts",
     "prisma:generate-tenant": "prisma generate --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts",
