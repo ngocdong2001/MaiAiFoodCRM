@@ -49,7 +49,7 @@ export const authMiddleware = async (
     req.tenant = {
       id: user.tenant.id,
       name: user.tenant.name,
-      databaseUrl: `mysql://maiai:123@127.0.0.1:3306/${user.tenant.databaseName}`,
+      databaseUrl: `mysql://maiai:maiai@127.0.0.1:3307/${user.tenant.databaseName}`,
     };
 
     // Create tenant-specific Prisma client
@@ -65,6 +65,8 @@ export const authMiddleware = async (
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
+      avatarUrl: user.avatarUrl,
     };
 
     return next();
