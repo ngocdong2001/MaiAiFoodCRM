@@ -9,6 +9,8 @@ declare global {
         name: string;
         email: string;
         role: string;
+        phone?: string | null;
+        avatarUrl?: string | null;
       };
       tenant?: {
         id: number;

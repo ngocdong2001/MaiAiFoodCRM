@@ -5,6 +5,7 @@ import {
   getTenant,
   updateTenant,
   deleteTenant,
+  getDatabaseInfo,
 } from "../controllers/tenant.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 
@@ -16,6 +17,7 @@ router.use(authMiddleware);
 router.post("/", createTenant);
 router.get("/", listTenants);
 router.get("/:id", getTenant);
+router.get("/:id/database-info", getDatabaseInfo);
 router.patch("/:id", updateTenant);
 router.delete("/:id", deleteTenant);
 

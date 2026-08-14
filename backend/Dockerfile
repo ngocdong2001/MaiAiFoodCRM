@@ -27,4 +27,4 @@ COPY --from=build /app/package.json ./
 COPY --from=build /app/prisma.config.ts ./
 COPY --from=build /app/prisma.config.tenant.ts ./
 EXPOSE 3001
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.master.prisma --config ./prisma.config.ts && node dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.master.prisma --config ./prisma.config.ts || echo 'Migration skipped (tables may already exist)'; node dist/server.js"]

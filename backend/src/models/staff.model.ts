@@ -1,4 +1,4 @@
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../generated/prisma-tenant/client.js";
 import { prisma } from "../lib/prisma";
 
 export const STAFF_STATUSES = ["active", "busy", "on_leave", "inactive"] as const;
@@ -94,16 +94,16 @@ export const StaffModel = {
       status: filters.status ?? { not: "inactive" },
       ...(filters.search
         ? {
-            OR: [
-              { name: { contains: filters.search } },
-              { role: { contains: filters.search } },
-              {
-                staffschedule: {
-                  some: { date, note: { contains: filters.search } },
-                },
+          OR: [
+            { name: { contains: filters.search } },
+            { role: { contains: filters.search } },
+            {
+              staffschedule: {
+                some: { date, note: { contains: filters.search } },
               },
-            ],
-          }
+            },
+          ],
+        }
         : {}),
     };
 
@@ -142,26 +142,26 @@ export const StaffModel = {
           ...buildStaffData(input),
           ...(input.specialtyIds?.length
             ? {
-                staffspecialtymapping: {
-                  create: input.specialtyIds.map((specialtyId) => ({
-                    specialtyId,
-                  })),
-                },
-              }
+              staffspecialtymapping: {
+                create: input.specialtyIds.map((specialtyId) => ({
+                  specialtyId,
+                })),
+              },
+            }
             : {}),
           ...(input.schedule
             ? {
-                staffschedule: {
-                  create: {
-                    ...input.schedule,
-                    date: parseDate(input.schedule.date),
-                    note: nullableText(input.schedule.note),
-                    breakStart: nullableText(input.schedule.breakStart),
-                    breakEnd: nullableText(input.schedule.breakEnd),
-                    updatedAt: new Date(),
-                  },
+              staffschedule: {
+                create: {
+                  ...input.schedule,
+                  date: parseDate(input.schedule.date),
+                  note: nullableText(input.schedule.note),
+                  breakStart: nullableText(input.schedule.breakStart),
+                  breakEnd: nullableText(input.schedule.breakEnd),
+                  updatedAt: new Date(),
                 },
-              }
+              },
+            }
             : {}),
         },
       });

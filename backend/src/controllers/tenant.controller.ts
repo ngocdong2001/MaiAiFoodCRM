@@ -1,15 +1,13 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { readFileSync, existsSync } from "fs";
-import { join, dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { join, resolve } from "path";
 import { createConnection } from "mariadb";
 
 import { getPrismaMaster } from "../lib/prisma-master.js";
 import { getPrismaTenant, disconnectPrismaTenant } from "../lib/prisma-tenant.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// __dirname is available in CommonJS modules
 
 // Resolve project root (backend/)
 const PROJECT_ROOT = resolve(__dirname, "../..");
@@ -84,14 +82,14 @@ export const createTenant = async (req: Request, res: Response) => {
       PROJECT_ROOT,
       "prisma/migrations_tenant/20260803000100_init_crm/migration.sql",
     );
-    
+
     console.log("Migration path:", migrationPath);
     console.log("File exists:", existsSync(migrationPath));
-    
+
     if (!existsSync(migrationPath)) {
       throw new Error(`Migration file not found: ${migrationPath}`);
     }
-    
+
     const migrationSQL = readFileSync(migrationPath, "utf-8");
     console.log("Migration SQL length:", migrationSQL.length);
     const statements = migrationSQL
@@ -232,6 +230,74 @@ export const deleteTenant = async (req: Request, res: Response) => {
     await prisma.tenant.delete({ where: { id } });
 
     return res.json({ message: `Tenant "${tenant.name}" deleted`, databaseDropped: tenant.databaseName });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ─── GET /api/admin/tenants/:id/database-info ──────────────────────────────
+export const getDatabaseInfo = async (req: Request, res: Response) => {
+  try {
+    const prisma = getPrismaMaster();
+    const id = Number(req.params.id);
+
+    const tenant = await prisma.tenant.findUnique({ where: { id } });
+    if (!tenant) {
+      return res.status(404).json({ message: "Tenant not found" });
+    }
+
+    const conn = await getRawConnection(tenant.databaseName);
+    try {
+      // Get tables with row counts and data sizes
+      const tables = await conn.query(`
+        SELECT
+          TABLE_NAME    AS tableName,
+          TABLE_ROWS    AS rowCount,
+          DATA_LENGTH   AS dataSize,
+          INDEX_LENGTH  AS indexSize,
+          UPDATE_TIME   AS lastUpdated
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = ?
+          AND TABLE_TYPE = 'BASE TABLE'
+        ORDER BY DATA_LENGTH DESC
+      `, [tenant.databaseName]);
+
+      // Get total database size
+      const [sizeRow] = await conn.query(`
+        SELECT
+          SUM(DATA_LENGTH + INDEX_LENGTH) AS totalSize
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = ? AND TABLE_TYPE = 'BASE TABLE'
+      `, [tenant.databaseName]);
+
+      // Get MariaDB version
+      const [versionRow] = await conn.query(`SELECT VERSION() AS version`);
+
+      // Get connection info
+      const url = new URL(process.env.DATABASE_URL_MASTER!);
+
+      return res.json({
+        ok: true,
+        database: {
+          name: tenant.databaseName,
+          host: url.hostname,
+          port: Number(url.port) || 3306,
+          version: versionRow?.version || "MariaDB",
+          totalSize: Number(sizeRow?.totalSize || 0),
+          isSslActive: true,
+        },
+        tables: tables.map((t: any) => ({
+          name: t.tableName,
+          rowCount: Number(t.rowCount) || 0,
+          dataSize: Number(t.dataSize) || 0,
+          indexSize: Number(t.indexSize) || 0,
+          totalSize: Number(Number(t.dataSize || 0) + Number(t.indexSize || 0)),
+          lastUpdated: t.lastUpdated || null,
+        })),
+      });
+    } finally {
+      await conn.end();
+    }
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }

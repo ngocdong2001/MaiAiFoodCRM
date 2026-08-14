@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../generated/prisma-tenant/client.js";
 import { APPOINTMENT_STATUSES, CalendarDomainError, CalendarModel, type AppointmentInput, type AppointmentStatus } from "../models/calendar.model";
 
 const parseId = (value: string) => { const id = Number.parseInt(value, 10); return Number.isInteger(id) && id > 0 ? id : null; };

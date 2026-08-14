@@ -1,4 +1,4 @@
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../generated/prisma-tenant/client.js";
 import { prisma } from "../lib/prisma";
 
 export type GuestSegment = "VIP" | "Loyal" | "At Risk";
@@ -115,13 +115,13 @@ export const CRMModel = {
       isActive: true,
       ...(filters.search
         ? {
-            OR: [
-              { name: { contains: filters.search } },
-              { phone: { contains: filters.search } },
-              { email: { contains: filters.search } },
-              { guesttagmapping: { some: { guesttag: { name: { contains: filters.search } } } } },
-            ],
-          }
+          OR: [
+            { name: { contains: filters.search } },
+            { phone: { contains: filters.search } },
+            { email: { contains: filters.search } },
+            { guesttagmapping: { some: { guesttag: { name: { contains: filters.search } } } } },
+          ],
+        }
         : {}),
     };
     const guests = await prisma.guest.findMany({ where, include: guestInclude, orderBy: { name: "asc" } });

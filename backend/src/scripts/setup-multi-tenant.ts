@@ -76,7 +76,8 @@ async function runMasterMigrations() {
 
 async function createDefaultTenant() {
   // Import Prisma after env is set
-  const { PrismaClient } = await import("./generated/prisma-master");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { PrismaClient } = require("../generated/prisma-master/client.js");
 
   const prismaMaster = new PrismaClient({
     datasources: {
@@ -102,6 +103,7 @@ async function createDefaultTenant() {
         maxUsers: 5,
         maxGuests: 1000,
         databaseName: "maiai_crm_1", // Will create this DB
+        updatedAt: new Date(),
       },
     });
   }
@@ -136,7 +138,8 @@ async function createTenantDatabaseAndMigrate(tenantId: number) {
 }
 
 async function createAdminUser(tenantId: number) {
-  const { PrismaClient } = await import("./generated/prisma-master");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { PrismaClient } = require("../generated/prisma-master/client.js");
 
   const prismaMaster = new PrismaClient({
     datasources: {
@@ -163,6 +166,7 @@ async function createAdminUser(tenantId: number) {
         passwordHash,
         name: "Admin User",
         role: "owner",
+        updatedAt: new Date(),
       },
     });
   }
@@ -172,6 +176,6 @@ async function createAdminUser(tenantId: number) {
 }
 
 // Run setup if this is the main module
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   setupMultiTenant().catch(console.error);
 }

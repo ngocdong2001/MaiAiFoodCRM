@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../generated/prisma-tenant/client.js";
 import { CRMModel, type GuestInput, type GuestSegment } from "../models/crm.model";
 
 const SEGMENTS: GuestSegment[] = ["VIP", "Loyal", "At Risk"];

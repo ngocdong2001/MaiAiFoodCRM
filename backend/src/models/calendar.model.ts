@@ -1,4 +1,4 @@
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../generated/prisma-tenant/client.js";
 import { prisma } from "../lib/prisma";
 
 export const APPOINTMENT_STATUSES = [
@@ -76,9 +76,9 @@ const serialize = (appointment: any) => ({
   })),
   payment: appointment.payment
     ? {
-        ...appointment.payment,
-        finalAmount: Number(appointment.payment.finalAmount),
-      }
+      ...appointment.payment,
+      finalAmount: Number(appointment.payment.finalAmount),
+    }
     : null,
 });
 
@@ -203,9 +203,9 @@ export const CalendarModel = {
 
     const schedules = schedulePairs.length
       ? await prisma.staffschedule.findMany({
-          where: { OR: schedulePairs },
-          select: { staffId: true, date: true, note: true },
-        })
+        where: { OR: schedulePairs },
+        select: { staffId: true, date: true, note: true },
+      })
       : [];
 
     const scheduleMap = new Map(
@@ -279,7 +279,7 @@ export const CalendarModel = {
           notes: input.notes?.trim() || null,
           updatedAt: new Date(),
           appointmentservice: {
-            create: services.map((service) => ({
+            create: services.map((service: { id: number; price: any; durationMinutes: number }) => ({
               serviceId: service.id,
               staffId: input.staffId,
               priceAtBooking: service.price,
@@ -314,7 +314,7 @@ export const CalendarModel = {
           updatedAt: new Date(),
           appointmentservice: {
             deleteMany: {},
-            create: services.map((service) => ({
+            create: services.map((service: { id: number; price: any; durationMinutes: number }) => ({
               serviceId: service.id,
               staffId: input.staffId,
               priceAtBooking: service.price,

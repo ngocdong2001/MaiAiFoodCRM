@@ -55,6 +55,7 @@ export const getOrCreateTenant = async (
         tier: "basic",
         maxUsers: 5,
         maxGuests: 1000,
+        updatedAt: new Date(),
       },
     });
 

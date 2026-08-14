@@ -1,12 +1,12 @@
 import { prisma } from "../lib/prisma";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../generated/prisma-tenant/client.js";
 
 type RevenueMetric = {
   key:
-    | "total-daily-revenue"
-    | "service-revenue"
-    | "product-revenue"
-    | "total-orders";
+  | "total-daily-revenue"
+  | "service-revenue"
+  | "product-revenue"
+  | "total-orders";
   label: string;
   value: number;
   deltaPercent: number;
