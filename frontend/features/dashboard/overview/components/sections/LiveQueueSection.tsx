@@ -1,12 +1,19 @@
+"use client";
+import { useTranslation } from "react-i18next";
+
 import { cn } from "@/shared/lib/utils";
 import { liveQueue } from "@/features/dashboard/overview/data/data";
 
 const LiveQueueSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]">
-      <h2 className="text-base font-semibold text-[#171A21]">Live Queue</h2>
+      <h2 className="text-base font-semibold text-[#171A21]">
+        {t("dashboard.overview.queue.title")}
+      </h2>
       <p className="mt-0.5 text-sm text-[#8D95A5]">
-        Guests waiting or recently checked-in
+        {t("dashboard.overview.queue.subtitle")}
       </p>
 
       <ul className="mt-4 divide-y divide-[#EEF0F3]">
@@ -26,7 +33,11 @@ const LiveQueueSection = () => {
                 <p className="text-sm font-medium text-[#171A21]">
                   {guest.name}
                 </p>
-                <p className="text-xs text-[#8D95A5]">{guest.service}</p>
+                <p className="text-xs text-[#8D95A5]">
+                  {t(`dashboard.overview.queue.items.${guest.key}.service`, {
+                    defaultValue: guest.service,
+                  })}
+                </p>
               </div>
             </div>
             <span
@@ -39,7 +50,9 @@ const LiveQueueSection = () => {
                     : "text-[#8D95A5]",
               )}
             >
-              {guest.status}
+              {t(`dashboard.overview.queue.items.${guest.key}.status`, {
+                defaultValue: guest.status,
+              })}
             </span>
           </li>
         ))}
@@ -49,11 +62,10 @@ const LiveQueueSection = () => {
         href="#"
         className="mt-4 block text-center text-sm font-medium text-primary hover:underline"
       >
-        View Full Queue
+        {t("dashboard.overview.queue.viewFullQueue")}
       </a>
     </section>
   );
 };
 
 export default LiveQueueSection;
-

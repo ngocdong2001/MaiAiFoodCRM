@@ -1,13 +1,18 @@
+"use client";
+import { useTranslation } from "react-i18next";
+
 import { aiRecommendations } from "@/features/dashboard/overview/data/data";
 
 const AIRecommendationsSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="rounded-xl border border-[#E4DAF5] bg-[#FBFAFE] p-5 shadow-[0px_1px_2px_0px_#0000000a]">
       <h2 className="text-base font-semibold text-[#171A21]">
-        AI Recommendations
+        {t("dashboard.overview.aiRecommendations.title")}
       </h2>
       <p className="mt-0.5 text-sm text-[#8D95A5]">
-        Intelligent suggestions for your business
+        {t("dashboard.overview.aiRecommendations.subtitle")}
       </p>
 
       <ul className="mt-4 space-y-3">
@@ -24,10 +29,20 @@ const AIRecommendationsSection = () => {
                 </span>
                 <div>
                   <p className="text-sm font-medium text-[#171A21]">
-                    {rec.title}
+                    {t(
+                      `dashboard.overview.aiRecommendations.items.${rec.key}.title`,
+                      {
+                        defaultValue: rec.title,
+                      },
+                    )}
                   </p>
                   <p className="mt-0.5 text-xs text-[#8D95A5]">
-                    {rec.description}
+                    {t(
+                      `dashboard.overview.aiRecommendations.items.${rec.key}.description`,
+                      {
+                        defaultValue: rec.description,
+                      },
+                    )}
                   </p>
                 </div>
               </div>
@@ -35,7 +50,7 @@ const AIRecommendationsSection = () => {
                 type="button"
                 className="shrink-0 rounded-lg border border-[#DEE1E7] bg-white px-3 py-1.5 text-xs font-medium text-[#171A21] transition-colors hover:bg-[#F9FAFB]"
               >
-                Action
+                {t("dashboard.overview.aiRecommendations.action")}
               </button>
             </li>
           );
@@ -46,11 +61,10 @@ const AIRecommendationsSection = () => {
         href="#"
         className="mt-4 block text-center text-sm font-medium text-[#8A4CE0] hover:underline"
       >
-        Manage Recommendations
+        {t("dashboard.overview.aiRecommendations.manage")}
       </a>
     </section>
   );
 };
 
 export default AIRecommendationsSection;
-

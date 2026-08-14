@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { getStoredAuthToken } from "@/core/store/authStore";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
@@ -24,6 +25,10 @@ const axiosInstance: AxiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    const token = getStoredAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -39,8 +44,10 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // Handle common errors here
     if (error.response) {
-      // Server responded with error status
-      console.error("API Error:", error.response.data);
+      // Expected 4xx validation/conflict errors are presented by feature UIs.
+      if (error.response.status >= 500) {
+        console.error("API Error:", error.response.data);
+      }
 
       switch (error.response.status) {
         case 401:

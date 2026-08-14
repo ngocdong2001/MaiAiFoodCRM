@@ -253,6 +253,323 @@
       }
     }
   },
+  "dashboard": {
+    "shared": {
+      "sampleDate": "Thứ Ba, ngày 14 tháng 10 năm 2023"
+    },
+    "nav": {
+      "dashboard": "Tổng quan",
+      "calendar": "Lịch hẹn",
+      "crm": "CRM",
+      "staff": "Nhân viên",
+      "ai-recs": "Gợi ý AI",
+      "reports": "Báo cáo",
+      "revenue": "Doanh thu",
+      "integrations": "Cài đặt"
+    },
+    "header": {
+      "title": "Bảng điều khiển chủ tiệm MaiAI",
+      "mobileDescription": "Điều hướng nhanh và thao tác tài khoản.",
+      "openNavigationMenu": "Mở menu điều hướng",
+      "closeNavigationMenu": "Đóng menu điều hướng",
+      "notifications": "Thông báo",
+      "settings": "Cài đặt",
+      "accountMenu": "Menu tài khoản",
+      "profile": "Hồ sơ",
+      "logout": "Đăng xuất",
+      "ownerAccount": "Tài khoản chủ tiệm",
+      "userName": "Sarah Lee",
+      "userFallback": "Tài khoản"
+    },
+    "footer": {
+      "copyright": "© 2026 MaiAI Systems. Bảo lưu mọi quyền.",
+      "support": "Hỗ trợ",
+      "termsOfService": "Điều khoản dịch vụ"
+    },
+    "calendar": {
+      "day": "Ngày",
+      "week": "Tuần",
+      "dailyTitle": "Lịch làm việc hằng ngày",
+      "weeklyTitle": "Lịch làm việc theo tuần",
+      "staffMember": "Nhân viên",
+      "newBooking": "Tạo lịch hẹn",
+      "previousWeek": "Tuần trước",
+      "nextWeek": "Tuần sau",
+      "previousMonth": "Tháng trước",
+      "nextMonth": "Tháng sau",
+      "noAppointments": "Không có lịch hẹn",
+      "filtersAndStaff": "Bộ lọc và nhân viên",
+      "filterStaff": "Lọc theo {{name}}",
+      "queue": {
+        "title": "Hàng chờ trực tiếp",
+        "subtitle": "Khách vãng lai và danh sách chờ",
+        "add": "Thêm vào hàng chờ",
+        "message": "Nhắn tin",
+        "accept": "Tiếp nhận",
+        "emptyTitle": "Hàng chờ đang ổn!",
+        "emptyDescription": "Yêu cầu mới sẽ xuất hiện ngay tại đây."
+      },
+      "booking": {
+        "title": "Tạo lịch hẹn",
+        "description": "Tạo lịch từ dữ liệu khách hàng, nhân viên và dịch vụ hiện có.",
+        "guest": "Khách hàng",
+        "selectGuest": "Chọn khách hàng",
+        "staff": "Nhân viên",
+        "selectStaff": "Chọn nhân viên",
+        "date": "Ngày",
+        "startTime": "Giờ bắt đầu",
+        "status": "Trạng thái",
+        "priority": "Ưu tiên",
+        "pending": "Chờ xác nhận",
+        "confirmed": "Đã xác nhận",
+        "normal": "Bình thường",
+        "high": "Cao",
+        "services": "Dịch vụ",
+        "minutes": "{{count}} phút",
+        "total": "Tổng: {{duration}} phút · ${{price}}",
+        "notes": "Ghi chú lịch hẹn",
+        "notesPlaceholder": "Sở thích, dị ứng hoặc lưu ý chuẩn bị",
+        "loadOptionsError": "Không tải được dữ liệu đặt lịch.",
+        "cancel": "Hủy",
+        "create": "Tạo lịch hẹn",
+        "creating": "Đang tạo...",
+        "errors": {
+          "required": "Vui lòng chọn khách hàng, nhân viên và ít nhất một dịch vụ.",
+          "invalidDate": "Vui lòng chọn ngày và giờ hợp lệ.",
+          "unknown": "Không thể tạo lịch hẹn.",
+          "conflict": "Nhân viên đã có lịch trong khung giờ này. Hãy chọn giờ khác hoặc đổi nhân viên.",
+          "outsideHours": "Khung giờ đã chọn nằm ngoài giờ làm việc của nhân viên.",
+          "breakOverlap": "Khung giờ đã chọn trùng với giờ nghỉ của nhân viên.",
+          "dayOff": "Nhân viên nghỉ vào ngày đã chọn. Hãy chọn ngày hoặc nhân viên khác."
+        }
+      }
+    },
+    "overview": {
+      "welcome": {
+        "title": "Chào mừng, {{name}}!",
+        "subtitle": "Đây là tổng quan tiệm của bạn trong hôm nay, ngày 24 tháng 9 năm 2023.",
+        "newBooking": "Tạo lịch hẹn",
+        "addWalkIn": "Thêm khách vãng lai"
+      },
+      "alerts": {
+        "title": "Cảnh báo quan trọng",
+        "message": "Kết nối lịch với Google Calendar đang bị lệch đồng bộ. Vui lòng kiểm tra cài đặt để xử lý.",
+        "reviewSettings": "Xem cài đặt"
+      },
+      "stats": {
+        "upcoming-bookings": {
+          "label": "Lịch hẹn sắp tới",
+          "hint": "+5 hôm nay"
+        },
+        "seat-utilization": {
+          "label": "Tỷ lệ sử dụng ghế hôm nay",
+          "hint": "Tăng 12% so với trung bình"
+        },
+        "active-waitlist": {
+          "label": "Khách chờ hiện tại",
+          "hint": "Không đổi"
+        },
+        "guest-activity": {
+          "label": "Hoạt động khách gần đây",
+          "hint": "24 giờ qua"
+        }
+      },
+      "snapshot": {
+        "title": "Tổng quan hôm nay",
+        "subtitle": "Lịch hẹn sắp tới và ca làm của nhân viên",
+        "items": {
+          "haircut-style": {
+            "title": "Cắt và tạo kiểu cùng Emily"
+          },
+          "mani-pedi": {
+            "title": "Làm tay và chân cùng Sophia"
+          },
+          "lunch-break": {
+            "title": "Nghỉ trưa (Emily)!"
+          },
+          "color-treatment": {
+            "title": "Nhuộm tóc cùng Emily"
+          },
+          "stylist-arrives": {
+            "title": "Stylist Sophia bắt đầu ca"
+          }
+        }
+      },
+      "queue": {
+        "title": "Hàng chờ trực tiếp",
+        "subtitle": "Khách đang chờ hoặc vừa check-in",
+        "viewFullQueue": "Xem toàn bộ hàng chờ",
+        "items": {
+          "oliver-chen": {
+            "service": "Cắt tóc vãng lai",
+            "status": "10 phút"
+          },
+          "chloe-davis": {
+            "service": "Tư vấn nhuộm",
+            "status": "5 phút"
+          },
+          "liam-white": {
+            "service": "Gội và sấy",
+            "status": "Sẵn sàng"
+          },
+          "ava-martinez": {
+            "service": "Dưỡng sâu",
+            "status": "15 phút"
+          },
+          "noah-brown": {
+            "service": "Tỉa tóc vãng lai",
+            "status": "Mới"
+          }
+        }
+      },
+      "recentGuests": {
+        "title": "Khách gần đây",
+        "subtitle": "Tương tác khách mới nhất",
+        "viewAll": "Xem tất cả khách",
+        "items": {
+          "emily-chen": {
+            "meta": "2 giờ trước"
+          },
+          "david-kim": {
+            "meta": "Hôm qua"
+          },
+          "sophia-miller": {
+            "meta": "3 ngày trước"
+          },
+          "michael-lee": {
+            "meta": "Tuần trước"
+          }
+        }
+      },
+      "aiRecommendations": {
+        "title": "Gợi ý AI",
+        "subtitle": "Đề xuất thông minh cho hoạt động kinh doanh của bạn",
+        "action": "Thao tác",
+        "manage": "Quản lý gợi ý",
+        "items": {
+          "upsell-conditioning": {
+            "title": "Upsell: Gói dưỡng tóc",
+            "description": "Gợi ý dịch vụ dưỡng sâu cho khách đặt dịch vụ nhuộm tóc."
+          },
+          "rebook-vip": {
+            "title": "Đặt lại: Ưu đãi khách VIP",
+            "description": "Ưu đãi giảm 15% cho lần ghé tiếp theo với khách chưa quay lại trong 60 ngày."
+          },
+          "upsell-bundle": {
+            "title": "Upsell: Combo sản phẩm",
+            "description": "Đề xuất combo sản phẩm tạo kiểu dựa trên lịch sử mua hàng trước đó."
+          },
+          "rebook-new-service": {
+            "title": "Đặt lại: Giới thiệu dịch vụ mới",
+            "description": "Quảng bá dịch vụ keratin mới cho nhóm khách thân thiết."
+          }
+        }
+      }
+    },
+    "crm": {
+      "title": "CRM khách hàng",
+      "subtitle": "Theo dõi hồ sơ khách, lịch sử đặt lịch và cơ hội cá nhân hóa.",
+      "createCampaign": "Tạo chiến dịch",
+      "addGuest": "Thêm khách",
+      "totalGuests": "Tổng khách: {{count}}",
+      "vip": "VIP: {{count}}",
+      "atRisk": "Cần chăm sóc lại: {{count}}",
+      "emptyState": "Không có khách phù hợp bộ lọc. Hãy thử đổi từ khóa hoặc phân khúc."
+    },
+    "reports": {
+      "title": "Báo cáo & Xuất dữ liệu",
+      "filters": "Bộ lọc",
+      "exportData": "Xuất dữ liệu"
+    },
+    "revenue": {
+      "title": "Tổng kết doanh thu ngày",
+      "reportFilters": "Bộ lọc báo cáo",
+      "exportExcel": "Xuất Excel",
+      "loading": "Đang tải dữ liệu doanh thu...",
+      "errors": {
+        "loadSummary": "Không thể tải dữ liệu doanh thu",
+        "exportExcel": "Không thể xuất báo cáo Excel"
+      },
+      "filters": {
+        "startDate": "Ngày bắt đầu",
+        "endDate": "Ngày kết thúc",
+        "staff": "Nhân viên",
+        "allStaff": "Tất cả nhân viên",
+        "paymentMethod": "Phương thức thanh toán",
+        "allMethods": "Tất cả phương thức",
+        "apply": "Áp dụng",
+        "reset": "Đặt lại"
+      },
+      "metrics": {
+        "total-daily-revenue": "Tổng doanh thu trong ngày",
+        "service-revenue": "Doanh thu dịch vụ",
+        "product-revenue": "Doanh thu sản phẩm",
+        "total-orders": "Tổng đơn hàng"
+      },
+      "paymentMethodLabels": {
+        "cash": "Tiền mặt",
+        "transfer": "Chuyển khoản",
+        "card": "Thẻ (POS)",
+        "ewallet": "Ví điện tử",
+        "loyalty_points": "Điểm thưởng"
+      },
+      "activity": {
+        "walkInGuest": "Khách vãng lai",
+        "paymentVia": "Thanh toán qua {{method}}"
+      },
+      "revenueByStaff": "Doanh thu theo nhân viên",
+      "viewDetails": "Xem chi tiết",
+      "table": {
+        "staff": "Nhân viên",
+        "services": "Dịch vụ",
+        "tips": "Tiền tip",
+        "totalRevenue": "Tổng doanh thu"
+      },
+      "paymentMethods": "Phương thức thanh toán",
+      "paymentDistribution": "Phân bổ thanh toán trong ngày",
+      "total": "Tổng",
+      "latestActivity": "Hoạt động mới nhất",
+      "readyForExport": "Sẵn sàng xuất",
+      "systemSynced": "Đã đồng bộ hệ thống",
+      "versionInfo": "© 2023 MaiAI Salon Management System • Phiên bản 2.4.0"
+    },
+    "aiRecs": {
+      "title": "Gợi ý AI & Upsell",
+      "subtitle": "Duyệt các gợi ý tự động và cấu hình chiến dịch chủ động.",
+      "newCampaign": "Chiến dịch mới"
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "tabs": {
+        "profile": "Hồ sơ của tôi",
+        "businessProfile": "Thông tin doanh nghiệp",
+        "operatingHours": "Giờ hoạt động",
+        "integrations": "Tích hợp",
+        "communications": "Liên lạc",
+        "security": "Bảo mật và truy cập"
+      },
+      "profile": {
+        "title": "Hồ sơ của tôi",
+        "description": "Quản lý thông tin và ảnh đại diện hiển thị trên tài khoản.",
+        "name": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "role": "Vai trò",
+        "avatarUrl": "Đường dẫn ảnh đại diện",
+        "avatarPlaceholder": "https://example.com/avatar.jpg",
+        "avatarHint": "Sử dụng đường dẫn ảnh công khai. Hệ thống sẽ hiện chữ viết tắt nếu ảnh không tải được.",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "saved": "Đã cập nhật hồ sơ.",
+        "emailInUse": "Email này đã được sử dụng.",
+        "saveError": "Không thể cập nhật hồ sơ.",
+        "loading": "Đang tải hồ sơ..."
+      }
+    },
+    "staff": {
+      "weekLabel": "12 Th10 - 18 Th10, 2023"
+    }
+  },
   "languageSwitcher": {
     "label": "Ngôn ngữ",
     "en": "English",

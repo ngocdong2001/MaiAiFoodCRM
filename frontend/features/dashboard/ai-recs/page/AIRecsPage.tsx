@@ -2,6 +2,7 @@
 
 import { Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/shared/components/ui/button";
 
@@ -12,6 +13,7 @@ import AIRecsStatsSection from "../components/sections/AIRecsStatsSection";
 import UpsellComposerSection from "../components/sections/UpsellComposerSection";
 
 const AIRecsPage = () => {
+  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState<AISuggestion[]>(aiSuggestions);
 
   const handleApprove = (key: string) =>
@@ -39,16 +41,16 @@ const AIRecsPage = () => {
           <Sparkles className="mt-1 h-6 w-6 text-primary" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#171A21]">
-              AI Recommendations &amp; Upsell
+              {t("dashboard.aiRecs.title")}
             </h1>
             <p className="mt-1 text-sm text-[#8D95A5]">
-              Review automated suggestions and configure proactive campaigns.
+              {t("dashboard.aiRecs.subtitle")}
             </p>
           </div>
         </div>
         <Button className="flex items-center gap-2 bg-primary text-white shadow hover:bg-primary/90">
           <Plus className="h-4 w-4" />
-          New Campaign
+          {t("dashboard.aiRecs.newCampaign")}
         </Button>
       </div>
 

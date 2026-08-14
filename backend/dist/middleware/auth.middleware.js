@@ -30,6 +30,8 @@ const authMiddleware = async (req, res, next) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            phone: user.phone,
+            avatarUrl: user.avatarUrl,
         };
         return next();
     }

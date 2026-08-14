@@ -57,7 +57,7 @@ const LoginForm = () => {
 
     try {
       await loginMutation.mutateAsync({ email, password });
-      router.replace("/dashboard");
+      router.replace("/dashboard/overview");
     } catch (err) {
       setErrorMessage(getLoginErrorMessage(err));
       setIsErrorOpen(true);

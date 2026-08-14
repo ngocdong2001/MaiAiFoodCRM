@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const crm_controller_1 = require("../controllers/crm.controller");
+const router = (0, express_1.Router)();
+router.get("/tags", crm_controller_1.CRMController.getTags);
+router.get("/guests", crm_controller_1.CRMController.getAll);
+router.get("/guests/:id", crm_controller_1.CRMController.getById);
+router.post("/guests", crm_controller_1.CRMController.create);
+router.put("/guests/:id", crm_controller_1.CRMController.update);
+router.put("/guests/:id/notes", crm_controller_1.CRMController.updateNotes);
+router.delete("/guests/:id", crm_controller_1.CRMController.delete);
+exports.default = router;

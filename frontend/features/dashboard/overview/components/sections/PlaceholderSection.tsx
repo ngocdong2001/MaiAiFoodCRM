@@ -1,3 +1,4 @@
+"use client";
 import { placeholderRoutes } from "@/features/dashboard/overview/data/data";
 
 type PlaceholderRoute = (typeof placeholderRoutes)[number];

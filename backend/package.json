@@ -7,13 +7,8 @@
   "scripts": {
     "dev": "tsx --env-file=.env --watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
-    "prisma:generate": "npm run prisma:generate-master && npm run prisma:generate-tenant",
-    "prisma:generate-master": "prisma generate --schema ./prisma/schema.master.prisma --config ./prisma.config.ts",
-    "prisma:generate-tenant": "prisma generate --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts",
-    "migrate:deploy": "npm run migrate:deploy-master && npm run migrate:deploy-tenant",
-    "migrate:deploy-master": "prisma migrate deploy --schema ./prisma/schema.master.prisma --config ./prisma.config.ts",
-    "migrate:deploy-tenant": "prisma migrate deploy --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts"
+    "seed": "ts-node-dev --transpile-only --exit-child prisma/seed.ts",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.0.0",

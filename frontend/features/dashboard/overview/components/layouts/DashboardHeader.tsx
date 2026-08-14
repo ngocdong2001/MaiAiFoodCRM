@@ -4,11 +4,14 @@ import { Activity, Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 import { authService } from "@/features/landing/services/auth.service";
 import { cn } from "@/shared/lib/utils";
 import { dashboardNavItems } from "@/features/dashboard/overview/data/data";
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import LanguageSwitcher from "@/core/lang/components/LanguageSwitcher";
+import { useAuthStore } from "@/core/store/authStore";
 import {
   Drawer,
   DrawerContent,
@@ -33,13 +36,18 @@ const isActiveRoute = (pathname: string, href: string) => {
   if (href === "/") {
     return pathname === "/";
   }
-  return pathname.startsWith(href);
+  return pathname === href || pathname.startsWith(`${href}/`);
 };
 
+const BRAND_TITLE = "MaiAI Owner Dashboard";
+
 const DashboardHeader = () => {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const userName = user?.name ?? t("dashboard.header.userFallback");
 
   const handleLogout = () => {
     authService.logout();
@@ -61,7 +69,7 @@ const DashboardHeader = () => {
             swipeDirection="left"
           >
             <DrawerTrigger
-              aria-label="Open navigation menu"
+              aria-label={t("dashboard.header.openNavigationMenu")}
               className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#DEE1E7] bg-white text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] transition-colors hover:bg-[#F3F4F6] lg:hidden"
             >
               <Menu className="h-5 w-5" />
@@ -74,18 +82,18 @@ const DashboardHeader = () => {
                 <div className="flex items-center justify-between gap-4">
                   <div className="space-y-1">
                     <DrawerTitle className="text-lg font-bold text-primary">
-                      MaiAI Owner Dashboard
+                      {BRAND_TITLE}
                     </DrawerTitle>
                     <DrawerDescription
                       id="dashboard-mobile-nav-description"
                       className="text-sm text-[#8D95A5]"
                     >
-                      Quick navigation and account actions.
+                      {t("dashboard.header.mobileDescription")}
                     </DrawerDescription>
                   </div>
                   <button
                     type="button"
-                    aria-label="Close navigation menu"
+                    aria-label={t("dashboard.header.closeNavigationMenu")}
                     onClick={() => setIsMobileNavOpen(false)}
                     className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#DEE1E7] bg-white text-[#171A21] transition-colors hover:bg-[#F3F4F6]"
                   >
@@ -111,7 +119,7 @@ const DashboardHeader = () => {
                             : "border-[#DEE1E7] bg-white text-[#171A21] hover:border-primary/30 hover:text-primary",
                         )}
                       >
-                        {item.label}
+                        {t(`dashboard.nav.${item.key}`)}
                       </Link>
                     );
                   })}
@@ -120,15 +128,18 @@ const DashboardHeader = () => {
                 <div className="mt-auto rounded-[16px] border border-[#DEE1E7] bg-white p-4 shadow-[0px_2px_4px_0px_#00000012]">
                   <div className="flex items-center gap-3">
                     <InitialsAvatar
-                      name="Sarah Lee"
+                      name={userName}
+                      src={user?.avatarUrl ?? undefined}
                       className="h-10 w-10"
                       online
                     />
                     <div>
                       <p className="text-sm font-semibold text-[#171A21]">
-                        Sarah Lee
+                        {userName}
                       </p>
-                      <p className="text-xs text-[#8D95A5]">Owner account</p>
+                      <p className="text-xs text-[#8D95A5]">
+                        {user?.email ?? t("dashboard.header.ownerAccount")}
+                      </p>
                     </div>
                   </div>
 
@@ -138,19 +149,22 @@ const DashboardHeader = () => {
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-[10px] bg-[#171A21] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2A2E37]"
                   >
                     <LogOut className="h-4 w-4" />
-                    Log out
+                    {t("dashboard.header.logout")}
                   </button>
                 </div>
               </div>
             </DrawerContent>
           </Drawer>
 
-          <Link href="/" className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/dashboard/overview"
+            className="flex shrink-0 items-center gap-3"
+          >
             <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <Activity className="h-5 w-5 text-white" />
             </span>
             <span className="hidden font-bold text-primary sm:block text-xl tracking-tight">
-              MaiAI Owner Dashboard
+              {BRAND_TITLE}
             </span>
           </Link>
         </div>
@@ -170,23 +184,25 @@ const DashboardHeader = () => {
                     : "text-[#8D95A5] hover:text-primary",
                 )}
               >
-                {item.label}
+                {t(`dashboard.nav.${item.key}`)}
               </Link>
             );
           })}
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <LanguageSwitcher className="hidden sm:flex" />
           <button
             type="button"
-            aria-label="Notifications"
+            aria-label={t("dashboard.header.notifications")}
             className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
           >
             <Bell className="h-5 w-5" />
           </button>
           <button
             type="button"
-            aria-label="Settings"
+            aria-label={t("dashboard.header.settings")}
+            onClick={() => router.push("/dashboard/settings")}
             className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
           >
             <Settings className="h-5 w-5" />
@@ -194,26 +210,28 @@ const DashboardHeader = () => {
           <DropdownMenu>
             <DropdownMenuTrigger
               className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-              aria-label="Account menu"
+              aria-label={t("dashboard.header.accountMenu")}
             >
-              <InitialsAvatar name="Sarah Lee" className="h-9 w-9" online />
+              <InitialsAvatar name={userName} src={user?.avatarUrl ?? undefined} className="h-9 w-9" online />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuLabel>Sarah Lee</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  {userName}
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
                   <User />
-                  Profile
+                  {t("dashboard.header.profile")}
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
                   <Settings />
-                  Settings
+                  {t("dashboard.header.settings")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={handleLogout}>
                   <LogOut />
-                  Log out
+                  {t("dashboard.header.logout")}
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>

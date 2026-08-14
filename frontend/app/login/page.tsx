@@ -15,7 +15,7 @@ export default function LoginPage() {
     const user = authService.getStoredUser();
 
     if (token && user) {
-      router.replace("/dashboard");
+      router.replace("/dashboard/overview");
       return;
     }
 

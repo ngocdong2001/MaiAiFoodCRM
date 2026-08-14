@@ -21,12 +21,17 @@ import type {
 } from "../types/dashboard.types";
 
 export const dashboardNavItems: DashboardNavItem[] = [
-  { key: "dashboard", label: "Dashboard", href: "/" },
+  { key: "dashboard", label: "Dashboard", href: "/dashboard/overview" },
   { key: "calendar", label: "Calendar", href: "/dashboard/calendar" },
   { key: "crm", label: "CRM", href: "/dashboard/crm" },
   { key: "staff", label: "Staff", href: "/dashboard/staff" },
   { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
   { key: "reports", label: "Reports", href: "/dashboard/reports" },
+  {
+    key: "revenue",
+    label: "Revenue",
+    href: "/dashboard/revenue",
+  },
   {
     key: "integrations",
     label: "Settings",

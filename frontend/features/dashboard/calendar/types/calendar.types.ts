@@ -63,3 +63,33 @@ export type CalendarData = {
   schedulerEvents: CalendarAppointment[];
   queueRequests: QueueRequest[];
 };
+
+export type CalendarOption = {
+  id: number;
+  name: string;
+};
+
+export type CalendarOptions = {
+  guests: Array<CalendarOption & { phone: string | null }>;
+  staff: Array<CalendarOption & { role: string }>;
+  services: Array<CalendarOption & { price: number; durationMinutes: number }>;
+};
+
+export type ApiAppointment = {
+  id: number;
+  guestId: number;
+  staffId: number;
+  startTime: string;
+  endTime: string;
+  status: string;
+  priority: string;
+  notes: string | null;
+  station: string | null;
+  guest: CalendarOption & {
+    totalVisits: number;
+    loyaltyPoints: number;
+    notes: string | null;
+  };
+  staff: CalendarOption & { role: string };
+  services: Array<CalendarOption & { price: number; durationMinutes: number }>;
+};

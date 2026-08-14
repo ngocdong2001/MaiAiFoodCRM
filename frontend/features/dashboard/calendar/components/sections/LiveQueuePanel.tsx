@@ -1,28 +1,31 @@
 import { Clock, MessageSquare, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
-import { queueRequests } from "@/features/dashboard/calendar/data/data";
+import { useCalendarData } from "../../context/CalendarDataContext";
 
 const LiveQueuePanel = () => {
+  const { t } = useTranslation();
+  const { queueRequests } = useCalendarData();
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-4 border-t border-[#DEE1E7] bg-[#F9FAFB] p-6 lg:w-80 lg:border-l lg:border-t-0">
+    <aside className="flex w-full flex-col gap-4 rounded-xl border border-[#DEE1E7] bg-[#F9FAFB] p-6 shadow-[0px_1px_2px_0px_#0000000a]">
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-[#171A21]">
-              Live Queue
+              {t("dashboard.calendar.queue.title")}
             </h2>
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-white">
               {queueRequests.length}
             </span>
           </div>
           <p className="mt-0.5 text-xs text-[#8D95A5]">
-            Walk-ins &amp; Waitlist
+            {t("dashboard.calendar.queue.subtitle")}
           </p>
         </div>
         <button
           type="button"
-          aria-label="Add to queue"
+          aria-label={t("dashboard.calendar.queue.add")}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-[#8D95A5] transition-colors hover:bg-[#EEF0F3] hover:text-[#171A21]"
         >
           <Plus className="h-5 w-5" />
@@ -55,13 +58,13 @@ const LiveQueuePanel = () => {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[#DEE1E7] bg-white px-3 py-1.5 text-xs font-medium text-[#171A21] transition-colors hover:bg-[#F9FAFB]"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
-                Msg
+                {t("dashboard.calendar.queue.message")}
               </button>
               <button
                 type="button"
                 className="flex-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary/90"
               >
-                Accept
+                {t("dashboard.calendar.queue.accept")}
               </button>
             </div>
           </li>
@@ -73,10 +76,10 @@ const LiveQueuePanel = () => {
           <Clock className="h-4 w-4 text-[#8D95A5]" />
         </span>
         <p className="text-sm font-medium text-[#171A21]">
-          Queue is looking good!
+          {t("dashboard.calendar.queue.emptyTitle")}
         </p>
         <p className="text-xs text-[#8D95A5]">
-          New requests will appear here instantly.
+          {t("dashboard.calendar.queue.emptyDescription")}
         </p>
       </div>
     </aside>
