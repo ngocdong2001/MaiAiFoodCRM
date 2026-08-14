@@ -1,5 +1,5 @@
 import { apiClient } from "@/core/config/axios.config";
-import { useAuthStore, type AuthUser } from "@/core/store/authStore";
+import { useAuthStore, type AuthUser, type AuthTenant } from "@/core/store/authStore";
 
 type LoginResponse = {
   token: string;
@@ -14,7 +14,9 @@ export const authService = {
       password,
     });
 
-    if (data?.token) useAuthStore.getState().setSession(data.token, data.user);
+    if (data?.token) {
+      useAuthStore.getState().setSession(data.token, data.user, data.tenant);
+    }
 
     return data;
   },
@@ -23,9 +25,12 @@ export const authService = {
     if (!useAuthStore.getState().token) return null;
 
     try {
-      const { data } = await apiClient.get<{ user: AuthUser }>("/auth/me");
+      const { data } = await apiClient.get<{ user: AuthUser; tenant: AuthTenant }>("/auth/me");
 
       useAuthStore.getState().setUser(data.user);
+      if (data.tenant) {
+        useAuthStore.getState().setTenant(data.tenant);
+      }
       return data.user;
     } catch {
       this.logout();
@@ -39,6 +44,10 @@ export const authService = {
 
   getStoredUser() {
     return useAuthStore.getState().user;
+  },
+
+  getStoredTenant() {
+    return useAuthStore.getState().tenant;
   },
 
   logout() {

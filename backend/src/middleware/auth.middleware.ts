@@ -20,7 +20,7 @@ export const authMiddleware = async (
   }
 
   try {
-    const payload = jwt.verify(token, jwtSecret) as JwtPayload;
+    const payload = jwt.verify(token, jwtSecret) as unknown as JwtPayload;
     const userId = Number(payload.sub);
     const tenantId = Number(payload.tenantId);
 
@@ -65,8 +65,6 @@ export const authMiddleware = async (
       name: user.name,
       email: user.email,
       role: user.role,
-      phone: user.phone,
-      avatarUrl: user.avatarUrl,
     };
 
     return next();
