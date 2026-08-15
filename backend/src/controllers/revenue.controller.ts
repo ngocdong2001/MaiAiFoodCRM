@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 
 import { RevenueModel } from "../models/revenue.model";
 
+const getDb = (req: Request) => req.tenantClient!;
+
 export const RevenueController = {
   async getSummary(req: Request, res: Response): Promise<void> {
     try {
@@ -11,7 +13,7 @@ export const RevenueController = {
           ? Number.parseInt(staffIdRaw, 10)
           : undefined;
 
-      const data = await RevenueModel.getSummary({
+      const data = await RevenueModel.getSummary(getDb(req), {
         startDate:
           typeof req.query.startDate === "string"
             ? req.query.startDate

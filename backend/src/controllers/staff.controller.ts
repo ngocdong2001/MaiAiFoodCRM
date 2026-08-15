@@ -8,6 +8,8 @@ import {
   type StaffStatus,
 } from "../models/staff.model";
 
+const getDb = (req: Request) => req.tenantClient!;
+
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -126,7 +128,7 @@ export const StaffController = {
         return;
       }
 
-      const data = await StaffModel.getAll({
+      const data = await StaffModel.getAll(getDb(req), {
         date,
         status: status as StaffStatus | undefined,
         search:
@@ -140,9 +142,9 @@ export const StaffController = {
     }
   },
 
-  async getSpecialties(_req: Request, res: Response): Promise<void> {
+  async getSpecialties(req: Request, res: Response): Promise<void> {
     try {
-      const data = await StaffModel.getSpecialties();
+      const data = await StaffModel.getSpecialties(getDb(req));
       res.status(200).json({ success: true, data });
     } catch (error) {
       handleError(res, error, "Failed to load staff specialties");
@@ -156,7 +158,7 @@ export const StaffController = {
       return;
     }
     try {
-      const data = await StaffModel.getById(id);
+      const data = await StaffModel.getById(getDb(req), id);
       if (!data) {
         res.status(404).json({ success: false, message: "Staff not found" });
         return;
@@ -175,7 +177,7 @@ export const StaffController = {
       return;
     }
     try {
-      const data = await StaffModel.create(input);
+      const data = await StaffModel.create(getDb(req), input);
       res
         .status(201)
         .json({ success: true, data, message: "Staff created successfully" });
@@ -197,7 +199,7 @@ export const StaffController = {
       return;
     }
     try {
-      const data = await StaffModel.update(id, input);
+      const data = await StaffModel.update(getDb(req), id, input);
       res
         .status(200)
         .json({ success: true, data, message: "Staff updated successfully" });
@@ -213,7 +215,7 @@ export const StaffController = {
       return;
     }
     try {
-      const result = await StaffModel.delete(id);
+      const result = await StaffModel.delete(getDb(req), id);
       res.status(200).json({
         success: true,
         message: result.archived

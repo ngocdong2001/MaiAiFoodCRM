@@ -1,5 +1,5 @@
-import { prisma } from "../lib/prisma";
 import { Prisma } from "../generated/prisma-tenant/client.js";
+import type { PrismaClient } from "../generated/prisma-tenant/client.js";
 
 type RevenueMetric = {
   key:
@@ -119,6 +119,7 @@ const buildReadableMethodLabel = (value: string) =>
 
 export const RevenueModel = {
   async getSummary(
+    db: PrismaClient,
     filters: RevenueSummaryFilters = {},
   ): Promise<RevenueSummaryResponse> {
     const filterWhere: Prisma.paymentWhereInput = {
@@ -128,7 +129,7 @@ export const RevenueModel = {
         : {}),
     };
 
-    const latestPayment = await prisma.payment.findFirst({
+    const latestPayment = await db.payment.findFirst({
       where: filterWhere,
       orderBy: { paidAt: "desc" },
       select: { paidAt: true },
@@ -217,7 +218,7 @@ export const RevenueModel = {
 
     const [currentAggregate, previousAggregate, currentPayments] =
       await Promise.all([
-        prisma.payment.aggregate({
+        db.payment.aggregate({
           where: currentWhere,
           _sum: {
             finalAmount: true,
@@ -228,7 +229,7 @@ export const RevenueModel = {
             id: true,
           },
         }),
-        prisma.payment.aggregate({
+        db.payment.aggregate({
           where: previousWhere,
           _sum: {
             finalAmount: true,
@@ -239,7 +240,7 @@ export const RevenueModel = {
             id: true,
           },
         }),
-        prisma.payment.findMany({
+        db.payment.findMany({
           where: currentWhere,
           orderBy: {
             paidAt: "desc",
@@ -255,7 +256,7 @@ export const RevenueModel = {
         }),
       ]);
 
-    const settingRows = await prisma.setting.findMany({
+    const settingRows = await db.setting.findMany({
       where: { group: SETTING_GROUP },
       select: { key: true, value: true },
     });

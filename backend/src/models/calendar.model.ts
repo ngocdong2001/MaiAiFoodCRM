@@ -1,5 +1,5 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
-import { prisma } from "../lib/prisma";
+import type { PrismaClient } from "../generated/prisma-tenant/client.js";
 
 export const APPOINTMENT_STATUSES = [
   "pending",
@@ -166,13 +166,13 @@ const ensureNoConflict = async (
 };
 
 export const CalendarModel = {
-  async getAll(filters: {
+  async getAll(db: PrismaClient, filters: {
     startDate: string;
     endDate: string;
     staffIds?: number[];
     status?: AppointmentStatus;
   }) {
-    const appointments = await prisma.appointment.findMany({
+    const appointments = await db.appointment.findMany({
       where: {
         startTime: {
           gte: new Date(filters.startDate),
@@ -202,7 +202,7 @@ export const CalendarModel = {
     });
 
     const schedules = schedulePairs.length
-      ? await prisma.staffschedule.findMany({
+      ? await db.staffschedule.findMany({
         where: { OR: schedulePairs },
         select: { staffId: true, date: true, note: true },
       })
@@ -226,19 +226,19 @@ export const CalendarModel = {
       };
     });
   },
-  async getOptions() {
+  async getOptions(db: PrismaClient) {
     const [guests, staff, services] = await Promise.all([
-      prisma.guest.findMany({
+      db.guest.findMany({
         where: { isActive: true },
         select: { id: true, name: true, phone: true },
         orderBy: { name: "asc" },
       }),
-      prisma.staff.findMany({
+      db.staff.findMany({
         where: { status: { notIn: ["inactive", "on_leave"] } },
         select: { id: true, name: true, role: true },
         orderBy: { name: "asc" },
       }),
-      prisma.service.findMany({
+      db.service.findMany({
         where: { isActive: true },
         select: { id: true, name: true, price: true, durationMinutes: true },
         orderBy: { name: "asc" },
@@ -253,15 +253,15 @@ export const CalendarModel = {
       })),
     };
   },
-  async getById(id: number) {
-    const appointment = await prisma.appointment.findUnique({
+  async getById(db: PrismaClient, id: number) {
+    const appointment = await db.appointment.findUnique({
       where: { id },
       include,
     });
     return appointment ? serialize(appointment) : null;
   },
-  async create(input: AppointmentInput) {
-    const id = await prisma.$transaction(async (transaction) => {
+  async create(db: PrismaClient, input: AppointmentInput) {
+    const id = await db.$transaction(async (transaction) => {
       const services = await validateRelationsAndAvailability(
         transaction,
         input,
@@ -291,10 +291,10 @@ export const CalendarModel = {
       });
       return appointment.id;
     });
-    return this.getById(id);
+    return this.getById(db, id);
   },
-  async update(id: number, input: AppointmentInput) {
-    await prisma.$transaction(async (transaction) => {
+  async update(db: PrismaClient, id: number, input: AppointmentInput) {
+    await db.$transaction(async (transaction) => {
       const services = await validateRelationsAndAvailability(
         transaction,
         input,
@@ -325,14 +325,15 @@ export const CalendarModel = {
         },
       });
     });
-    return this.getById(id);
+    return this.getById(db, id);
   },
   async updateStatus(
+    db: PrismaClient,
     id: number,
     status: AppointmentStatus,
     cancelReason?: string,
   ) {
-    const appointment = await prisma.appointment.update({
+    const appointment = await db.appointment.update({
       where: { id },
       data: {
         status,
@@ -347,8 +348,8 @@ export const CalendarModel = {
     });
     return serialize(appointment);
   },
-  async delete(id: number) {
-    const appointment = await prisma.appointment.findUnique({
+  async delete(db: PrismaClient, id: number) {
+    const appointment = await db.appointment.findUnique({
       where: { id },
       select: { payment: { select: { id: true } } },
     });
@@ -359,13 +360,14 @@ export const CalendarModel = {
       });
     if (appointment.payment) {
       await this.updateStatus(
+        db,
         id,
         "cancelled",
         "Cancelled while preserving payment history",
       );
       return { cancelled: true };
     }
-    await prisma.appointment.delete({ where: { id } });
+    await db.appointment.delete({ where: { id } });
     return { cancelled: false };
   },
 };

@@ -1,8 +1,11 @@
 import { Router } from "express";
 
+import { authMiddleware } from "../middleware/auth.middleware";
 import { CRMController } from "../controllers/crm.controller";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.get("/tags", CRMController.getTags);
 router.get("/guests", CRMController.getAll);

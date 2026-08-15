@@ -1,5 +1,5 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
-import { prisma } from "../lib/prisma";
+import type { PrismaClient } from "../generated/prisma-tenant/client.js";
 
 export type GuestSegment = "VIP" | "Loyal" | "At Risk";
 
@@ -110,7 +110,7 @@ const inputData = (input: GuestInput) => ({
 });
 
 export const CRMModel = {
-  async getAll(filters: GuestListFilters = {}) {
+  async getAll(db: PrismaClient, filters: GuestListFilters = {}) {
     const where: Prisma.guestWhereInput = {
       isActive: true,
       ...(filters.search
@@ -124,22 +124,22 @@ export const CRMModel = {
         }
         : {}),
     };
-    const guests = await prisma.guest.findMany({ where, include: guestInclude, orderBy: { name: "asc" } });
+    const guests = await db.guest.findMany({ where, include: guestInclude, orderBy: { name: "asc" } });
     const serialized = guests.map(serializeGuest);
     return filters.segment ? serialized.filter((guest) => guest.segment === filters.segment) : serialized;
   },
 
-  async getById(id: number) {
-    const guest = await prisma.guest.findUnique({ where: { id }, include: guestInclude });
+  async getById(db: PrismaClient, id: number) {
+    const guest = await db.guest.findUnique({ where: { id }, include: guestInclude });
     return guest ? serializeGuest(guest) : null;
   },
 
-  async getTags() {
-    return prisma.guesttag.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+  async getTags(db: PrismaClient) {
+    return db.guesttag.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
   },
 
-  async create(input: GuestInput) {
-    const guest = await prisma.guest.create({
+  async create(db: PrismaClient, input: GuestInput) {
+    const guest = await db.guest.create({
       data: {
         ...inputData(input),
         ...(input.tagIds?.length
@@ -147,11 +147,11 @@ export const CRMModel = {
           : {}),
       },
     });
-    return this.getById(guest.id);
+    return this.getById(db, guest.id);
   },
 
-  async update(id: number, input: GuestInput) {
-    await prisma.guest.update({
+  async update(db: PrismaClient, id: number, input: GuestInput) {
+    await db.guest.update({
       where: { id },
       data: {
         ...inputData(input),
@@ -161,21 +161,21 @@ export const CRMModel = {
         },
       },
     });
-    return this.getById(id);
+    return this.getById(db, id);
   },
 
-  async updateNotes(id: number, content: string, author?: string) {
-    await prisma.$transaction([
-      prisma.guest.update({ where: { id }, data: { notes: content, updatedAt: new Date() } }),
-      prisma.guestnote.create({
+  async updateNotes(db: PrismaClient, id: number, content: string, author?: string) {
+    await db.$transaction([
+      db.guest.update({ where: { id }, data: { notes: content, updatedAt: new Date() } }),
+      db.guestnote.create({
         data: { guestId: id, content, author: nullableText(author), isPinned: true, updatedAt: new Date() },
       }),
     ]);
-    return this.getById(id);
+    return this.getById(db, id);
   },
 
-  async delete(id: number) {
-    const guest = await prisma.guest.findUnique({
+  async delete(db: PrismaClient, id: number) {
+    const guest = await db.guest.findUnique({
       where: { id },
       select: { _count: { select: { appointment: true, payment: true, airecommendation: true } } },
     });
@@ -184,10 +184,10 @@ export const CRMModel = {
     }
     const hasHistory = guest._count.appointment > 0 || guest._count.payment > 0 || guest._count.airecommendation > 0;
     if (hasHistory) {
-      await prisma.guest.update({ where: { id }, data: { isActive: false, updatedAt: new Date() } });
+      await db.guest.update({ where: { id }, data: { isActive: false, updatedAt: new Date() } });
       return { archived: true };
     }
-    await prisma.guest.delete({ where: { id } });
+    await db.guest.delete({ where: { id } });
     return { archived: false };
   },
 };

@@ -1,5 +1,5 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
-import { prisma } from "../lib/prisma";
+import type { PrismaClient } from "../generated/prisma-tenant/client.js";
 
 export const STAFF_STATUSES = ["active", "busy", "on_leave", "inactive"] as const;
 
@@ -88,7 +88,7 @@ const buildStaffData = (input: StaffInput) => ({
 });
 
 export const StaffModel = {
-  async getAll(filters: StaffListFilters) {
+  async getAll(db: PrismaClient, filters: StaffListFilters) {
     const date = parseDate(filters.date);
     const where: Prisma.staffWhereInput = {
       status: filters.status ?? { not: "inactive" },
@@ -107,7 +107,7 @@ export const StaffModel = {
         : {}),
     };
 
-    const staff = await prisma.staff.findMany({
+    const staff = await db.staff.findMany({
       where,
       include: {
         ...staffInclude,
@@ -119,8 +119,8 @@ export const StaffModel = {
     return staff.map(serializeStaff);
   },
 
-  async getById(id: number) {
-    const staff = await prisma.staff.findUnique({
+  async getById(db: PrismaClient, id: number) {
+    const staff = await db.staff.findUnique({
       where: { id },
       include: staffInclude,
     });
@@ -128,15 +128,15 @@ export const StaffModel = {
     return staff ? serializeStaff(staff) : null;
   },
 
-  async getSpecialties() {
-    return prisma.staffspecialty.findMany({
+  async getSpecialties(db: PrismaClient) {
+    return db.staffspecialty.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
     });
   },
 
-  async create(input: StaffInput) {
-    const createdId = await prisma.$transaction(async (transaction) => {
+  async create(db: PrismaClient, input: StaffInput) {
+    const createdId = await db.$transaction(async (transaction) => {
       const staff = await transaction.staff.create({
         data: {
           ...buildStaffData(input),
@@ -169,11 +169,11 @@ export const StaffModel = {
       return staff.id;
     });
 
-    return this.getById(createdId);
+    return this.getById(db, createdId);
   },
 
-  async update(id: number, input: StaffInput) {
-    await prisma.$transaction(async (transaction) => {
+  async update(db: PrismaClient, id: number, input: StaffInput) {
+    await db.$transaction(async (transaction) => {
       await transaction.staff.update({
         where: { id },
         data: {
@@ -212,11 +212,11 @@ export const StaffModel = {
       }
     });
 
-    return this.getById(id);
+    return this.getById(db, id);
   },
 
-  async delete(id: number) {
-    const staff = await prisma.staff.findUnique({
+  async delete(db: PrismaClient, id: number) {
+    const staff = await db.staff.findUnique({
       where: { id },
       select: {
         _count: {
@@ -233,18 +233,18 @@ export const StaffModel = {
     }
 
     if (staff._count.appointment > 0) {
-      await prisma.$transaction([
-        prisma.staff.update({
+      await db.$transaction([
+        db.staff.update({
           where: { id },
           data: { status: "inactive", updatedAt: new Date() },
         }),
-        prisma.staffschedule.deleteMany({ where: { staffId: id } }),
-        prisma.staffspecialtymapping.deleteMany({ where: { staffId: id } }),
+        db.staffschedule.deleteMany({ where: { staffId: id } }),
+        db.staffspecialtymapping.deleteMany({ where: { staffId: id } }),
       ]);
       return { archived: true };
     }
 
-    await prisma.staff.delete({ where: { id } });
+    await db.staff.delete({ where: { id } });
     return { archived: false };
   },
 };

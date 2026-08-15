@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import { CRMModel, type GuestInput, type GuestSegment } from "../models/crm.model";
 
+const getDb = (req: Request) => req.tenantClient!;
+
 const SEGMENTS: GuestSegment[] = ["VIP", "Loyal", "At Risk"];
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -36,7 +38,7 @@ export const CRMController = {
       return;
     }
     try {
-      const data = await CRMModel.getAll({
+      const data = await CRMModel.getAll(getDb(req), {
         search: typeof req.query.search === "string" ? req.query.search.trim() : undefined,
         segment: segment as GuestSegment | undefined,
       });
@@ -44,8 +46,8 @@ export const CRMController = {
     } catch (error) { handleError(res, error, "Failed to load guests"); }
   },
 
-  async getTags(_req: Request, res: Response): Promise<void> {
-    try { res.status(200).json({ success: true, data: await CRMModel.getTags() }); }
+  async getTags(req: Request, res: Response): Promise<void> {
+    try { res.status(200).json({ success: true, data: await CRMModel.getTags(getDb(req)) }); }
     catch (error) { handleError(res, error, "Failed to load guest tags"); }
   },
 
@@ -53,7 +55,7 @@ export const CRMController = {
     const id = parseId(req.params.id);
     if (!id) return void res.status(400).json({ success: false, message: "Invalid guest ID" });
     try {
-      const data = await CRMModel.getById(id);
+      const data = await CRMModel.getById(getDb(req), id);
       if (!data) return void res.status(404).json({ success: false, message: "Guest not found" });
       res.status(200).json({ success: true, data });
     } catch (error) { handleError(res, error, "Failed to load guest"); }
@@ -63,7 +65,7 @@ export const CRMController = {
     const input = req.body as GuestInput;
     const validationError = validateGuest(input);
     if (validationError) return void res.status(400).json({ success: false, message: validationError });
-    try { res.status(201).json({ success: true, data: await CRMModel.create(input), message: "Guest created successfully" }); }
+    try { res.status(201).json({ success: true, data: await CRMModel.create(getDb(req), input), message: "Guest created successfully" }); }
     catch (error) { handleError(res, error, "Failed to create guest"); }
   },
 
@@ -73,7 +75,7 @@ export const CRMController = {
     const input = req.body as GuestInput;
     const validationError = validateGuest(input);
     if (validationError) return void res.status(400).json({ success: false, message: validationError });
-    try { res.status(200).json({ success: true, data: await CRMModel.update(id, input), message: "Guest updated successfully" }); }
+    try { res.status(200).json({ success: true, data: await CRMModel.update(getDb(req), id, input), message: "Guest updated successfully" }); }
     catch (error) { handleError(res, error, "Failed to update guest"); }
   },
 
@@ -82,7 +84,7 @@ export const CRMController = {
     const content = typeof req.body.content === "string" ? req.body.content.trim() : "";
     if (!id) return void res.status(400).json({ success: false, message: "Invalid guest ID" });
     if (!content) return void res.status(400).json({ success: false, message: "Note content is required" });
-    try { res.status(200).json({ success: true, data: await CRMModel.updateNotes(id, content, req.body.author), message: "Notes updated successfully" }); }
+    try { res.status(200).json({ success: true, data: await CRMModel.updateNotes(getDb(req), id, content, req.body.author), message: "Notes updated successfully" }); }
     catch (error) { handleError(res, error, "Failed to update guest notes"); }
   },
 
@@ -90,7 +92,7 @@ export const CRMController = {
     const id = parseId(req.params.id);
     if (!id) return void res.status(400).json({ success: false, message: "Invalid guest ID" });
     try {
-      const data = await CRMModel.delete(id);
+      const data = await CRMModel.delete(getDb(req), id);
       res.status(200).json({ success: true, data, message: data.archived ? "Guest archived to preserve booking history" : "Guest deleted successfully" });
     } catch (error) { handleError(res, error, "Failed to delete guest"); }
   },
