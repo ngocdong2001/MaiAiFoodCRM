@@ -4,6 +4,8 @@ import jwt, { type SignOptions } from "jsonwebtoken";
 
 import { getPrismaMaster } from "../lib/prisma-master.js";
 
+const prisma = getPrismaMaster();
+
 const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiresIn =
   (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"] | undefined) ?? "7d";
@@ -13,6 +15,8 @@ const toAuthUser = (user: {
   name: string;
   email: string;
   role: string;
+  phone: string | null;
+  avatarUrl: string | null;
   tenantId: number;
   phone: string | null;
   avatarUrl: string | null;
@@ -21,6 +25,8 @@ const toAuthUser = (user: {
   name: user.name,
   email: user.email,
   role: user.role,
+  phone: user.phone,
+  avatarUrl: user.avatarUrl,
   tenantId: user.tenantId,
   phone: user.phone,
   avatarUrl: user.avatarUrl,
@@ -42,6 +48,7 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     const prismaMaster = getPrismaMaster();
+
 
     const user = await prismaMaster.user.findUnique({
       where: { email: normalizedEmail },
@@ -84,11 +91,11 @@ export const login = async (req: Request, res: Response) => {
       user: toAuthUser(user),
       tenant: user.tenant
         ? {
-            id: user.tenant.id,
-            name: user.tenant.name,
-            slug: user.tenant.slug,
-            databaseName: user.tenant.databaseName,
-          }
+          id: user.tenant.id,
+          name: user.tenant.name,
+          slug: user.tenant.slug,
+          databaseName: user.tenant.databaseName,
+        }
         : null,
     });
   } catch (error) {
@@ -103,50 +110,51 @@ export const me = (req: Request, res: Response) => {
   }
 
   return res.status(200).json({
-    user: req.user,
-    tenant: req.tenant || null,
-  });
-};
-
-export const updateProfile = async (req: Request, res: Response) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
-  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
-  const phone = typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
-  const avatarUrl = typeof req.body?.avatarUrl === "string" ? req.body.avatarUrl.trim() : "";
-
-  if (!name || !email) {
-    return res.status(400).json({ message: "Name and email are required" });
-  }
-
-  try {
-    const prismaMaster = getPrismaMaster();
-
-    const emailOwner = await prismaMaster.user.findFirst({
-      where: { email, id: { not: req.user.id } },
-      select: { id: true },
+    return res.status(200).json({
+      user: req.user,
+      tenant: req.tenant || null,
     });
-    if (emailOwner) {
-      return res.status(409).json({ message: "Email is already in use" });
+  };
+
+  export const updateProfile = async (req: Request, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await prismaMaster.user.update({
-      where: { id: req.user.id },
-      data: {
-        name,
-        email,
-        phone: phone || null,
-        avatarUrl: avatarUrl || null,
-        updatedAt: new Date(),
-      },
-    });
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const phone = typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
+    const avatarUrl = typeof req.body?.avatarUrl === "string" ? req.body.avatarUrl.trim() : "";
 
-    return res.status(200).json({ user: toAuthUser(user) });
-  } catch (error) {
-    console.error("Profile update failed", error);
-    return res.status(500).json({ message: "Unable to update profile" });
-  }
-};
+    if (!name || !email) {
+      return res.status(400).json({ message: "Name and email are required" });
+    }
+
+    try {
+      const prismaMaster = getPrismaMaster();
+
+      const emailOwner = await prismaMaster.user.findFirst({
+        where: { email, id: { not: req.user.id } },
+        select: { id: true },
+      });
+      if (emailOwner) {
+        return res.status(409).json({ message: "Email is already in use" });
+      }
+
+      const user = await prismaMaster.user.update({
+        where: { id: req.user.id },
+        data: {
+          name,
+          email,
+          phone: phone || null,
+          avatarUrl: avatarUrl || null,
+          updatedAt: new Date(),
+        },
+      });
+
+      return res.status(200).json({ user: toAuthUser(user) });
+    } catch (error) {
+      console.error("Profile update failed", error);
+      return res.status(500).json({ message: "Unable to update profile" });
+    }
+  };
