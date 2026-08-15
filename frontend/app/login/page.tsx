@@ -13,8 +13,9 @@ export default function LoginPage() {
   useEffect(() => {
     const token = authService.getStoredToken();
     const user = authService.getStoredUser();
+    const tenant = authService.getStoredTenant();
 
-    if (token && user) {
+    if (token && user && tenant) {
       router.replace("/dashboard/overview");
       return;
     }

@@ -48,6 +48,7 @@ const DashboardHeader = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const userName = user?.name ?? t("dashboard.header.userFallback");
+  const navItems = dashboardNavItems;
 
   const handleLogout = () => {
     authService.logout();
@@ -104,7 +105,7 @@ const DashboardHeader = () => {
 
               <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-5 py-6">
                 <nav className="flex flex-col gap-2">
-                  {dashboardNavItems.map((item) => {
+                  {navItems.map((item) => {
                     const active = isActiveRoute(pathname, item.href);
                     return (
                       <Link
@@ -170,7 +171,7 @@ const DashboardHeader = () => {
         </div>
 
         <nav className="hidden items-center gap-1 rounded-full border border-[#DEE1E7] bg-[#FEF1F8] p-1 shadow-[0px_2px_4px_0px_#00000012] lg:flex">
-          {dashboardNavItems.map((item) => {
+          {navItems.map((item) => {
             const active = isActiveRoute(pathname, item.href);
             return (
               <Link
@@ -202,7 +203,7 @@ const DashboardHeader = () => {
           <button
             type="button"
             aria-label={t("dashboard.header.settings")}
-            onClick={() => router.push("/dashboard/settings")}
+            onClick={() => router.push("/dashboard/integrations")}
             className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
           >
             <Settings className="h-5 w-5" />
@@ -220,11 +221,11 @@ const DashboardHeader = () => {
                   {userName}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/integrations")}>
                   <User />
                   {t("dashboard.header.profile")}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/integrations")}>
                   <Settings />
                   {t("dashboard.header.settings")}
                 </DropdownMenuItem>

@@ -45,11 +45,20 @@ export const authMiddleware = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Set tenant context
+    // Cross-validate X-Tenant-ID header (if present) against JWT tenant
+    const headerTenantSlug = req.headers["x-tenant-id"] as string | undefined;
+    if (headerTenantSlug && headerTenantSlug !== user.tenant.slug) {
+      return res.status(403).json({ message: "Tenant mismatch" });
+    }
+
+    // Set tenant context — resolve DB host/port from environment
+    const masterUrl = new URL(process.env.DATABASE_URL_MASTER || "mysql://maiai:maiai@localhost:3306/maiai_master");
+    const tenantDbUrl = `mysql://${masterUrl.username}:${masterUrl.password}@${masterUrl.hostname}:${masterUrl.port || 3306}/${user.tenant.databaseName}`;
+
     req.tenant = {
       id: user.tenant.id,
       name: user.tenant.name,
-      databaseUrl: `mysql://maiai:maiai@127.0.0.1:3307/${user.tenant.databaseName}`,
+      databaseUrl: tenantDbUrl,
     };
 
     // Create tenant-specific Prisma client

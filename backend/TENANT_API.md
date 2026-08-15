@@ -9,12 +9,19 @@
 
 - [Cấu trúc tổng quan](#cấu-trúc-tổng-quan)
 - [Xác thực](#xác-thực)
-- [API Endpoints](#api-endpoints)
+- [Tenant API Endpoints](#tenant-api-endpoints)
   - [POST /api/admin/tenants — Tạo tenant mới](#post-apitenants--tạo-tenant-mới)
   - [GET /api/admin/tenants — Danh sách tenant](#get-apitenants--danh-sách-tenant)
   - [GET /api/admin/tenants/:id — Chi tiết tenant](#get-apitenantsid--chi-tiết-tenant)
   - [PATCH /api/admin/tenants/:id — Cập nhật tenant](#patch-apitenantsid--cập-nhật-tenant)
   - [DELETE /api/admin/tenants/:id — Xóa tenant](#delete-apitenantsid--xóa-tenant)
+  - [GET /api/admin/tenants/:id/database-info — Database stats](#get-apitenantsiddatabase-info--database-stats)
+- [User Management API Endpoints](#user-management-api-endpoints)
+  - [GET /api/admin/tenants/:id/users — Danh sách users](#get-apitenantsidusers--danh-sách-users)
+  - [POST /api/admin/tenants/:id/users — Tạo user mới](#post-apitenantsidusers--tạo-user-mới)
+  - [PATCH /api/admin/tenants/:id/users/:userId — Cập nhật user](#patch-apitenantsidusersuserid--cập-nhật-user)
+  - [DELETE /api/admin/tenants/:id/users/:userId — Xóa user](#delete-apitenantsidusersuserid--xóa-user)
+  - [POST /api/admin/tenants/:id/users/:userId/reset-password — Đặt lại mật khẩu](#post-apitenantsidusersuseridreset-password--đặt-lại-mật-khẩu)
 - [Ví dụ sử dụng](#ví-dụ-sử-dụng)
 - [Quy trình tạo tenant mới](#quy-trình-tạo-tenant-mới)
 - [Troubleshooting](#troubleshooting)
@@ -80,15 +87,28 @@ Response:
 
 ## API Endpoints
 
-Base URL: `http://localhost:3002/api/admin/tenants`
+Base URL: `http://localhost:3002/api/admin`
 
-| Method   | Endpoint            | Mô tả                    |
-| -------- | ------------------- | ------------------------ |
-| `POST`   | `/api/admin/tenants`       | Tạo tenant mới          |
-| `GET`    | `/api/admin/tenants`       | Danh sách tất cả tenant |
-| `GET`    | `/api/admin/tenants/:id`   | Chi tiết 1 tenant       |
-| `PATCH`  | `/api/admin/tenants/:id`   | Cập nhật tenant         |
-| `DELETE` | `/api/admin/tenants/:id`   | Xóa tenant              |
+### Tenant Management
+
+| Method   | Endpoint                        | Mô tả                    |
+| -------- | ------------------------------- | ------------------------ |
+| `POST`   | `/tenants`                      | Tạo tenant mới          |
+| `GET`    | `/tenants`                      | Danh sách tất cả tenant |
+| `GET`    | `/tenants/:id`                  | Chi tiết 1 tenant       |
+| `PATCH`  | `/tenants/:id`                  | Cập nhật tenant         |
+| `DELETE` | `/tenants/:id`                  | Xóa tenant              |
+| `GET`    | `/tenants/:id/database-info`    | Database stats          |
+
+### User Management (per Tenant)
+
+| Method   | Endpoint                                    | Mô tả                      |
+| -------- | ------------------------------------------- | -------------------------- |
+| `GET`    | `/tenants/:id/users`                        | Danh sách users            |
+| `POST`   | `/tenants/:id/users`                        | Tạo user mới              |
+| `PATCH`  | `/tenants/:id/users/:userId`                | Cập nhật user             |
+| `DELETE` | `/tenants/:id/users/:userId`                | Xóa user                  |
+| `POST`   | `/tenants/:id/users/:userId/reset-password` | Đặt lại mật khẩu         |
 
 ---
 
@@ -332,6 +352,196 @@ curl -X DELETE http://localhost:3002/api/admin/tenants/2 \
 ```
 
 > ⚠️ **Cảnh báo:** Hành động này không thể hoàn tác. Database `maiai_crm_2` sẽ bị DROP.
+
+---
+
+## User Management API Endpoints
+
+Quản lý user cho mỗi tenant. Mỗi tenant có tối đa `tenant.maxUsers` user (mặc định: 5).
+
+### GET /api/admin/tenants/:id/users — Danh sách users
+
+Lấy danh sách tất cả users thuộc về 1 tenant.
+
+#### Ví dụ Request
+
+```bash
+curl http://localhost:3002/api/admin/tenants/1/users \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### Response — 200 OK
+
+```json
+{
+  "ok": true,
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@maiai.com",
+      "name": "Admin User",
+      "role": "admin",
+      "isActive": true,
+      "phone": null,
+      "avatarUrl": null,
+      "lastLoginAt": "2026-08-15T10:30:00.000Z",
+      "createdAt": "2026-08-03T12:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### POST /api/admin/tenants/:id/users — Tạo user mới
+
+Tạo user mới cho tenant. Kiểm tra giới hạn `maxUsers`.
+
+#### Request Body
+
+| Field      | Type     | Required | Mô tả                  | Ví dụ              |
+| ---------- | -------- | -------- | ---------------------- | ------------------ |
+| `email`    | `string` | ✅       | Email (unique/tenant)  | `"staff@salon.com"` |
+| `password` | `string` | ✅       | Mật khẩu              | `"Staff@123"`     |
+| `name`     | `string` | ✅       | Họ tên                | `"Nguyen Van A"`  |
+| `role`     | `string` | ❌       | Vai trò (default: `staff`) | `"manager"`   |
+| `phone`    | `string` | ❌       | Số điện thoại          | `"0901234567"`    |
+
+Roles: `admin`, `manager`, `staff`
+
+#### Ví dụ Request
+
+```bash
+curl -X POST http://localhost:3002/api/admin/tenants/1/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "email": "staff@salon.com",
+    "password": "Staff@123",
+    "name": "Nguyen Van A",
+    "role": "staff",
+    "phone": "0901234567"
+  }'
+```
+
+#### Response — 201 Created
+
+```json
+{
+  "ok": true,
+  "user": {
+    "id": 3,
+    "email": "staff@salon.com",
+    "name": "Nguyen Van A",
+    "role": "staff",
+    "isActive": true,
+    "phone": "0901234567"
+  }
+}
+```
+
+#### Lỗi
+
+| Status | Message                    | Nguyên nhân              |
+| ------ | -------------------------- | ------------------------ |
+| `400`  | `Missing required fields`  | Thiếu email/password/name |
+| `409`  | `Email already exists`     | Email trùng trong tenant |
+| `409`  | `User limit reached`       | Đã đạt maxUsers          |
+
+---
+
+### PATCH /api/admin/tenants/:id/users/:userId — Cập nhật user
+
+Cập nhật thông tin user. Chỉ gửi các field cần thay đổi.
+
+#### Request Body
+
+| Field      | Type      | Mô tả                  |
+| ---------- | --------- | ---------------------- |
+| `name`     | `string`  | Họ tên                |
+| `role`     | `string`  | Vai trò               |
+| `isActive` | `boolean` | Kích hoạt/ngừng       |
+| `phone`    | `string`  | Số điện thoại          |
+
+#### Ví dụ Request
+
+```bash
+curl -X PATCH http://localhost:3002/api/admin/tenants/1/users/3 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{ "role": "manager", "isActive": true }'
+```
+
+#### Response — 200 OK
+
+```json
+{
+  "ok": true,
+  "user": {
+    "id": 3,
+    "email": "staff@salon.com",
+    "name": "Nguyen Van A",
+    "role": "manager",
+    "isActive": true,
+    "phone": "0901234567"
+  }
+}
+```
+
+---
+
+### DELETE /api/admin/tenants/:id/users/:userId — Xóa user
+
+Xóa user khỏi tenant.
+
+#### Ví dụ Request
+
+```bash
+curl -X DELETE http://localhost:3002/api/admin/tenants/1/users/3 \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### Response — 200 OK
+
+```json
+{
+  "ok": true,
+  "message": "User \"staff@salon.com\" deleted"
+}
+```
+
+> ⚠️ **Không thể xóa admin cuối cùng** của tenant. Nếu chỉ còn 1 admin, sẽ trả lỗi `409`.
+
+---
+
+### POST /api/admin/tenants/:id/users/:userId/reset-password — Đặt lại mật khẩu
+
+Đặt lại mật khẩu cho user. Nếu không gửi `password`, sẽ dùng mặc định `Admin@123`.
+
+#### Request Body
+
+| Field      | Type     | Required | Mô tả                  |
+| ---------- | -------- | -------- | ---------------------- |
+| `password` | `string` | ❌       | Mật khẩu mới (default: `Admin@123`) |
+
+#### Ví dụ Request
+
+```bash
+curl -X POST http://localhost:3002/api/admin/tenants/1/users/3/reset-password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{ "password": "NewPass@123" }'
+```
+
+#### Response — 200 OK
+
+```json
+{
+  "ok": true,
+  "message": "Password reset for staff@salon.com",
+  "email": "staff@salon.com"
+}
+```
 
 ---
 

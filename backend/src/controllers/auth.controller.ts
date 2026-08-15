@@ -82,6 +82,14 @@ export const login = async (req: Request, res: Response) => {
     return res.status(200).json({
       token,
       user: toAuthUser(user),
+      tenant: user.tenant
+        ? {
+            id: user.tenant.id,
+            name: user.tenant.name,
+            slug: user.tenant.slug,
+            databaseName: user.tenant.databaseName,
+          }
+        : null,
     });
   } catch (error) {
     console.error("Login failed", error);
@@ -94,7 +102,10 @@ export const me = (req: Request, res: Response) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  return res.status(200).json({ user: req.user });
+  return res.status(200).json({
+    user: req.user,
+    tenant: req.tenant || null,
+  });
 };
 
 export const updateProfile = async (req: Request, res: Response) => {

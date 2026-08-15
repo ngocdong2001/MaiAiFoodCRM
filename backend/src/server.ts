@@ -3,11 +3,11 @@ import express from "express";
 import cors from "cors";
 import infoRouter from "./routes/info.route";
 import authRouter from "./routes/auth.route";
-import tenantRouter from "./routes/tenant.route";
 import revenueRouter from "./routes/revenue.route";
 import staffRouter from "./routes/staff.route";
 import crmRouter from "./routes/crm.route";
 import calendarRouter from "./routes/calendar.route";
+import tenantAdminRouter from "./routes/tenant-admin.route";
 import { getPrismaMaster, disconnectPrismaMaster } from "./lib/prisma-master";
 import { disconnectAllTenants } from "./lib/prisma-tenant";
 
@@ -33,11 +33,11 @@ async function initializePrisma() {
 // Routes
 app.use("/api/info", infoRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/admin/tenants", tenantRouter);
 app.use("/api/revenue", revenueRouter);
 app.use("/api/staff", staffRouter);
 app.use("/api/crm", crmRouter);
 app.use("/api/calendar", calendarRouter);
+app.use("/api/admin", tenantAdminRouter);
 
 // Health check
 app.get("/health", (_req, res) => {

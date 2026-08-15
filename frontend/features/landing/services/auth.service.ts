@@ -4,7 +4,7 @@ import { useAuthStore, type AuthUser, type AuthTenant } from "@/core/store/authS
 type LoginResponse = {
   token: string;
   user: AuthUser;
-  tenant: AuthTenant;
+  tenant?: AuthTenant;
 };
 
 export const authService = {
@@ -15,7 +15,7 @@ export const authService = {
     });
 
     if (data?.token) {
-      useAuthStore.getState().setSession(data.token, data.user, data.tenant);
+      useAuthStore.getState().setSession(data.token, data.user, data.tenant ?? null);
     }
 
     return data;

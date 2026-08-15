@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { getStoredAuthToken } from "@/core/store/authStore";
+import { getStoredAuthToken, useAuthStore } from "@/core/store/authStore";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
@@ -29,6 +29,13 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Attach tenant slug from auth store → X-Tenant-ID header
+    const tenant = useAuthStore.getState().tenant;
+    if (tenant?.slug) {
+      config.headers["X-Tenant-ID"] = tenant.slug;
+    }
+
     return config;
   },
   (error) => {

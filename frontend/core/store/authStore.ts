@@ -12,12 +12,15 @@ export type AuthUser = {
   name: string;
   email: string;
   role: string;
+  phone?: string | null;
+  avatarUrl?: string | null;
 };
 
 export type AuthTenant = {
   id: number;
   name: string;
   slug: string;
+  databaseName?: string;
 };
 
 type AuthState = {
@@ -26,14 +29,20 @@ type AuthState = {
   token: string | null;
   hydrated: boolean;
   hydrate: () => void;
-  setSession: (token: string, user: AuthUser, tenant: AuthTenant) => void;
+  setSession: (token: string, user: AuthUser, tenant: AuthTenant | null) => void;
   setUser: (user: AuthUser) => void;
   setTenant: (tenant: AuthTenant) => void;
   logout: () => void;
 };
 
 const writeUser = (user: AuthUser) => localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-const writeTenant = (tenant: AuthTenant) => localStorage.setItem(AUTH_TENANT_KEY, JSON.stringify(tenant));
+const writeTenant = (tenant: AuthTenant | null) => {
+  if (tenant) {
+    localStorage.setItem(AUTH_TENANT_KEY, JSON.stringify(tenant));
+  } else {
+    localStorage.removeItem(AUTH_TENANT_KEY);
+  }
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
