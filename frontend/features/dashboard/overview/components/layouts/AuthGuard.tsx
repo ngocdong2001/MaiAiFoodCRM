@@ -3,15 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { authService } from "@/features/landing/services/auth.service";
+import { useAuthStore } from "@/core/store/authStore";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const { hydrate, hydrated, token, user } = useAuthStore();
 
   useEffect(() => {
-    const token = authService.getStoredToken();
-    const user = authService.getStoredUser();
+    if (!hydrated) {
+      hydrate();
+      return;
+    }
 
     if (!token || !user) {
       router.replace("/login");
@@ -19,7 +22,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     }
 
     setReady(true);
-  }, [router]);
+  }, [hydrated, token, user, router, hydrate]);
 
   if (!ready) {
     return null;

@@ -262,6 +262,7 @@
       "calendar": "Lịch hẹn",
       "crm": "CRM",
       "staff": "Nhân viên",
+      "services": "Dịch vụ",
       "ai-recs": "Gợi ý AI",
       "reports": "Báo cáo",
       "revenue": "Doanh thu",
@@ -564,6 +565,88 @@
         "emailInUse": "Email này đã được sử dụng.",
         "saveError": "Không thể cập nhật hồ sơ.",
         "loading": "Đang tải hồ sơ..."
+      }
+    },
+    "services": {
+      "title": "Bảng giá dịch vụ",
+      "subtitle": "Cập nhật danh sách dịch vụ, thời gian thực hiện và đơn giá nhanh chóng theo dạng bảng tính.",
+      "searchPlaceholder": "Tìm tên dịch vụ...",
+      "filterLabel": "Bộ lọc dịch vụ",
+      "categoryGroup": "Nhóm dịch vụ",
+      "allCategories": "Tất cả nhóm",
+      "statusGroup": "Trạng thái",
+      "statusAll": "Tất cả trạng thái",
+      "statusActive": "Đang mở bán",
+      "statusInactive": "Đang tạm ẩn",
+      "summary": {
+        "totalLabel": "Tổng số dịch vụ",
+        "totalValue": "{{count}} hạng mục",
+        "categoryLabel": "Nhóm dịch vụ",
+        "categoryValue": "{{count}} phân loại",
+        "manage": "Quản lý",
+        "updatedLabel": "Cập nhật cuối",
+        "noData": "Chưa có dữ liệu",
+        "today": "Hôm nay, {{time}}",
+        "onDate": "{{date}}, {{time}}"
+      },
+      "table": {
+        "heading": "Chi tiết bảng giá",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "index": "STT",
+        "name": "Tên dịch vụ",
+        "category": "Nhóm dịch vụ",
+        "duration": "Thời lượng",
+        "price": "Giá niêm yết (đ)",
+        "loading": "Đang tải bảng giá...",
+        "empty": "Chưa có dịch vụ nào khớp với bộ lọc hiện tại.",
+        "namePlaceholder": "Tên dịch vụ",
+        "selectCategory": "Chọn nhóm...",
+        "minutes": "phút",
+        "currency": "đ",
+        "newRowLabel": "dòng mới",
+        "deleteRow": "Xóa {{name}}",
+        "addRowHint": "Bấm vào đây để thêm dịch vụ mới...",
+        "totalValue": "Tổng giá trị danh mục",
+        "averageValue": "Trung bình/dịch vụ",
+        "cancel": "Hủy bỏ",
+        "addRow": "Thêm dòng mới",
+        "finish": "Hoàn tất thiết lập"
+      },
+      "errors": {
+        "loadFailed": "Không tải được bảng giá dịch vụ từ cơ sở dữ liệu.",
+        "retry": "Thử lại",
+        "saveFailed": "Không thể lưu bảng giá dịch vụ",
+        "rowName": "Dòng {{row}}: cần nhập tên dịch vụ",
+        "rowCategory": "Dòng {{row}}: cần chọn nhóm dịch vụ",
+        "rowDuration": "Dòng {{row}}: thời lượng phải lớn hơn 0 phút",
+        "rowPrice": "Dòng {{row}}: giá niêm yết không hợp lệ"
+      },
+      "tip": {
+        "title": "Mẹo quản lý nhanh:",
+        "before": "Dữ liệu được đồng bộ với hệ thống đặt lịch MaiAI sau khi bạn nhấn \"Lưu thay đổi\". Bạn có thể nhấn",
+        "after": "ở dòng cuối cùng để tự động thêm dòng mới."
+      },
+      "reset": {
+        "title": "Hủy các thay đổi chưa lưu?",
+        "description": "Bảng giá sẽ được khôi phục về dữ liệu đang lưu trong cơ sở dữ liệu.",
+        "keep": "Giữ lại",
+        "confirm": "Hủy thay đổi"
+      },
+      "categoryDialog": {
+        "title": "Nhóm dịch vụ",
+        "description": "Thêm, sửa hoặc xóa các phân loại dùng cho bảng giá dịch vụ.",
+        "empty": "Chưa có nhóm dịch vụ nào.",
+        "serviceCount": "{{count}} dịch vụ",
+        "edit": "Sửa {{name}}",
+        "delete": "Xóa {{name}}",
+        "namePlaceholder": "Tên nhóm dịch vụ",
+        "descriptionPlaceholder": "Mô tả (tùy chọn)",
+        "nameRequired": "Tên nhóm dịch vụ là bắt buộc",
+        "cancelEdit": "Hủy sửa",
+        "create": "Thêm nhóm",
+        "update": "Cập nhật nhóm",
+        "saveError": "Không thể lưu nhóm dịch vụ"
       }
     },
     "staff": {

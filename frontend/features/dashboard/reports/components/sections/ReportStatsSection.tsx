@@ -9,6 +9,8 @@ import {
   Users,
 } from "lucide-react";
 
+import StatCard from "@/shared/components/molecules/StatCard";
+
 import type { ReportStatMetric } from "../../types/reports.types";
 
 const iconMap = {
@@ -31,34 +33,30 @@ const ReportStatCard = ({ metric }: ReportStatCardProps) => {
   const isUp = metric.trend === "up";
 
   return (
-    <div className="flex flex-col justify-between rounded-[14px] border border-[#DEE1E7] bg-white px-6 py-5 shadow-[0px_2px_4px_0px_#00000012]">
-      <div className="flex items-start justify-between">
-        <span className="text-sm font-medium text-[#8D95A5]">
-          {metric.label}
+    <StatCard
+      label={metric.label}
+      value={metric.value}
+      className="rounded-[14px] px-6 py-5 shadow-[0px_2px_4px_0px_#00000012]"
+      icon={<Icon className={`h-5 w-5 ${color}`} />}
+      iconWrapperClassName={`h-9 w-9 rounded-xl ${bg}`}
+      hint={
+        <span className="flex items-center gap-1.5">
+          {isUp ? (
+            <TrendingUp className="h-3 w-3 text-[#171A21]" />
+          ) : (
+            <TrendingDown className="h-3 w-3 text-[#EB5656]" />
+          )}
+          <span
+            className={`font-semibold ${isUp ? "text-[#171A21]" : "text-[#EB5656]"}`}
+          >
+            {metric.change}
+          </span>
+          <span className="text-sm font-normal text-[#8D95A5]">
+            vs last period
+          </span>
         </span>
-        <div
-          className={`flex h-9 w-9 items-center justify-center rounded-xl ${bg}`}
-        >
-          <Icon className={`h-5 w-5 ${color}`} />
-        </div>
-      </div>
-      <p className="mt-2 text-3xl font-bold tracking-tight text-[#171A21]">
-        {metric.value}
-      </p>
-      <div className="mt-3 flex items-center gap-1.5">
-        {isUp ? (
-          <TrendingUp className="h-3 w-3 text-[#171A21]" />
-        ) : (
-          <TrendingDown className="h-3 w-3 text-[#EB5656]" />
-        )}
-        <span
-          className={`text-xs font-semibold ${isUp ? "text-[#171A21]" : "text-[#EB5656]"}`}
-        >
-          {metric.change}
-        </span>
-        <span className="text-sm text-[#8D95A5]">vs last period</span>
-      </div>
-    </div>
+      }
+    />
   );
 };
 

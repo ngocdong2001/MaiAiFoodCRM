@@ -1,6 +1,7 @@
 import { ChevronRight } from "lucide-react";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import EmptyState from "@/shared/components/molecules/EmptyState";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { cn } from "@/shared/lib/utils";
 
@@ -128,9 +129,11 @@ const CRMGuestsListSection = ({
       </ScrollArea>
 
       {guests.length === 0 && (
-        <div className="mt-4 rounded-lg border border-dashed border-[#D6DFEB] p-4 text-center text-xs text-[#8D95A5]">
-          No guests found with current search/filter.
-        </div>
+        <EmptyState
+          variant="dashed"
+          className="mt-4"
+          message="No guests found with current search/filter."
+        />
       )}
     </section>
   );

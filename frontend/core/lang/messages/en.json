@@ -262,6 +262,7 @@
       "calendar": "Calendar",
       "crm": "CRM",
       "staff": "Staff",
+      "services": "Services",
       "ai-recs": "AI Recs",
       "reports": "Reports",
       "revenue": "Revenue",
@@ -564,6 +565,88 @@
         "emailInUse": "This email is already in use.",
         "saveError": "Unable to update your profile.",
         "loading": "Loading your profile..."
+      }
+    },
+    "services": {
+      "title": "Service price list",
+      "subtitle": "Update your services, durations and prices quickly in a spreadsheet-style table.",
+      "searchPlaceholder": "Search service name...",
+      "filterLabel": "Service filters",
+      "categoryGroup": "Category",
+      "allCategories": "All categories",
+      "statusGroup": "Status",
+      "statusAll": "All statuses",
+      "statusActive": "Published",
+      "statusInactive": "Hidden",
+      "summary": {
+        "totalLabel": "Total services",
+        "totalValue": "{{count}} items",
+        "categoryLabel": "Categories",
+        "categoryValue": "{{count}} groups",
+        "manage": "Manage",
+        "updatedLabel": "Last updated",
+        "noData": "No data yet",
+        "today": "Today, {{time}}",
+        "onDate": "{{date}}, {{time}}"
+      },
+      "table": {
+        "heading": "Price list details",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "index": "No.",
+        "name": "Service name",
+        "category": "Category",
+        "duration": "Duration",
+        "price": "List price",
+        "loading": "Loading price list...",
+        "empty": "No service matches the current filters.",
+        "namePlaceholder": "Service name",
+        "selectCategory": "Select category...",
+        "minutes": "min",
+        "currency": "đ",
+        "newRowLabel": "new row",
+        "deleteRow": "Delete {{name}}",
+        "addRowHint": "Click here to add a new service...",
+        "totalValue": "Catalog total value",
+        "averageValue": "Average per service",
+        "cancel": "Discard",
+        "addRow": "Add row",
+        "finish": "Finish setup"
+      },
+      "errors": {
+        "loadFailed": "Could not load the service price list from the database.",
+        "retry": "Try again",
+        "saveFailed": "Unable to save the service price list",
+        "rowName": "Row {{row}}: service name is required",
+        "rowCategory": "Row {{row}}: please select a category",
+        "rowDuration": "Row {{row}}: duration must be greater than 0 minutes",
+        "rowPrice": "Row {{row}}: list price is invalid"
+      },
+      "tip": {
+        "title": "Quick tip:",
+        "before": "Data syncs with MaiAI booking once you press \"Save changes\". You can press",
+        "after": "on the last row to append a new one automatically."
+      },
+      "reset": {
+        "title": "Discard unsaved changes?",
+        "description": "The price list will be restored to the data currently stored in the database.",
+        "keep": "Keep editing",
+        "confirm": "Discard changes"
+      },
+      "categoryDialog": {
+        "title": "Service categories",
+        "description": "Add, edit or delete the categories used by the service price list.",
+        "empty": "No category yet.",
+        "serviceCount": "{{count}} services",
+        "edit": "Edit {{name}}",
+        "delete": "Delete {{name}}",
+        "namePlaceholder": "Category name",
+        "descriptionPlaceholder": "Description (optional)",
+        "nameRequired": "Category name is required",
+        "cancelEdit": "Cancel edit",
+        "create": "Add category",
+        "update": "Update category",
+        "saveError": "Unable to save the service category"
       }
     },
     "staff": {
