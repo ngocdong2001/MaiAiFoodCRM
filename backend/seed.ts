@@ -1,4 +1,4 @@
-import { getPrismaMaster } from './src/lib/prisma-master.js';
+import { getPrismaMaster } from './dist/lib/prisma-master.js';
 
 async function seed() {
   const prisma = getPrismaMaster();

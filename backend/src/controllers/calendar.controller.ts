@@ -39,4 +39,15 @@ export const CalendarController = {
   async update(req: Request, res: Response): Promise<void> { const id = parseId(req.params.id); const input = req.body as AppointmentInput; const validation = validateInput(input); if (!id) return void res.status(400).json({ success: false, message: "Invalid appointment ID" }); if (validation) return void res.status(400).json({ success: false, message: validation }); try { res.status(200).json({ success: true, data: await CalendarModel.update(getDb(req), id, input), message: "Appointment updated successfully" }); } catch (error) { handleError(res, error, "Failed to update appointment"); } },
   async updateStatus(req: Request, res: Response): Promise<void> { const id = parseId(req.params.id); const status = req.body.status as AppointmentStatus; if (!id) return void res.status(400).json({ success: false, message: "Invalid appointment ID" }); if (!APPOINTMENT_STATUSES.includes(status)) return void res.status(400).json({ success: false, message: "Invalid appointment status" }); try { res.status(200).json({ success: true, data: await CalendarModel.updateStatus(getDb(req), id, status, req.body.cancelReason), message: "Appointment status updated" }); } catch (error) { handleError(res, error, "Failed to update appointment status"); } },
   async delete(req: Request, res: Response): Promise<void> { const id = parseId(req.params.id); if (!id) return void res.status(400).json({ success: false, message: "Invalid appointment ID" }); try { const data = await CalendarModel.delete(getDb(req), id); res.status(200).json({ success: true, data, message: data.cancelled ? "Paid appointment cancelled and preserved" : "Appointment deleted successfully" }); } catch (error) { handleError(res, error, "Failed to delete appointment"); } },
+  async getAvailability(req: Request, res: Response): Promise<void> {
+    const date = typeof req.query.date === "string" ? req.query.date : "";
+    if (!date || !validDate(date)) return void res.status(400).json({ success: false, message: "Valid date parameter is required" });
+    const service = typeof req.query.service === "string" ? req.query.service : undefined;
+    const staffId = typeof req.query.staff_id === "string" ? Number.parseInt(req.query.staff_id) : undefined;
+    const preferredTime = typeof req.query.preferred_time === "string" ? req.query.preferred_time : undefined;
+    try {
+      const data = await CalendarModel.getAvailability(getDb(req), { date, service, staffId: Number.isInteger(staffId) ? staffId : undefined, preferredTime });
+      res.status(200).json({ success: true, data });
+    } catch (error) { handleError(res, error, "Failed to check availability"); }
+  },
 };

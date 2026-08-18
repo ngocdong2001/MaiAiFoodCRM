@@ -10,4 +10,5 @@ router.post("/appointments", CalendarController.create);
 router.put("/appointments/:id", CalendarController.update);
 router.patch("/appointments/:id/status", CalendarController.updateStatus);
 router.delete("/appointments/:id", CalendarController.delete);
+router.get("/availability", CalendarController.getAvailability);
 export default router;

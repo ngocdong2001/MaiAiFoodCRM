@@ -96,4 +96,18 @@ export const CRMController = {
       res.status(200).json({ success: true, data, message: data.archived ? "Guest archived to preserve booking history" : "Guest deleted successfully" });
     } catch (error) { handleError(res, error, "Failed to delete guest"); }
   },
+
+  /**
+   * GET /guests/by-phone/:phone
+   * Quick lookup by phone number for voice agent integration.
+   */
+  async getByPhone(req: Request, res: Response): Promise<void> {
+    const phone = typeof req.params.phone === "string" ? req.params.phone.trim() : "";
+    if (!phone) return void res.status(400).json({ success: false, message: "Phone number is required" });
+    try {
+      const guest = await CRMModel.getByPhone(getDb(req), phone);
+      if (!guest) return void res.status(404).json({ success: false, message: "Guest not found" });
+      res.status(200).json({ success: true, data: guest });
+    } catch (error) { handleError(res, error, "Failed to lookup guest by phone"); }
+  },
 };
