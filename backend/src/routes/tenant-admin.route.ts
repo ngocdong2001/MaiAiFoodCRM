@@ -1,8 +1,54 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
+import { execSync } from "child_process";
 import { getPrismaMaster } from "../lib/prisma-master.js";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient as PrismaTenant } from "../generated/prisma-tenant/client.js";
 
 const router = Router();
+
+// ─── Helper: Create tenant database + run Prisma migrations ────────────────
+
+async function createTenantDatabase(databaseName: string): Promise<void> {
+  const masterUrl = process.env.DATABASE_URL_MASTER;
+  if (!masterUrl) throw new Error("DATABASE_URL_MASTER not set");
+
+  const u = new URL(masterUrl);
+  const host = u.hostname;
+  const port = Number(u.port) || 3306;
+  const user = u.username;
+  const password = u.password;
+
+  // 1. Create the database via master Prisma raw query
+  const masterAdapter = new PrismaMariaDb({
+    host, port, user, password,
+    database: "maiai_master",
+    connectionLimit: 1,
+  });
+  const prismaMaster = new (await import("../generated/prisma-master/client.js")).PrismaClient({ adapter: masterAdapter });
+  await prismaMaster.$executeRawUnsafe(`CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+  await prismaMaster.$executeRawUnsafe(`GRANT ALL ON \`${databaseName}\`.* TO '${user}'@'%'`);
+  await prismaMaster.$executeRawUnsafe(`FLUSH PRIVILEGES`);
+  await prismaMaster.$disconnect();
+
+  // 2. Run Prisma tenant migrations via CLI
+  const tenantUrl = `mysql://${user}:${password}@${host}:${port}/${databaseName}`;
+  try {
+    execSync(
+      `npx prisma migrate deploy --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts`,
+      {
+        cwd: "/app",
+        env: { ...process.env, DATABASE_URL_TENANT: tenantUrl },
+        timeout: 30000,
+        stdio: "pipe",
+      }
+    );
+    console.log(`[TenantAdmin] Migrated tenant DB: ${databaseName}`);
+  } catch (migErr: any) {
+    console.error(`[TenantAdmin] Migration failed for ${databaseName}:`, migErr.stderr?.toString() || migErr.message);
+    throw new Error(`Database created but migration failed: ${migErr.stderr?.toString() || migErr.message}`);
+  }
+}
 
 // ─── GET /api/admin/tenants/:id ─────────────────────────────────────────────
 // Get tenant detail with users list
@@ -175,6 +221,17 @@ router.post("/tenants", async (req, res) => {
       select: { id: true, email: true, name: true, role: true },
     });
 
+    // Create tenant database and run migrations
+    let databaseCreated = false;
+    let databaseError: string | null = null;
+    try {
+      await createTenantDatabase(databaseName);
+      databaseCreated = true;
+    } catch (dbErr: any) {
+      databaseError = dbErr.message;
+      console.error("[TenantAdmin] Tenant DB setup error:", dbErr.message);
+    }
+
     res.status(201).json({
       tenant: {
         id: tenant.id,
@@ -183,7 +240,13 @@ router.post("/tenants", async (req, res) => {
         databaseName: tenant.databaseName,
       },
       admin: adminUser,
-      message: "Tenant created successfully",
+      database: {
+        created: databaseCreated,
+        ...(databaseError ? { error: databaseError } : {}),
+      },
+      message: databaseCreated
+        ? "Tenant created successfully with database"
+        : "Tenant created but database setup failed — run migration manually",
     });
   } catch (err) {
     console.error("[TenantAdmin] Error creating tenant:", err);
