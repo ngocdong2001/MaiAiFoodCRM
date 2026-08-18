@@ -53,8 +53,8 @@ type ApiResponse<T> = { success: boolean; data: T };
 
 export const overviewService = {
   async getStats(): Promise<OverviewData> {
-    const response = await apiClient.get<ApiResponse<OverviewData>>("/overview/stats");
+    const response =
+      await apiClient.get<ApiResponse<OverviewData>>("/overview/stats");
     return response.data.data;
   },
 };
-

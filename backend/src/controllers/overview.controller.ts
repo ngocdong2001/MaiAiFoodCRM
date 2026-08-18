@@ -12,7 +12,9 @@ export const OverviewController = {
       res.json({ success: true, data });
     } catch (error) {
       console.error("OverviewController.get error:", error);
-      res.status(500).json({ success: false, message: "Failed to load overview data" });
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to load overview data" });
     }
   },
 };

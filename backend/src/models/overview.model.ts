@@ -58,7 +58,11 @@ const todayRange = () => {
 };
 
 const fmt12h = (date: Date) =>
-  date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 
 export const OverviewModel = {
   async get(prisma: PrismaClient): Promise<OverviewData> {
@@ -80,16 +84,25 @@ export const OverviewModel = {
       staffScheduleRows,
     ] = await Promise.all([
       prisma.appointment.count({
-        where: { startTime: { gte: start }, status: { notIn: ["cancelled", "no_show"] } },
+        where: {
+          startTime: { gte: start },
+          status: { notIn: ["cancelled", "no_show"] },
+        },
       }),
       prisma.appointment.count({
         where: { createdAt: { gte: start, lte: end } },
       }),
       prisma.appointment.count({
-        where: { startTime: { gte: start, lte: end }, status: { in: ["pending", "confirmed"] } },
+        where: {
+          startTime: { gte: start, lte: end },
+          status: { in: ["pending", "confirmed"] },
+        },
       }),
       prisma.appointment.count({
-        where: { startTime: { gte: start, lte: end }, status: { in: ["in_progress", "confirmed"] } },
+        where: {
+          startTime: { gte: start, lte: end },
+          status: { in: ["in_progress", "confirmed"] },
+        },
       }),
       prisma.appointment.count({
         where: { startTime: { gte: start, lte: end }, status: "completed" },
@@ -101,12 +114,20 @@ export const OverviewModel = {
       }),
       // Live queue: today's not-yet-completed bookings
       prisma.appointment.findMany({
-        where: { startTime: { gte: start, lte: end }, status: { in: ["pending", "confirmed", "in_progress"] } },
+        where: {
+          startTime: { gte: start, lte: end },
+          status: { in: ["pending", "confirmed", "in_progress"] },
+        },
         orderBy: { startTime: "asc" },
         select: {
-          id: true, startTime: true, status: true,
+          id: true,
+          startTime: true,
+          status: true,
           guest: { select: { name: true } },
-          appointmentservice: { take: 1, select: { service: { select: { name: true } } } },
+          appointmentservice: {
+            take: 1,
+            select: { service: { select: { name: true } } },
+          },
         },
       }),
       // Today's full snapshot
@@ -114,10 +135,15 @@ export const OverviewModel = {
         where: { startTime: { gte: start, lte: end } },
         orderBy: { startTime: "asc" },
         select: {
-          id: true, startTime: true, status: true,
+          id: true,
+          startTime: true,
+          status: true,
           guest: { select: { name: true } },
           staff: { select: { name: true } },
-          appointmentservice: { take: 1, select: { service: { select: { name: true } } } },
+          appointmentservice: {
+            take: 1,
+            select: { service: { select: { name: true } } },
+          },
         },
       }),
       // Recent guests
@@ -126,7 +152,10 @@ export const OverviewModel = {
         orderBy: { startTime: "desc" },
         take: 20,
         distinct: ["guestId"],
-        select: { startTime: true, guest: { select: { id: true, name: true } } },
+        select: {
+          startTime: true,
+          guest: { select: { id: true, name: true } },
+        },
       }),
       // Staff on duty today (schedule exists, not a day off)
       prisma.staffschedule.findMany({
@@ -134,9 +163,16 @@ export const OverviewModel = {
         select: {
           staff: {
             select: {
-              id: true, name: true, role: true, avatarUrl: true, status: true,
+              id: true,
+              name: true,
+              role: true,
+              avatarUrl: true,
+              status: true,
               appointment: {
-                where: { startTime: { gte: start, lte: end }, status: { notIn: ["cancelled", "no_show"] } },
+                where: {
+                  startTime: { gte: start, lte: end },
+                  status: { notIn: ["cancelled", "no_show"] },
+                },
                 select: { id: true },
               },
             },
@@ -164,11 +200,13 @@ export const OverviewModel = {
       status: row.status,
     }));
 
-    const recentGuests: RecentGuestItem[] = recentGuestRows.slice(0, 6).map((row) => ({
-      id: row.guest.id,
-      name: row.guest.name,
-      lastVisitAt: row.startTime.toISOString(),
-    }));
+    const recentGuests: RecentGuestItem[] = recentGuestRows
+      .slice(0, 6)
+      .map((row) => ({
+        id: row.guest.id,
+        name: row.guest.name,
+        lastVisitAt: row.startTime.toISOString(),
+      }));
 
     const staffOnDuty: StaffOnDutyItem[] = staffScheduleRows.map((row) => ({
       id: row.staff.id,
@@ -180,7 +218,14 @@ export const OverviewModel = {
     }));
 
     return {
-      stats: { upcomingBookings, newBookingsToday, activePending, recentCheckIns, completedToday, todayRevenue },
+      stats: {
+        upcomingBookings,
+        newBookingsToday,
+        activePending,
+        recentCheckIns,
+        completedToday,
+        todayRevenue,
+      },
       liveQueue,
       todaysSnapshot,
       recentGuests,
@@ -188,4 +233,3 @@ export const OverviewModel = {
     };
   },
 };
-

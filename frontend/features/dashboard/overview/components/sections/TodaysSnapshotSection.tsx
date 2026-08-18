@@ -21,7 +21,9 @@ const TodaysSnapshotSection = () => {
       {isLoading ? (
         <p className="mt-4 text-sm text-[#8D95A5]">Loading…</p>
       ) : snapshot.length === 0 ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">No appointments scheduled for today.</p>
+        <p className="mt-4 text-sm text-[#8D95A5]">
+          No appointments scheduled for today.
+        </p>
       ) : (
         <ul className="mt-4 space-y-4">
           {snapshot.map((item) => (
@@ -51,4 +53,3 @@ const TodaysSnapshotSection = () => {
 };
 
 export default TodaysSnapshotSection;
-

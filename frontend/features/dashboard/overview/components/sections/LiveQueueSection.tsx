@@ -4,10 +4,16 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/utils";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
-const statusLabel = (item: { status: string; startTime: string; urgent: boolean }) => {
+const statusLabel = (item: {
+  status: string;
+  startTime: string;
+  urgent: boolean;
+}) => {
   if (item.status === "in_progress") return "Now";
   if (item.urgent) return "Soon";
-  const mins = Math.round((new Date(item.startTime).getTime() - Date.now()) / 60000);
+  const mins = Math.round(
+    (new Date(item.startTime).getTime() - Date.now()) / 60000,
+  );
   if (mins <= 0) return "Overdue";
   return `${mins} min`;
 };
@@ -29,7 +35,9 @@ const LiveQueueSection = () => {
       {isLoading ? (
         <p className="mt-4 text-sm text-[#8D95A5]">Loading…</p>
       ) : queue.length === 0 ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">No active appointments today.</p>
+        <p className="mt-4 text-sm text-[#8D95A5]">
+          No active appointments today.
+        </p>
       ) : (
         <ul className="mt-4 divide-y divide-[#EEF0F3]">
           {queue.map((guest) => {
@@ -47,8 +55,12 @@ const LiveQueueSection = () => {
                     )}
                   />
                   <div>
-                    <p className="text-sm font-medium text-[#171A21]">{guest.guestName}</p>
-                    <p className="text-xs text-[#8D95A5]">{guest.serviceName}</p>
+                    <p className="text-sm font-medium text-[#171A21]">
+                      {guest.guestName}
+                    </p>
+                    <p className="text-xs text-[#8D95A5]">
+                      {guest.serviceName}
+                    </p>
                   </div>
                 </div>
                 <span
@@ -80,4 +92,3 @@ const LiveQueueSection = () => {
 };
 
 export default LiveQueueSection;
-
