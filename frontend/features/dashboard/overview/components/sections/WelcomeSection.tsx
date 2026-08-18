@@ -2,14 +2,18 @@
 import { Plus, UserPlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { useAuthStore } from "@/core/store/authStore";
+
 const WelcomeSection = () => {
   const { t } = useTranslation();
+  const user = useAuthStore((s) => s.user);
+  const firstName = user?.name?.split(" ")[0] ?? "there";
 
   return (
     <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-[#171A21] sm:text-3xl">
-          {t("dashboard.overview.welcome.title", { name: "Sarah" })}
+          {t("dashboard.overview.welcome.title", { name: firstName })}
         </h1>
         <p className="mt-1 text-sm text-[#8D95A5] sm:text-base">
           {t("dashboard.overview.welcome.subtitle")}
@@ -37,3 +41,4 @@ const WelcomeSection = () => {
 };
 
 export default WelcomeSection;
+
