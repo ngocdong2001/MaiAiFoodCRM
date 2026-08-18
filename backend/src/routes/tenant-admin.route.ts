@@ -19,16 +19,17 @@ async function createTenantDatabase(databaseName: string): Promise<void> {
   const user = u.username;
   const password = u.password;
 
-  // 1. Create the database via master Prisma raw query
+  // 1. Create the database via raw SQL (maiai has CREATE privilege on *.*)
   const masterAdapter = new PrismaMariaDb({
     host, port, user, password,
     database: "maiai_master",
     connectionLimit: 1,
   });
-  const prismaMaster = new (await import("../generated/prisma-master/client.js")).PrismaClient({ adapter: masterAdapter });
-  await prismaMaster.$executeRawUnsafe(`CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-  await prismaMaster.$executeRawUnsafe(`GRANT ALL ON \`${databaseName}\`.* TO '${user}'@'%'`);
-  await prismaMaster.$executeRawUnsafe(`FLUSH PRIVILEGES`);
+  const { PrismaClient } = await import("../generated/prisma-master/client.js");
+  const prismaMaster = new PrismaClient({ adapter: masterAdapter });
+  await prismaMaster.$executeRawUnsafe(
+    `CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+  );
   await prismaMaster.$disconnect();
 
   // 2. Run Prisma tenant migrations via CLI
@@ -43,10 +44,11 @@ async function createTenantDatabase(databaseName: string): Promise<void> {
         stdio: "pipe",
       }
     );
-    console.log(`[TenantAdmin] Migrated tenant DB: ${databaseName}`);
+    console.log(`[TenantAdmin] ✅ Migrated tenant DB: ${databaseName}`);
   } catch (migErr: any) {
-    console.error(`[TenantAdmin] Migration failed for ${databaseName}:`, migErr.stderr?.toString() || migErr.message);
-    throw new Error(`Database created but migration failed: ${migErr.stderr?.toString() || migErr.message}`);
+    const errMsg = migErr.stderr?.toString() || migErr.message;
+    console.error(`[TenantAdmin] ❌ Migration failed for ${databaseName}:`, errMsg);
+    throw new Error(`Database created but migration failed: ${errMsg}`);
   }
 }
 
@@ -191,7 +193,7 @@ router.post("/tenants", async (req, res) => {
       return;
     }
 
-    const databaseName = `crm_${slug.replace(/[^a-z0-9]/g, "_")}`;
+    const databaseName = `maiai_crm_${slug.replace(/[^a-z0-9]/g, "_")}`;
     const passwordHash = await bcrypt.hash(String(password), 12);
 
     const tenantNow = new Date();
