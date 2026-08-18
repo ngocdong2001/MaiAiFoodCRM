@@ -1,4 +1,3 @@
-import AIRecommendationsSection from "../components/sections/AIRecommendationsSection";
 import AlertsBanner from "../components/sections/AlertsBanner";
 import LiveQueueSection from "../components/sections/LiveQueueSection";
 import RecentGuestsSection from "../components/sections/RecentGuestsSection";
@@ -20,10 +19,7 @@ const DashboardPage = () => {
         <LiveQueueSection />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <RecentGuestsSection />
-        <AIRecommendationsSection />
-      </div>
+      <RecentGuestsSection />
     </div>
   );
 };

@@ -26,7 +26,7 @@ export const dashboardNavItems: DashboardNavItem[] = [
   { key: "crm", label: "CRM", href: "/dashboard/crm" },
   { key: "staff", label: "Staff", href: "/dashboard/staff" },
   { key: "services", label: "Services", href: "/dashboard/services" },
-  { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
+  // { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
   { key: "reports", label: "Reports", href: "/dashboard/reports" },
   {
     key: "revenue",

@@ -484,6 +484,8 @@
     },
     "revenue": {
       "title": "Daily Revenue Summary",
+      "subtitle": "Track financial performance and customer transaction details for today.",
+      "vsYesterday": "vs yesterday",
       "reportFilters": "Report Filters",
       "exportExcel": "Export Excel",
       "loading": "Loading revenue data...",
@@ -507,6 +509,18 @@
         "product-revenue": "Product Revenue",
         "total-orders": "Total Orders"
       },
+      "cards": {
+        "totalCustomers": "Total Customers Served",
+        "ordersUnit": "invoices",
+        "guestUnit": "guests",
+        "totalPaidOrders": "Number of paid invoices",
+        "avgPerStaff": "Avg Revenue / Staff",
+        "avgPerStylist": "Average per stylist",
+        "dailyRevenue": "Daily Revenue",
+        "totalReceived": "Total amount received",
+        "popularService": "Popular Service",
+        "chosenMost": "Most chosen today"
+      },
       "paymentMethodLabels": {
         "cash": "Cash",
         "transfer": "Bank Transfer",
@@ -517,6 +531,35 @@
       "activity": {
         "walkInGuest": "Walk-in Guest",
         "paymentVia": "Payment via {{method}}"
+      },
+      "staffTable": {
+        "title": "Staff Revenue Details",
+        "subtitle": "Detailed breakdown of revenue by service provider.",
+        "searchPlaceholder": "Search staff...",
+        "colStaff": "Staff",
+        "colOrders": "Invoices",
+        "colRevenue": "Total Revenue",
+        "colServices": "Services Performed",
+        "colPerf": "Performance"
+      },
+      "subTable": {
+        "clickForDetail": "Click the ⋮ icon to view detailed service history."
+      },
+      "staffDetail": {
+        "jobHistory": "Job History",
+        "noJobs": "No jobs found for this period.",
+        "guest": "Guest",
+        "time": "Time",
+        "services": "Services",
+        "amount": "Amount",
+        "discount": "Discount",
+        "final": "Final",
+        "paymentMethod": "Payment Method",
+        "receipt": "Receipt"
+      },
+      "perf": {
+        "good": "Good",
+        "stable": "Stable"
       },
       "revenueByStaff": "Revenue by Staff",
       "viewDetails": "View details",
@@ -530,6 +573,10 @@
       "paymentDistribution": "Daily payment distribution",
       "total": "Total",
       "latestActivity": "Latest Activity",
+      "info": {
+        "title": "Management Guide",
+        "body": "Revenue data is automatically aggregated from the POS system. Click on any staff member to view their detailed service history."
+      },
       "readyForExport": "Ready for export",
       "systemSynced": "System synced",
       "versionInfo": "© 2023 MaiAI Salon Management System • Version 2.4.0"

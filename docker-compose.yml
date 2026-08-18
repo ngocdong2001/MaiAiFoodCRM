@@ -15,7 +15,7 @@ services:
     ports:
       - "${MARIADB_PORT:-3307}:3306"
     volumes:
-      - test_maiai-mariadb-data:/var/lib/mysql
+      - maindatabasedata:/var/lib/mysql
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -45,9 +45,6 @@ services:
       - "${BACKEND_PORT:-3001}:3001"
     networks:
       - maiai-net
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
 
   frontend:
     build:
@@ -64,12 +61,10 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     networks:
       - maiai-net
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
 volumes:
-  test_maiai-mariadb-data:
+  maindatabasedata:
+    external: true
 
 networks:
   maiai-net:

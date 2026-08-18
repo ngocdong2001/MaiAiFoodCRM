@@ -483,7 +483,9 @@
       "exportData": "Xuất dữ liệu"
     },
     "revenue": {
-      "title": "Tổng kết doanh thu ngày",
+      "title": "Tổng kết doanh thu trong ngày",
+      "subtitle": "Theo dõi tình hình tài chính và chi tiết giao dịch khách hàng trong ngày hôm nay.",
+      "vsYesterday": "so với hôm qua",
       "reportFilters": "Bộ lọc báo cáo",
       "exportExcel": "Xuất Excel",
       "loading": "Đang tải dữ liệu doanh thu...",
@@ -507,6 +509,18 @@
         "product-revenue": "Doanh thu sản phẩm",
         "total-orders": "Tổng đơn hàng"
       },
+      "cards": {
+        "totalCustomers": "Tổng khách phục vụ",
+        "ordersUnit": "hóa đơn",
+        "guestUnit": "khách",
+        "totalPaidOrders": "Số lượng hóa đơn đã thanh toán",
+        "avgPerStaff": "Doanh thu TB / Nhân viên",
+        "avgPerStylist": "Trung bình trên mỗi stylist",
+        "dailyRevenue": "Doanh thu trong ngày",
+        "totalReceived": "Tổng tiền thực thu",
+        "popularService": "Dịch vụ phổ biến",
+        "chosenMost": "Được chọn nhiều nhất hôm nay"
+      },
       "paymentMethodLabels": {
         "cash": "Tiền mặt",
         "transfer": "Chuyển khoản",
@@ -517,6 +531,35 @@
       "activity": {
         "walkInGuest": "Khách vãng lai",
         "paymentVia": "Thanh toán qua {{method}}"
+      },
+      "staffTable": {
+        "title": "Chi tiết doanh thu nhân viên",
+        "subtitle": "Thống kê chi tiết các khoản thu dựa trên người thực hiện dịch vụ.",
+        "searchPlaceholder": "Tìm nhân viên...",
+        "colStaff": "Nhân viên",
+        "colOrders": "Số hóa đơn",
+        "colRevenue": "Tổng doanh thu",
+        "colServices": "Dịch vụ thực hiện",
+        "colPerf": "Hiệu suất"
+      },
+      "subTable": {
+        "clickForDetail": "Nhấn biểu tượng ⋮ để xem chi tiết lịch sử phục vụ."
+      },
+      "staffDetail": {
+        "jobHistory": "Lịch sử phục vụ",
+        "noJobs": "Không có hóa đơn nào trong kỳ này.",
+        "guest": "Khách",
+        "time": "Thời gian",
+        "services": "Dịch vụ",
+        "amount": "Số tiền",
+        "discount": "Giảm giá",
+        "final": "Thực thu",
+        "paymentMethod": "Phương thức thanh toán",
+        "receipt": "Hóa đơn"
+      },
+      "perf": {
+        "good": "Tốt",
+        "stable": "Ổn định"
       },
       "revenueByStaff": "Doanh thu theo nhân viên",
       "viewDetails": "Xem chi tiết",
@@ -530,6 +573,10 @@
       "paymentDistribution": "Phân bổ thanh toán trong ngày",
       "total": "Tổng",
       "latestActivity": "Hoạt động mới nhất",
+      "info": {
+        "title": "Hướng dẫn quản trị",
+        "body": "Dữ liệu doanh thu được tổng hợp tự động từ hệ thống POS. Bạn có thể nhấn vào từng nhân viên để xem lịch sử phục vụ chi tiết."
+      },
       "readyForExport": "Sẵn sàng xuất",
       "systemSynced": "Đã đồng bộ hệ thống",
       "versionInfo": "© 2023 MaiAI Salon Management System • Phiên bản 2.4.0"

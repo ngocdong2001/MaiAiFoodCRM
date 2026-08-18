@@ -19,6 +19,7 @@ export type StaffRevenueRow = {
   tips: number;
   totalRevenue: number;
   avatarUrl: string | null;
+  recentServiceNames: string[];
 };
 
 export type PaymentMethodItem = {
@@ -36,6 +37,8 @@ export type RevenueActivity = {
   amount: number;
   time: string;
   isWalkIn: boolean;
+  serviceTags: string[];
+  serviceCount: number;
 };
 
 export type RevenueSummaryResponse = {
@@ -53,10 +56,47 @@ export type RevenueSummaryParams = {
   paymentMethod?: string;
 };
 
+export type StaffRevenueDetailJob = {
+  paymentId: number;
+  appointmentId: number;
+  paidAt: string;
+  guestName: string;
+  guestAvatarUrl: string | null;
+  services: { serviceId: number; serviceName: string; price: number }[];
+  amount: number;
+  discountAmount: number;
+  tipAmount: number;
+  finalAmount: number;
+  paymentMethod: string;
+  receiptNumber: string | null;
+};
+
+export type StaffRevenueDetailResponse = {
+  staffId: number;
+  staffName: string;
+  staffRole: string | null;
+  staffAvatarUrl: string | null;
+  totalRevenue: number;
+  totalTips: number;
+  totalJobs: number;
+  jobs: StaffRevenueDetailJob[];
+};
+
 export const revenueService = {
   async getSummary(params?: RevenueSummaryParams) {
     const response = await apiClient.get<RevenueSummaryResponse>(
       "/revenue/summary",
+      { params },
+    );
+    return response.data;
+  },
+
+  async getStaffDetail(
+    staffId: string,
+    params?: Pick<RevenueSummaryParams, "startDate" | "endDate">,
+  ) {
+    const response = await apiClient.get<StaffRevenueDetailResponse>(
+      `/revenue/staff/${staffId}`,
       { params },
     );
     return response.data;
