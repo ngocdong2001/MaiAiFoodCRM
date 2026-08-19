@@ -240,7 +240,13 @@ export const CalendarModel = {
       }),
       db.service.findMany({
         where: { isActive: true },
-        select: { id: true, name: true, price: true, durationMinutes: true },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          durationMinutes: true,
+          category: { select: { name: true } },
+        },
         orderBy: { name: "asc" },
       }),
     ]);
@@ -250,6 +256,7 @@ export const CalendarModel = {
       services: services.map((service) => ({
         ...service,
         price: Number(service.price),
+        category: service.category?.name ?? null,
       })),
     };
   },
