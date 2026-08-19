@@ -50,10 +50,10 @@ export type OverviewData = {
 };
 
 const todayRange = () => {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
+  const now = new Date();
+  const isoDate = now.toISOString().slice(0, 10);
+  const start = new Date(`${isoDate}T00:00:00.000Z`);
+  const end = new Date(`${isoDate}T23:59:59.999Z`);
   return { start, end };
 };
 
@@ -157,9 +157,9 @@ export const OverviewModel = {
           guest: { select: { id: true, name: true } },
         },
       }),
-      // Staff on duty today (schedule exists, not a day off)
+      // Staff on duty today — match staffschedule.date (stored as UTC midnight DATE)
       prisma.staffschedule.findMany({
-        where: { date: { gte: start, lte: end }, isDayOff: false },
+        where: { date: new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z"), isDayOff: false },
         select: {
           staff: {
             select: {
@@ -185,7 +185,7 @@ export const OverviewModel = {
 
     const liveQueue: QueueItem[] = queueRows.map((row) => ({
       id: row.id,
-      guestName: row.guest.name,
+      guestName: row.guest?.name ?? "Walk-in Guest",
       serviceName: row.appointmentservice[0]?.service.name ?? "—",
       startTime: row.startTime.toISOString(),
       status: row.status,
@@ -201,10 +201,11 @@ export const OverviewModel = {
     }));
 
     const recentGuests: RecentGuestItem[] = recentGuestRows
+      .filter((row) => row.guest?.name)
       .slice(0, 6)
       .map((row) => ({
         id: row.guest.id,
-        name: row.guest.name,
+        name: row.guest.name ?? "Walk-in Guest",
         lastVisitAt: row.startTime.toISOString(),
       }));
 

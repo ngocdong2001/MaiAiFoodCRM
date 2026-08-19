@@ -73,6 +73,12 @@ export type CalendarOptions = {
   guests: Array<CalendarOption & { phone: string | null }>;
   staff: Array<CalendarOption & { role: string }>;
   services: Array<CalendarOption & { price: number; durationMinutes: number }>;
+  operatingHours: Array<{
+    day: string;
+    open: boolean;
+    from: string;
+    to: string;
+  }> | null;
 };
 
 export type ApiAppointment = {

@@ -696,6 +696,90 @@ const main = async () => {
     }
   }
 
+  // ── Historical data (5 past months) for Reports revenue chart ────────────
+  const historicalSeeds = [
+    { monthOffset: -5, count: 8,  basePrice: 45 },
+    { monthOffset: -4, count: 11, basePrice: 50 },
+    { monthOffset: -3, count: 14, basePrice: 52 },
+    { monthOffset: -2, count: 13, basePrice: 55 },
+    { monthOffset: -1, count: 18, basePrice: 58 },
+  ];
+
+  const staffIds = Object.values(staffByName);
+  const guestIds = Object.values(guestByName);
+  const allServiceIds = Array.from(services.values());
+  const allServiceSeedsArr = serviceSeeds;
+
+  for (const hist of historicalSeeds) {
+    const monthBase = new Date(today);
+    monthBase.setUTCMonth(today.getUTCMonth() + hist.monthOffset);
+    monthBase.setUTCDate(10);
+    monthBase.setUTCHours(10, 0, 0, 0);
+
+    for (let i = 0; i < hist.count; i++) {
+      const apptDate = new Date(monthBase);
+      apptDate.setUTCDate(10 + (i % 18));
+      const svcIndex = i % allServiceIds.length;
+      const svcId = allServiceIds[svcIndex];
+      const svcData = allServiceSeedsArr[svcIndex];
+      const gId = guestIds[i % guestIds.length];
+      const stId = staffIds[i % staffIds.length];
+      const endT = new Date(apptDate.getTime() + svcData.durationMinutes * 60_000);
+
+      const existing = await prisma.appointment.findFirst({
+        where: { guestId: gId, staffId: stId, startTime: apptDate },
+      });
+      const appt = existing
+        ? existing
+        : await prisma.appointment.create({
+            data: {
+              guestId: gId,
+              staffId: stId,
+              startTime: apptDate,
+              endTime: endT,
+              status: "completed",
+              notes: `hist-${hist.monthOffset}-${i}`,
+              updatedAt: now,
+            },
+          });
+
+      await prisma.appointmentservice.upsert({
+        where: { appointmentId_serviceId: { appointmentId: appt.id, serviceId: svcId } },
+        create: {
+          appointmentId: appt.id,
+          serviceId: svcId,
+          staffId: stId,
+          priceAtBooking: hist.basePrice,
+          durationAtBooking: svcData.durationMinutes,
+          status: "completed",
+        },
+        update: { status: "completed" },
+      });
+
+      const paidAt = new Date(endT);
+      const pExisting = await prisma.payment.findUnique({ where: { appointmentId: appt.id } });
+      if (!pExisting) {
+        await prisma.payment.create({
+          data: {
+            appointmentId: appt.id,
+            guestId: gId,
+            staffId: stId,
+            amount: hist.basePrice,
+            discountAmount: 0,
+            tipAmount: 0,
+            finalAmount: hist.basePrice,
+            paymentMethod: i % 2 === 0 ? "credit_card" : "cash",
+            paymentStatus: "paid",
+            paidAt,
+            receiptNumber: `RCP-H${String(receiptCounter++).padStart(5, "0")}`,
+          },
+        });
+        paymentCount++;
+      }
+      appointmentCount++;
+    }
+  }
+
   console.log(
     `Seeded ${staffSeeds.length} staff, ${specialtyNames.length} specialties, ${guestSeeds.length} guests, ${guestTagNames.length} guest tags, ${categorySeeds.length} service categories, ${serviceSeeds.length} services, ${appointmentCount} appointments, ${paymentCount} payments.`,
   );

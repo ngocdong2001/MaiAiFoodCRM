@@ -341,7 +341,11 @@
           "conflict": "Nhân viên đã có lịch trong khung giờ này. Hãy chọn giờ khác hoặc đổi nhân viên.",
           "outsideHours": "Khung giờ đã chọn nằm ngoài giờ làm việc của nhân viên.",
           "breakOverlap": "Khung giờ đã chọn trùng với giờ nghỉ của nhân viên.",
-          "dayOff": "Nhân viên nghỉ vào ngày đã chọn. Hãy chọn ngày hoặc nhân viên khác."
+          "dayOff": "Nhân viên nghỉ vào ngày đã chọn. Hãy chọn ngày hoặc nhân viên khác.",
+          "storeClosed": "Cửa hàng đóng cửa vào ngày đã chọn.",
+          "outsideStoreHours": "Khung giờ đặt lịch nằm ngoài giờ hoạt động của cửa hàng. Vui lòng chọn khung giờ khác.",
+          "walkInNameRequired": "Vui lòng nhập tên khách vãng lai.",
+          "createGuestFailed": "Không thể tạo hồ sơ khách. Vui lòng thử lại."
         }
       }
     },

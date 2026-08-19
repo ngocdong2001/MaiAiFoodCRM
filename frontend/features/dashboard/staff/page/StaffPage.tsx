@@ -37,8 +37,9 @@ const toDateKey = (date: Date) => {
 
 const toDayQueryRange = (dateKey: string) => {
   const [year, month, day] = dateKey.split("-").map(Number);
-  const start = new Date(year, month - 1, day, 0, 0, 0, 0);
-  const end = new Date(year, month - 1, day, 23, 59, 59, 999);
+  // Use UTC bounds so appointments stored in UTC are reliably included
+  const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+  const end = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
   return { startDate: start.toISOString(), endDate: end.toISOString() };
 };
 

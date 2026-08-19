@@ -4,6 +4,7 @@ import { AlertCircle } from "lucide-react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/shared/components/ui/button";
 import SelectField from "@/shared/components/molecules/SelectField";
@@ -22,6 +23,7 @@ import { Textarea } from "@/shared/components/ui/textarea";
 
 import { useCalendarData } from "../context/CalendarDataContext";
 import { useCalendarOptions, useCreateAppointment } from "../hooks/useCalendar";
+import { calendarService } from "../services/calendar.service";
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 type Values = {
@@ -42,9 +44,15 @@ const errorKey = (error: unknown) => {
       return "conflict";
     if (message === "Appointment is outside staff working hours")
       return "outsideHours";
-    if (message === "Appointment overlaps the staff break")
+    if (
+      message === "Appointment overlaps the staff break" ||
+      message?.startsWith("Appointment overlaps the staff break")
+    )
       return "breakOverlap";
     if (message === "Staff is off on the selected date") return "dayOff";
+    if (message === "Store is closed on the selected day") return "storeClosed";
+    if (message === "Appointment is outside store operating hours")
+      return "outsideStoreHours";
   }
   return "unknown";
 };
@@ -63,16 +71,22 @@ const BookingFormDialog = ({ open, onOpenChange }: Props) => {
   );
 };
 
-const BookingFormContent = ({
+export const BookingFormContent = ({
   open,
   onOpenChange,
   initialDate,
   onCreated,
-}: Props & { initialDate: Date; onCreated: (date: Date) => void }) => {
+  defaultWalkIn = false,
+}: Props & { initialDate: Date; onCreated: (date: Date) => void; defaultWalkIn?: boolean }) => {
   const options = useCalendarOptions();
   const create = useCreateAppointment();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
+  const [isWalkIn, setIsWalkIn] = useState(defaultWalkIn);
+  const [walkInName, setWalkInName] = useState("");
+  const [walkInPhone, setWalkInPhone] = useState("");
+  const [isCreatingGuest, setIsCreatingGuest] = useState(false);
   const [values, setValues] = useState<Values>({
     guestId: "",
     staffId: "",
@@ -99,21 +113,53 @@ const BookingFormContent = ({
     0,
   );
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    if (!values.guestId || !values.staffId || values.serviceIds.length === 0)
+
+    let resolvedGuestId = values.guestId;
+
+    if (isWalkIn) {
+      if (!walkInName.trim())
+        return setError(
+          t("dashboard.calendar.booking.errors.walkInNameRequired"),
+        );
+      setIsCreatingGuest(true);
+      try {
+        const newGuest = await calendarService.createQuickGuest(
+          walkInName.trim(),
+          walkInPhone.trim() || undefined,
+        );
+        resolvedGuestId = String(newGuest.id);
+        // Refresh options so the new guest appears in future dropdowns
+        void queryClient.invalidateQueries({
+          queryKey: ["calendar", "options"],
+        });
+      } catch {
+        setIsCreatingGuest(false);
+        return setError(
+          t("dashboard.calendar.booking.errors.createGuestFailed"),
+        );
+      }
+      setIsCreatingGuest(false);
+    }
+
+    if (!resolvedGuestId || !values.staffId || values.serviceIds.length === 0)
       return setError(t("dashboard.calendar.booking.errors.required"));
-    const startTime = new Date(`${values.date}T${values.startTime}:00`);
-    if (Number.isNaN(startTime.getTime()))
+    const startDate = new Date(`${values.date}T${values.startTime}:00`);
+    if (Number.isNaN(startDate.getTime()))
       return setError(t("dashboard.calendar.booking.errors.invalidDate"));
-    const endTime = new Date(startTime.getTime() + durationMinutes * 60_000);
+    const endDate = new Date(startDate.getTime() + durationMinutes * 60_000);
+    // Send as local time (no UTC conversion) so backend schedule comparison is timezone-safe
+    const pad2 = (n: number) => String(n).padStart(2, "0");
+    const fmtLocal = (d: Date) =>
+      `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:00`;
     create.mutate(
       {
-        guestId: Number(values.guestId),
+        guestId: Number(resolvedGuestId),
         staffId: Number(values.staffId),
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
+        startTime: fmtLocal(startDate),
+        endTime: fmtLocal(endDate),
         serviceIds: values.serviceIds,
         status: values.status,
         priority: values.priority,
@@ -121,7 +167,7 @@ const BookingFormContent = ({
       },
       {
         onSuccess: () => {
-          onCreated(startTime);
+          onCreated(startDate);
           onOpenChange(false);
         },
         onError: (mutationError) =>
@@ -155,19 +201,69 @@ const BookingFormContent = ({
           <form id="booking-form" onSubmit={submit} className="space-y-5 py-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("dashboard.calendar.booking.guest")} required>
-                <SelectField
-                  value={values.guestId}
-                  onValueChange={(value) => update("guestId", value)}
-                  options={(options.data?.guests ?? []).map((guest) => ({
-                    value: String(guest.id),
-                    label: guest.phone
-                      ? `${guest.name} · ${guest.phone}`
-                      : guest.name,
-                  }))}
-                  placeholder={t("dashboard.calendar.booking.selectGuest")}
-                  ariaLabel={t("dashboard.calendar.booking.guest")}
-                  className="h-9"
-                />
+                {isWalkIn ? (
+                  <div className="space-y-1.5">
+                    <div className="flex gap-1.5">
+                      <Input
+                        placeholder="Tên khách vãng lai"
+                        value={walkInName}
+                        onChange={(e) => {
+                          setWalkInName(e.target.value);
+                          setError(null);
+                        }}
+                        className="h-9 flex-1"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsWalkIn(false);
+                          setWalkInName("");
+                          setWalkInPhone("");
+                        }}
+                        className="h-9 rounded-md border border-[#DEE1E7] px-2.5 text-xs text-[#8D95A5] hover:bg-[#F3F4F7]"
+                      >
+                        Chọn có sẵn
+                      </button>
+                    </div>
+                    <Input
+                      placeholder="Số điện thoại (tuỳ chọn)"
+                      value={walkInPhone}
+                      onChange={(e) => setWalkInPhone(e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <div className="flex-1">
+                      <SelectField
+                        value={values.guestId}
+                        onValueChange={(value) => update("guestId", value)}
+                        options={(options.data?.guests ?? []).map((guest) => ({
+                          value: String(guest.id),
+                          label: guest.phone
+                            ? `${guest.name} · ${guest.phone}`
+                            : guest.name,
+                        }))}
+                        placeholder={t(
+                          "dashboard.calendar.booking.selectGuest",
+                        )}
+                        ariaLabel={t("dashboard.calendar.booking.guest")}
+                        className="h-9"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsWalkIn(true);
+                        update("guestId", "");
+                      }}
+                      className="h-9 rounded-md border border-[#DEE1E7] bg-[#F9FAFB] px-2.5 text-xs font-medium text-[#8D95A5] hover:bg-[#F3F4F7] hover:text-[#171A21]"
+                    >
+                      + Vãng lai
+                    </button>
+                  </div>
+                )}
               </Field>
               <Field label={t("dashboard.calendar.booking.staff")} required>
                 <SelectField
@@ -317,11 +413,13 @@ const BookingFormContent = ({
           <Button
             type="submit"
             form="booking-form"
-            disabled={create.isPending || options.isPending}
+            disabled={create.isPending || options.isPending || isCreatingGuest}
           >
-            {create.isPending
-              ? t("dashboard.calendar.booking.creating")
-              : t("dashboard.calendar.booking.create")}
+            {isCreatingGuest
+              ? "Đang tạo khách..."
+              : create.isPending
+                ? t("dashboard.calendar.booking.creating")
+                : t("dashboard.calendar.booking.create")}
           </Button>
         </DialogFooter>
       </DialogContent>

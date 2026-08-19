@@ -1,8 +1,23 @@
 import { Router } from "express";
+import type { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import { getPrismaMaster } from "../lib/prisma-master.js";
 
 const router = Router();
+
+// Admin API key guard — all /api/admin/* routes require X-Admin-Key header
+router.use((req: Request, res: Response, next: NextFunction) => {
+  const adminKey = process.env.ADMIN_API_KEY;
+  if (!adminKey) {
+    res.status(503).json({ ok: false, error: "Admin access not configured" });
+    return;
+  }
+  if (req.headers["x-admin-key"] !== adminKey) {
+    res.status(401).json({ ok: false, error: "Unauthorized" });
+    return;
+  }
+  next();
+});
 
 // ─── GET /api/admin/tenants/:id ─────────────────────────────────────────────
 // Get tenant detail with users list

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import {
+  ArrowDownRight,
   ArrowUpRight,
   Download,
   DollarSign,
@@ -248,9 +249,20 @@ const RevenuePage = () => {
               {formatCurrency(totalRevenue)}
             </span>
             {totalRevenueDelta && (
-              <span className="flex items-center gap-1 text-sm font-semibold text-[#059669]">
-                <ArrowUpRight className="h-4 w-4" />+
-                {totalRevenueDelta.percent.toFixed(1)}%{" "}
+              <span
+                className={`flex items-center gap-1 text-sm font-semibold ${
+                  totalRevenueDelta.trend === "down"
+                    ? "text-[#DC2626]"
+                    : "text-[#059669]"
+                }`}
+              >
+                {totalRevenueDelta.trend === "down" ? (
+                  <ArrowDownRight className="h-4 w-4" />
+                ) : (
+                  <ArrowUpRight className="h-4 w-4" />
+                )}
+                {totalRevenueDelta.trend === "down" ? "-" : "+"}
+                {Math.abs(totalRevenueDelta.percent).toFixed(1)}%{" "}
                 {t("dashboard.revenue.vsYesterday", {
                   defaultValue: "so với hôm qua",
                 })}
@@ -550,7 +562,7 @@ const RevenuePage = () => {
         </div>
         <div className="border-t border-[#DFE1E4]" />
 
-        <Accordion multiple={false}>
+        <Accordion multiple={true}>
           {filteredStaffRows.map((row, index) => (
             <StaffRevenueAccordionItem
               key={row.key}

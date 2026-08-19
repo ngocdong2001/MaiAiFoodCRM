@@ -76,70 +76,127 @@ const serialize = (appointment: any) => ({
   })),
   payment: appointment.payment
     ? {
-      ...appointment.payment,
-      finalAmount: Number(appointment.payment.finalAmount),
-    }
+        ...appointment.payment,
+        finalAmount: Number(appointment.payment.finalAmount),
+      }
     : null,
 });
 
-const minutesOfDay = (date: Date) => date.getHours() * 60 + date.getMinutes();
 const parseTime = (value: string) => {
   const [hours, minutes] = value.split(":").map(Number);
   return hours * 60 + minutes;
 };
 
+// Extract minutes-of-day directly from datetime string to avoid timezone bugs
+const timeStringMinutes = (datetimeStr: string): number => {
+  const match = datetimeStr.match(/T(\d{2}):(\d{2})/);
+  if (!match) return 0;
+  return Number(match[1]) * 60 + Number(match[2]);
+};
+
+// Use UTC noon so date never shifts across timezone boundaries
+const dayNameFromDateStr = (datePart: string): string => {
+  const idx = new Date(`${datePart}T12:00:00Z`).getUTCDay();
+  return [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ][idx];
+};
+
+type DayHours = { day: string; open: boolean; from: string; to: string };
+
 const validateRelationsAndAvailability = async (
   transaction: Prisma.TransactionClient,
   input: AppointmentInput,
 ) => {
-  const start = new Date(input.startTime);
-  const end = new Date(input.endTime);
-  const scheduleDate = new Date(start);
-  scheduleDate.setHours(0, 0, 0, 0);
-  const [guest, staff, services, schedule] = await Promise.all([
-    transaction.guest.findUnique({
-      where: { id: input.guestId },
-      select: { isActive: true },
-    }),
-    transaction.staff.findUnique({
-      where: { id: input.staffId },
-      select: { status: true },
-    }),
-    transaction.service.findMany({
-      where: { id: { in: input.serviceIds }, isActive: true },
-    }),
-    transaction.staffschedule.findUnique({
-      where: { staffId_date: { staffId: input.staffId, date: scheduleDate } },
-    }),
-  ]);
+  // Parse date part from string to avoid timezone-shifting scheduleDate
+  const datePart = input.startTime.slice(0, 10);
+  const scheduleDate = new Date(`${datePart}T00:00:00.000Z`);
+
+  const [guest, staff, services, schedule, storeHoursSetting] =
+    await Promise.all([
+      transaction.guest.findUnique({
+        where: { id: input.guestId },
+        select: { isActive: true },
+      }),
+      transaction.staff.findUnique({
+        where: { id: input.staffId },
+        select: { status: true },
+      }),
+      transaction.service.findMany({
+        where: { id: { in: input.serviceIds }, isActive: true },
+      }),
+      transaction.staffschedule.findUnique({
+        where: { staffId_date: { staffId: input.staffId, date: scheduleDate } },
+      }),
+      transaction.setting.findUnique({ where: { key: "operating_hours" } }),
+    ]);
+
   if (!guest?.isActive) throw new CalendarDomainError("Guest is unavailable");
   if (!staff || staff.status === "inactive" || staff.status === "on_leave")
     throw new CalendarDomainError("Staff is unavailable");
   if (services.length !== new Set(input.serviceIds).size)
     throw new CalendarDomainError("One or more services are invalid");
+
+  const bookingStart = timeStringMinutes(input.startTime);
+  const bookingEnd = timeStringMinutes(input.endTime);
+
+  // Validate against store operating hours
+  let storeHours: DayHours[] | null = null;
+  if (storeHoursSetting?.value) {
+    try {
+      storeHours = JSON.parse(storeHoursSetting.value) as DayHours[];
+    } catch {
+      /* ignore */
+    }
+  }
+  if (storeHours) {
+    const dayName = dayNameFromDateStr(datePart);
+    const dayConfig = storeHours.find((d) => d.day === dayName);
+    if (!dayConfig || !dayConfig.open)
+      throw new CalendarDomainError("Store is closed on the selected day", 409);
+    if (
+      bookingStart < parseTime(dayConfig.from) ||
+      bookingEnd > parseTime(dayConfig.to)
+    )
+      throw new CalendarDomainError(
+        "Appointment is outside store operating hours",
+        409,
+      );
+  }
+
   if (schedule?.isDayOff)
     throw new CalendarDomainError("Staff is off on the selected date", 409);
   if (schedule) {
-    const startMinutes = minutesOfDay(start);
-    const endMinutes = minutesOfDay(end);
     if (
-      startMinutes < parseTime(schedule.startTime) ||
-      endMinutes > parseTime(schedule.endTime)
+      bookingStart < parseTime(schedule.startTime) ||
+      bookingEnd > parseTime(schedule.endTime)
     )
       throw new CalendarDomainError(
         "Appointment is outside staff working hours",
         409,
       );
-    if (
-      schedule.breakStart &&
-      schedule.breakEnd &&
-      startMinutes < parseTime(schedule.breakEnd) &&
-      endMinutes > parseTime(schedule.breakStart)
-    )
-      throw new CalendarDomainError(
-        "Appointment overlaps the staff break",
-        409,
-      );
+    if (schedule.breakStart && schedule.breakEnd) {
+      const breakS = parseTime(schedule.breakStart);
+      const breakE = parseTime(schedule.breakEnd);
+      // Only validate if break data is coherent and within the shift
+      if (
+        breakS < breakE &&
+        breakS >= parseTime(schedule.startTime) &&
+        breakE <= parseTime(schedule.endTime) &&
+        bookingStart < breakE &&
+        bookingEnd > breakS
+      )
+        throw new CalendarDomainError(
+          `Appointment overlaps the staff break (${schedule.breakStart}–${schedule.breakEnd})`,
+          409,
+        );
+    }
   }
   return services;
 };
@@ -166,12 +223,15 @@ const ensureNoConflict = async (
 };
 
 export const CalendarModel = {
-  async getAll(db: PrismaClient, filters: {
-    startDate: string;
-    endDate: string;
-    staffIds?: number[];
-    status?: AppointmentStatus;
-  }) {
+  async getAll(
+    db: PrismaClient,
+    filters: {
+      startDate: string;
+      endDate: string;
+      staffIds?: number[];
+      status?: AppointmentStatus;
+    },
+  ) {
     const appointments = await db.appointment.findMany({
       where: {
         startTime: {
@@ -203,9 +263,9 @@ export const CalendarModel = {
 
     const schedules = schedulePairs.length
       ? await db.staffschedule.findMany({
-        where: { OR: schedulePairs },
-        select: { staffId: true, date: true, note: true },
-      })
+          where: { OR: schedulePairs },
+          select: { staffId: true, date: true, note: true },
+        })
       : [];
 
     const scheduleMap = new Map(
@@ -227,7 +287,11 @@ export const CalendarModel = {
     });
   },
   async getOptions(db: PrismaClient) {
-    const [guests, staff, services] = await Promise.all([
+    // Use UTC midnight so the date lookup matches staffschedule rows stored as UTC dates
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayStart = new Date(`${todayStr}T00:00:00.000Z`);
+
+    const [guests, staff, services, storeHoursSetting] = await Promise.all([
       db.guest.findMany({
         where: { isActive: true },
         select: { id: true, name: true, phone: true },
@@ -235,7 +299,22 @@ export const CalendarModel = {
       }),
       db.staff.findMany({
         where: { status: { notIn: ["inactive", "on_leave"] } },
-        select: { id: true, name: true, role: true },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+          staffschedule: {
+            where: { date: todayStart },
+            select: {
+              startTime: true,
+              endTime: true,
+              breakStart: true,
+              breakEnd: true,
+              isDayOff: true,
+            },
+            take: 1,
+          },
+        },
         orderBy: { name: "asc" },
       }),
       db.service.findMany({
@@ -243,14 +322,29 @@ export const CalendarModel = {
         select: { id: true, name: true, price: true, durationMinutes: true },
         orderBy: { name: "asc" },
       }),
+      db.setting.findUnique({ where: { key: "operating_hours" } }),
     ]);
+    let operatingHours: DayHours[] | null = null;
+    if (storeHoursSetting?.value) {
+      try {
+        operatingHours = JSON.parse(storeHoursSetting.value) as DayHours[];
+      } catch {
+        /* ignore */
+      }
+    }
     return {
       guests,
-      staff,
+      staff: staff.map((s) => ({
+        id: s.id,
+        name: s.name,
+        role: s.role,
+        todaySchedule: s.staffschedule[0] ?? null,
+      })),
       services: services.map((service) => ({
         ...service,
         price: Number(service.price),
       })),
+      operatingHours,
     };
   },
   async getById(db: PrismaClient, id: number) {
@@ -279,13 +373,19 @@ export const CalendarModel = {
           notes: input.notes?.trim() || null,
           updatedAt: new Date(),
           appointmentservice: {
-            create: services.map((service: { id: number; price: any; durationMinutes: number }) => ({
-              serviceId: service.id,
-              staffId: input.staffId,
-              priceAtBooking: service.price,
-              durationAtBooking: service.durationMinutes,
-              status: input.status ?? "pending",
-            })),
+            create: services.map(
+              (service: {
+                id: number;
+                price: any;
+                durationMinutes: number;
+              }) => ({
+                serviceId: service.id,
+                staffId: input.staffId,
+                priceAtBooking: service.price,
+                durationAtBooking: service.durationMinutes,
+                status: input.status ?? "pending",
+              }),
+            ),
           },
         },
       });
@@ -314,13 +414,19 @@ export const CalendarModel = {
           updatedAt: new Date(),
           appointmentservice: {
             deleteMany: {},
-            create: services.map((service: { id: number; price: any; durationMinutes: number }) => ({
-              serviceId: service.id,
-              staffId: input.staffId,
-              priceAtBooking: service.price,
-              durationAtBooking: service.durationMinutes,
-              status: input.status ?? "pending",
-            })),
+            create: services.map(
+              (service: {
+                id: number;
+                price: any;
+                durationMinutes: number;
+              }) => ({
+                serviceId: service.id,
+                staffId: input.staffId,
+                priceAtBooking: service.price,
+                durationAtBooking: service.durationMinutes,
+                status: input.status ?? "pending",
+              }),
+            ),
           },
         },
       });

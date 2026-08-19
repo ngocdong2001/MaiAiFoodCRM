@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MaiAI CRM — API Documentation</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --get: #22c55e;
+      --post: #3b82f6;
+      --put: #f59e0b;
+      --patch: #a855f7;
+      --delete: #ef4444;
+      --radius: 8px;
+      --font-mono: 'Fira Code', 'Consolas', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    nav {
+      width: 260px;
+      min-width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .nav-logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .nav-logo h1 { font-size: 18px; color: var(--accent); font-weight: 700; }
+    .nav-logo p { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .nav-group { margin-bottom: 8px; }
+    .nav-group-title {
+      padding: 6px 20px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    nav a {
+      display: block;
+      padding: 7px 20px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+    nav a:hover, nav a.active {
+      color: var(--text);
+      border-left-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 960px;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: 56px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      background: var(--surface2);
+    }
+    .section-title { font-size: 22px; font-weight: 700; }
+    .section-desc { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #1a1d27 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px;
+      margin-bottom: 40px;
+    }
+    .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+    .base-url {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    .base-url .label { color: var(--muted); }
+    .base-url .url { color: var(--accent2); }
+
+    /* ── Auth badge ── */
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1c1a2e;
+      border: 1px solid #4c3f8a;
+      color: #a78bfa;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+
+    /* ── Endpoint card ── */
+    .endpoint {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .endpoint-header:hover { background: var(--surface2); }
+    .method {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      min-width: 64px;
+      text-align: center;
+    }
+    .GET    { background: #052e16; color: var(--get); border: 1px solid #166534; }
+    .POST   { background: #0c1a3a; color: #60a5fa; border: 1px solid #1e40af; }
+    .PUT    { background: #1c1000; color: var(--put); border: 1px solid #92400e; }
+    .PATCH  { background: #1e0a3a; color: #c084fc; border: 1px solid #6b21a8; }
+    .DELETE { background: #1c0505; color: #f87171; border: 1px solid #991b1b; }
+    .endpoint-path {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      flex: 1;
+    }
+    .endpoint-summary { font-size: 13px; color: var(--muted); }
+    .endpoint-body {
+      display: none;
+      padding: 16px 18px;
+      border-top: 1px solid var(--border);
+    }
+    .endpoint.open .endpoint-body { display: block; }
+    .endpoint.open .endpoint-header { background: var(--surface2); }
+    .chevron { margin-left: auto; color: var(--muted); transition: transform .2s; }
+    .endpoint.open .chevron { transform: rotate(90deg); }
+
+    /* ── Params/Body table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent2);
+    }
+    .req { color: #f87171; font-size: 11px; }
+    .opt { color: var(--muted); font-size: 11px; }
+
+    /* ── Sub label ── */
+    .sub-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--muted);
+      margin: 14px 0 6px;
+    }
+
+    /* ── Feature info bar ── */
+    .feature-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .feature-tag {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .feature-tag.highlight { color: var(--accent2); border-color: var(--accent2); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav { display: none; }
+      main { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<nav>
+  <div class="nav-logo">
+    <h1>MaiAI CRM</h1>
+    <p>API Reference v1.0</p>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Tổng quan</div>
+    <a href="#overview">Giới thiệu</a>
+    <a href="#auth-guide">Xác thực</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Tính năng</div>
+    <a href="#auth">🔐 Đăng nhập / Auth</a>
+    <a href="#info">📋 Thông tin Salon</a>
+    <a href="#overview-api">📊 Tổng quan Dashboard</a>
+    <a href="#staff">👤 Nhân viên</a>
+    <a href="#services">💅 Dịch vụ</a>
+    <a href="#calendar">📅 Lịch hẹn</a>
+    <a href="#crm">🧑‍🤝‍🧑 Khách hàng (CRM)</a>
+    <a href="#revenue">💰 Doanh thu</a>
+    <a href="#reports">📈 Báo cáo</a>
+    <a href="#settings">⚙️ Cài đặt</a>
+    <a href="#admin">🛡️ Admin Tenant</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main>
+
+  <!-- ── Hero ── -->
+  <div class="hero" id="overview">
+    <h1>MaiAI CRM <span>API</span></h1>
+    <p>Tài liệu đầy đủ các endpoint REST API của hệ thống quản lý salon MaiAI CRM.<br>
+       Mỗi section mô tả tính năng sử dụng API đó và chi tiết request/response.</p>
+    <div class="base-url">
+      <span class="label">Base URL</span>
+      <span class="url">http://localhost:3001/api</span>
+    </div>
+  </div>
+
+  <!-- ── Auth Guide ── -->
+  <div class="section" id="auth-guide">
+    <div class="section-header">
+      <div class="section-icon">🔑</div>
+      <div>
+        <div class="section-title">Xác thực</div>
+        <div class="section-desc">Cách gửi token trong mỗi request</div>
+      </div>
+    </div>
+    <p style="color:var(--muted);font-size:14px;line-height:1.7;">
+      Hầu hết các API yêu cầu JWT token trong header. Gọi <code>POST /api/auth/login</code> để lấy token, sau đó gửi kèm mỗi request:
+    </p>
+    <div class="sub-label">Header</div>
+    <table>
+      <tr><th>Key</th><th>Value</th><th>Bắt buộc</th></tr>
+      <tr><td><code>Authorization</code></td><td><code>Bearer &lt;token&gt;</code></td><td><span class="req">✓ Có</span></td></tr>
+      <tr><td><code>Content-Type</code></td><td><code>application/json</code></td><td><span class="req">✓ Với POST/PUT/PATCH</span></td></tr>
+    </table>
+    <p style="color:var(--muted);font-size:13px;margin-top:12px;">
+      Các route admin (<code>/api/admin/*</code>) dùng header <code>X-Admin-Key</code> thay cho JWT.
+    </p>
+  </div>
+
+  <!-- ═══════════════ AUTH ═══════════════ -->
+  <div class="section" id="auth">
+    <div class="section-header">
+      <div class="section-icon">🔐</div>
+      <div>
+        <div class="section-title">Đăng nhập / Auth</div>
+        <div class="section-desc">Tính năng: Màn hình Login — xác thực người dùng, lấy token phiên làm việc</div>
+      </div>
+    </div>
+
+    <!-- POST /login -->
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/auth/login</span>
+        <span class="endpoint-summary">Đăng nhập, nhận JWT token</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar">
+          <span class="feature-tag highlight">Trang Login</span>
+          <span class="feature-tag">Không cần token</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">
+          Xác thực email + mật khẩu. Trả về JWT token (mặc định hết hạn sau 7 ngày) và thông tin user + tenant hiện tại.
+        </p>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th><th>Mô tả</th></tr>
+          <tr><td><code>email</code></td><td>string</td><td><span class="req">✓</span></td><td>Email đăng nhập</td></tr>
+          <tr><td><code>password</code></td><td>string</td><td><span class="req">✓</span></td><td>Mật khẩu</td></tr>
+        </table>
+        <div class="sub-label">Response 200</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>token</code></td><td>string</td><td>JWT dùng cho các request tiếp theo</td></tr>
+          <tr><td><code>user</code></td><td>object</td><td>id, name, email, role, phone, avatarUrl, tenantId</td></tr>
+          <tr><td><code>tenant</code></td><td>object</td><td>id, name, slug, databaseName</td></tr>
+        </table>
+        <div class="sub-label">Lỗi</div>
+        <table>
+          <tr><th>Status</th><th>Nguyên nhân</th></tr>
+          <tr><td>400</td><td>Thiếu email hoặc password</td></tr>
+          <tr><td>401</td><td>Sai thông tin đăng nhập hoặc tài khoản bị khoá</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- GET /me -->
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/auth/me</span>
+        <span class="endpoint-summary">Lấy thông tin người dùng hiện tại</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar">
+          <span class="feature-tag highlight">Header / Profile</span>
+          <span class="feature-tag">Cần JWT</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;">
+          Trả về thông tin user đang đăng nhập và tenant của họ. Dùng để hydrate store khi app khởi động.
+        </p>
+        <div class="sub-label">Response 200</div>
+        <table>
+          <tr><th>Field</th><th>Mô tả</th></tr>
+          <tr><td><code>user</code></td><td>Thông tin user hiện tại</td></tr>
+          <tr><td><code>tenant</code></td><td>Thông tin tenant (có thể null)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INFO ═══════════════ -->
+  <div class="section" id="info">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div>
+        <div class="section-title">Thông tin Salon (Landing)</div>
+        <div class="section-desc">Tính năng: Trang Landing — form đăng ký thông tin salon mới</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/info</span>
+        <span class="endpoint-summary">Lưu thông tin đăng ký salon</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar">
+          <span class="feature-tag highlight">Trang Landing</span>
+          <span class="feature-tag">Không cần token</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;">
+          Khách hàng tiềm năng điền form trên trang landing để đăng ký dùng thử. Dữ liệu lưu vào master DB.
+        </p>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr>
+          <tr><td><code>firstName</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>lastName</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>email</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>salonName</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/info</span>
+        <span class="endpoint-summary">Lấy danh sách đăng ký</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar">
+          <span class="feature-tag highlight">Admin nội bộ</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;">Trả về toàn bộ danh sách đăng ký thông tin salon từ trang landing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ OVERVIEW ═══════════════ -->
+  <div class="section" id="overview-api">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-title">Tổng quan Dashboard</div>
+        <div class="section-desc">Tính năng: Dashboard chính — thống kê nhanh tình trạng salon hôm nay</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/overview/stats</span>
+        <span class="endpoint-summary">Thống kê tổng quan hôm nay</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar">
+          <span class="feature-tag highlight">Dashboard</span>
+          <span class="feature-tag">Cần JWT</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;">
+          Trả về các số liệu tổng hợp: lịch hẹn hôm nay, doanh thu, khách mới, nhân viên đang làm việc... Dùng để hiển thị các card trên trang chủ dashboard.
+        </p>
+        <div class="sub-label">Response 200 — Ví dụ</div>
+        <table>
+          <tr><th>Field</th><th>Mô tả</th></tr>
+          <tr><td><code>appointmentsToday</code></td><td>Số lịch hẹn hôm nay</td></tr>
+          <tr><td><code>revenueToday</code></td><td>Doanh thu hôm nay</td></tr>
+          <tr><td><code>newGuestsToday</code></td><td>Khách mới hôm nay</td></tr>
+          <tr><td><code>activeStaff</code></td><td>Số nhân viên đang làm việc</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ STAFF ═══════════════ -->
+  <div class="section" id="staff">
+    <div class="section-header">
+      <div class="section-icon">👤</div>
+      <div>
+        <div class="section-title">Nhân viên</div>
+        <div class="section-desc">Tính năng: Quản lý nhân viên — thêm, sửa, xoá, xem danh sách nhân viên và chuyên môn</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/staff/specialties</span>
+        <span class="endpoint-summary">Danh sách chuyên môn</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Nhân viên</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về danh sách chuyên môn (specialty) dùng cho dropdown khi tạo/sửa nhân viên.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/staff</span>
+        <span class="endpoint-summary">Danh sách nhân viên</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Nhân viên</span><span class="feature-tag">Lịch hẹn</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về danh sách toàn bộ nhân viên của salon. Dùng ở trang quản lý nhân viên và dropdown chọn nhân viên trong lịch hẹn.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/staff/:id</span>
+        <span class="endpoint-summary">Chi tiết nhân viên</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Nhân viên</span></div>
+        <div class="sub-label">URL Params</div>
+        <table><tr><th>Param</th><th>Mô tả</th></tr><tr><td><code>id</code></td><td>ID nhân viên</td></tr></table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/staff</span>
+        <span class="endpoint-summary">Tạo nhân viên mới</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Nhân viên</span></div>
+        <div class="sub-label">Request Body (ví dụ)</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr>
+          <tr><td><code>name</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>phone</code></td><td>string</td><td><span class="opt">–</span></td></tr>
+          <tr><td><code>specialtyId</code></td><td>number</td><td><span class="opt">–</span></td></tr>
+          <tr><td><code>isActive</code></td><td>boolean</td><td><span class="opt">–</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/staff/:id</span>
+        <span class="endpoint-summary">Cập nhật nhân viên</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Nhân viên</span></div>
+        <p style="color:var(--muted);font-size:13px;">Cập nhật toàn bộ thông tin nhân viên theo ID.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/staff/:id</span>
+        <span class="endpoint-summary">Xoá nhân viên</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Nhân viên</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SERVICES ═══════════════ -->
+  <div class="section" id="services">
+    <div class="section-header">
+      <div class="section-icon">💅</div>
+      <div>
+        <div class="section-title">Dịch vụ</div>
+        <div class="section-desc">Tính năng: Quản lý dịch vụ & danh mục — thêm, sửa, ẩn/hiện, bulk save dịch vụ</div>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-weight:600;">📁 Danh mục dịch vụ</p>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/services/categories</span>
+        <span class="endpoint-summary">Danh sách danh mục</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span><span class="feature-tag">Tạo lịch hẹn</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về danh sách category dùng cho filter và dropdown.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/services/categories</span>
+        <span class="endpoint-summary">Tạo danh mục mới</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/services/categories/:id</span>
+        <span class="endpoint-summary">Cập nhật danh mục</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/services/categories/:id</span>
+        <span class="endpoint-summary">Xoá danh mục</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <p style="font-size:13px;color:var(--muted);margin:18px 0 10px;font-weight:600;">✂️ Dịch vụ</p>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/services</span>
+        <span class="endpoint-summary">Danh sách dịch vụ</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span><span class="feature-tag">Tạo lịch hẹn</span></div>
+        <div class="sub-label">Query Params</div>
+        <table>
+          <tr><th>Param</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>search</code></td><td>string</td><td>Tìm kiếm theo tên</td></tr>
+          <tr><td><code>categoryId</code></td><td>number</td><td>Lọc theo danh mục</td></tr>
+          <tr><td><code>isActive</code></td><td>boolean</td><td>Lọc theo trạng thái</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/services/:id</span>
+        <span class="endpoint-summary">Chi tiết dịch vụ</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div></div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/services</span>
+        <span class="endpoint-summary">Tạo dịch vụ mới</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th><th>Mô tả</th></tr>
+          <tr><td><code>name</code></td><td>string</td><td><span class="req">✓</span></td><td>Tên dịch vụ</td></tr>
+          <tr><td><code>categoryId</code></td><td>number</td><td><span class="req">✓</span></td><td>ID danh mục</td></tr>
+          <tr><td><code>price</code></td><td>number</td><td><span class="req">✓</span></td><td>Giá dịch vụ</td></tr>
+          <tr><td><code>duration</code></td><td>number</td><td><span class="opt">–</span></td><td>Thời gian (phút)</td></tr>
+          <tr><td><code>description</code></td><td>string</td><td><span class="opt">–</span></td><td>Mô tả</td></tr>
+          <tr><td><code>isActive</code></td><td>boolean</td><td><span class="opt">–</span></td><td>Hiển thị hay ẩn</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/services/:id</span>
+        <span class="endpoint-summary">Cập nhật dịch vụ</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div></div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/services/bulk</span>
+        <span class="endpoint-summary">Lưu hàng loạt (upsert + xoá)</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div>
+        <p style="color:var(--muted);font-size:13px;">Gửi một mảng để tạo/cập nhật và một mảng ID để xoá cùng lúc. Thường dùng ở màn hình chỉnh sửa bảng dịch vụ.</p>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>upserts</code></td><td>array</td><td>Danh sách dịch vụ tạo/cập nhật (có <code>id</code> → update, không có → create)</td></tr>
+          <tr><td><code>deleteIds</code></td><td>number[]</td><td>Danh sách ID dịch vụ cần xoá</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PATCH">PATCH</span>
+        <span class="endpoint-path">/api/services/:id/active</span>
+        <span class="endpoint-summary">Ẩn / Hiện dịch vụ</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div>
+        <div class="sub-label">Request Body</div>
+        <table><tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr><tr><td><code>isActive</code></td><td>boolean</td><td><span class="req">✓</span></td></tr></table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/services/:id</span>
+        <span class="endpoint-summary">Xoá dịch vụ</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Quản lý Dịch vụ</span></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CALENDAR ═══════════════ -->
+  <div class="section" id="calendar">
+    <div class="section-header">
+      <div class="section-icon">📅</div>
+      <div>
+        <div class="section-title">Lịch hẹn (Calendar)</div>
+        <div class="section-desc">Tính năng: Quản lý lịch hẹn — đặt lịch, xem lịch theo ngày/tuần, đổi trạng thái</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/calendar/options</span>
+        <span class="endpoint-summary">Lấy options cho form đặt lịch</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Đặt lịch hẹn</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về danh sách nhân viên + dịch vụ để populate dropdown trong form đặt lịch.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/calendar/appointments</span>
+        <span class="endpoint-summary">Danh sách lịch hẹn</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Lịch hẹn</span><span class="feature-tag">Dashboard</span></div>
+        <div class="sub-label">Query Params</div>
+        <table>
+          <tr><th>Param</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>date</code></td><td>string (YYYY-MM-DD)</td><td>Lọc theo ngày</td></tr>
+          <tr><td><code>staffId</code></td><td>number</td><td>Lọc theo nhân viên</td></tr>
+          <tr><td><code>status</code></td><td>string</td><td>Lọc theo trạng thái</td></tr>
+          <tr><td><code>guestId</code></td><td>number</td><td>Lọc theo khách hàng</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/calendar/appointments</span>
+        <span class="endpoint-summary">Tạo lịch hẹn mới</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Đặt lịch hẹn</span></div>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th><th>Mô tả</th></tr>
+          <tr><td><code>guestId</code></td><td>number</td><td><span class="req">✓</span></td><td>ID khách hàng</td></tr>
+          <tr><td><code>staffId</code></td><td>number</td><td><span class="req">✓</span></td><td>ID nhân viên thực hiện</td></tr>
+          <tr><td><code>serviceId</code></td><td>number</td><td><span class="req">✓</span></td><td>ID dịch vụ</td></tr>
+          <tr><td><code>startTime</code></td><td>datetime</td><td><span class="req">✓</span></td><td>Thời gian bắt đầu</td></tr>
+          <tr><td><code>note</code></td><td>string</td><td><span class="opt">–</span></td><td>Ghi chú</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/calendar/appointments/:id</span>
+        <span class="endpoint-summary">Cập nhật lịch hẹn</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Lịch hẹn</span></div></div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PATCH">PATCH</span>
+        <span class="endpoint-path">/api/calendar/appointments/:id/status</span>
+        <span class="endpoint-summary">Đổi trạng thái lịch hẹn</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Lịch hẹn</span></div>
+        <p style="color:var(--muted);font-size:13px;">Đổi trạng thái: <code>pending</code> → <code>confirmed</code> → <code>completed</code> / <code>cancelled</code>.</p>
+        <div class="sub-label">Request Body</div>
+        <table><tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr><tr><td><code>status</code></td><td>string</td><td><span class="req">✓</span></td></tr></table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/calendar/appointments/:id</span>
+        <span class="endpoint-summary">Xoá lịch hẹn</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Lịch hẹn</span></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CRM ═══════════════ -->
+  <div class="section" id="crm">
+    <div class="section-header">
+      <div class="section-icon">🧑‍🤝‍🧑</div>
+      <div>
+        <div class="section-title">Khách hàng (CRM)</div>
+        <div class="section-desc">Tính năng: Quản lý khách hàng — danh bạ, lịch sử, ghi chú, phân nhóm bằng tag</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/crm/tags</span>
+        <span class="endpoint-summary">Danh sách tag khách hàng</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">CRM</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về các tag dùng để phân nhóm khách hàng (VIP, Thường xuyên, Mới...).</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/crm/guests</span>
+        <span class="endpoint-summary">Danh sách khách hàng</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">CRM</span><span class="feature-tag">Đặt lịch hẹn</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về danh sách khách hàng, hỗ trợ tìm kiếm và lọc. Dùng ở trang CRM và dropdown chọn khách trong form đặt lịch.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/crm/guests/:id</span>
+        <span class="endpoint-summary">Chi tiết khách hàng</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">CRM</span></div>
+        <p style="color:var(--muted);font-size:13px;">Xem đầy đủ hồ sơ khách hàng: thông tin cá nhân, lịch sử đặt lịch, ghi chú.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/crm/guests</span>
+        <span class="endpoint-summary">Tạo khách hàng mới</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">CRM</span><span class="feature-tag">Đặt lịch hẹn</span></div>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr>
+          <tr><td><code>name</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>phone</code></td><td>string</td><td><span class="opt">–</span></td></tr>
+          <tr><td><code>email</code></td><td>string</td><td><span class="opt">–</span></td></tr>
+          <tr><td><code>birthday</code></td><td>date</td><td><span class="opt">–</span></td></tr>
+          <tr><td><code>tagIds</code></td><td>number[]</td><td><span class="opt">–</span></td></tr>
+          <tr><td><code>note</code></td><td>string</td><td><span class="opt">–</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/crm/guests/:id</span>
+        <span class="endpoint-summary">Cập nhật khách hàng</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">CRM</span></div></div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/crm/guests/:id/notes</span>
+        <span class="endpoint-summary">Cập nhật ghi chú khách hàng</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">CRM</span></div>
+        <p style="color:var(--muted);font-size:13px;">Cập nhật riêng phần ghi chú (notes) của khách hàng mà không cần gửi toàn bộ thông tin.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/crm/guests/:id</span>
+        <span class="endpoint-summary">Xoá khách hàng</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">CRM</span></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ REVENUE ═══════════════ -->
+  <div class="section" id="revenue">
+    <div class="section-header">
+      <div class="section-icon">💰</div>
+      <div>
+        <div class="section-title">Doanh thu</div>
+        <div class="section-desc">Tính năng: Trang doanh thu — xem tổng quan và chi tiết theo nhân viên</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/revenue/summary</span>
+        <span class="endpoint-summary">Tổng hợp doanh thu</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Doanh thu</span><span class="feature-tag">Dashboard</span></div>
+        <div class="sub-label">Query Params</div>
+        <table>
+          <tr><th>Param</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>from</code></td><td>string (YYYY-MM-DD)</td><td>Từ ngày</td></tr>
+          <tr><td><code>to</code></td><td>string (YYYY-MM-DD)</td><td>Đến ngày</td></tr>
+          <tr><td><code>groupBy</code></td><td>day | week | month</td><td>Nhóm theo</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/revenue/staff/:staffId</span>
+        <span class="endpoint-summary">Doanh thu chi tiết theo nhân viên</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Doanh thu</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về doanh thu, số lịch hoàn thành, dịch vụ đã thực hiện của một nhân viên cụ thể trong khoảng thời gian.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ REPORTS ═══════════════ -->
+  <div class="section" id="reports">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <div>
+        <div class="section-title">Báo cáo</div>
+        <div class="section-desc">Tính năng: Trang báo cáo — tổng hợp hoạt động kinh doanh theo kỳ</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/reports/summary</span>
+        <span class="endpoint-summary">Báo cáo tổng hợp</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Báo cáo</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về báo cáo tổng hợp: tổng lịch hẹn, doanh thu, khách mới, tỷ lệ hoàn thành, dịch vụ phổ biến nhất trong kỳ.</p>
+        <div class="sub-label">Query Params</div>
+        <table>
+          <tr><th>Param</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>from</code></td><td>string</td><td>Từ ngày (YYYY-MM-DD)</td></tr>
+          <tr><td><code>to</code></td><td>string</td><td>Đến ngày (YYYY-MM-DD)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SETTINGS ═══════════════ -->
+  <div class="section" id="settings">
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <div>
+        <div class="section-title">Cài đặt Salon</div>
+        <div class="section-desc">Tính năng: Trang cài đặt — giờ mở cửa, giờ làm việc của salon</div>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/settings/operating-hours</span>
+        <span class="endpoint-summary">Lấy giờ hoạt động</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Cài đặt</span><span class="feature-tag">Đặt lịch hẹn</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về giờ mở/đóng cửa theo từng ngày trong tuần. Dùng cho form đặt lịch để giới hạn khung giờ hợp lệ.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/settings/operating-hours</span>
+        <span class="endpoint-summary">Cập nhật giờ hoạt động</span>
+        <span class="auth-badge">🔒 JWT</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Cài đặt</span></div>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>hours</code></td><td>array</td><td>Mảng cấu hình theo ngày: <code>{ day, openTime, closeTime, isClosed }</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ADMIN ═══════════════ -->
+  <div class="section" id="admin">
+    <div class="section-header">
+      <div class="section-icon">🛡️</div>
+      <div>
+        <div class="section-title">Admin — Quản lý Tenant</div>
+        <div class="section-desc">Tính năng: Hệ thống Multi-tenant — tạo, quản lý các salon (tenant) và user admin của họ</div>
+      </div>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">
+      Tất cả các route <code>/api/admin/*</code> yêu cầu header <code>X-Admin-Key: &lt;ADMIN_API_KEY&gt;</code> thay cho JWT thông thường.
+    </p>
+
+    <!-- Tenant CRUD -->
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-weight:600;">🏢 Tenant</p>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/admin/tenants</span>
+        <span class="endpoint-summary">Danh sách tất cả tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về danh sách tất cả salon (tenant) kèm danh sách user của mỗi tenant.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/admin/tenants/:id</span>
+        <span class="endpoint-summary">Chi tiết tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div></div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/admin/tenants</span>
+        <span class="endpoint-summary">Tạo tenant mới</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <p style="color:var(--muted);font-size:13px;">Tạo một salon mới hoàn chỉnh: tạo record tenant, user admin đầu tiên trong master DB.</p>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th><th>Mô tả</th></tr>
+          <tr><td><code>name</code></td><td>string</td><td><span class="req">✓</span></td><td>Tên salon</td></tr>
+          <tr><td><code>slug</code></td><td>string</td><td><span class="req">✓</span></td><td>Định danh duy nhất (kebab-case)</td></tr>
+          <tr><td><code>email</code></td><td>string</td><td><span class="req">✓</span></td><td>Email admin đầu tiên</td></tr>
+          <tr><td><code>password</code></td><td>string</td><td><span class="req">✓</span></td><td>Mật khẩu admin</td></tr>
+          <tr><td><code>description</code></td><td>string</td><td><span class="opt">–</span></td><td>Mô tả salon</td></tr>
+          <tr><td><code>tier</code></td><td>string</td><td><span class="opt">–</span></td><td>Gói: basic / premium / enterprise</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PATCH">PATCH</span>
+        <span class="endpoint-path">/api/admin/tenants/:id</span>
+        <span class="endpoint-summary">Cập nhật tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <div class="sub-label">Request Body (partial)</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Mô tả</th></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Tên salon</td></tr>
+          <tr><td><code>description</code></td><td>string</td><td>Mô tả</td></tr>
+          <tr><td><code>tier</code></td><td>string</td><td>Gói dịch vụ</td></tr>
+          <tr><td><code>isActive</code></td><td>boolean</td><td>Kích hoạt / khoá</td></tr>
+          <tr><td><code>maxUsers</code></td><td>number</td><td>Số user tối đa</td></tr>
+          <tr><td><code>maxGuests</code></td><td>number</td><td>Số khách tối đa</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/admin/tenants/:id</span>
+        <span class="endpoint-summary">Xoá tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <p style="color:var(--muted);font-size:13px;">Xoá tenant và toàn bộ dữ liệu liên quan trong master DB.</p>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/admin/tenants/:id/database-info</span>
+        <span class="endpoint-summary">Thông tin database tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <p style="color:var(--muted);font-size:13px;">Trả về số bảng, kích thước database, số bản ghi của tenant.</p>
+      </div>
+    </div>
+
+    <!-- User Management -->
+    <p style="font-size:13px;color:var(--muted);margin:18px 0 10px;font-weight:600;">👥 User của Tenant</p>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/admin/tenants/:id/users</span>
+        <span class="endpoint-summary">Danh sách user của tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body"><div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div></div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/admin/tenants/:id/users</span>
+        <span class="endpoint-summary">Tạo user mới cho tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <div class="sub-label">Request Body</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr>
+          <tr><td><code>email</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>password</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>name</code></td><td>string</td><td><span class="req">✓</span></td></tr>
+          <tr><td><code>role</code></td><td>string</td><td><span class="opt">–</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method PATCH">PATCH</span>
+        <span class="endpoint-path">/api/admin/tenants/:id/users/:userId</span>
+        <span class="endpoint-summary">Cập nhật user</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <div class="sub-label">Có thể cập nhật</div>
+        <table>
+          <tr><th>Field</th><th>Type</th></tr>
+          <tr><td><code>name</code></td><td>string</td></tr>
+          <tr><td><code>role</code></td><td>string</td></tr>
+          <tr><td><code>isActive</code></td><td>boolean</td></tr>
+          <tr><td><code>phone</code></td><td>string</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/admin/tenants/:id/users/:userId/reset-password</span>
+        <span class="endpoint-summary">Đặt lại mật khẩu user</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <div class="sub-label">Request Body</div>
+        <table><tr><th>Field</th><th>Type</th><th>Bắt buộc</th></tr><tr><td><code>newPassword</code></td><td>string</td><td><span class="req">✓</span></td></tr></table>
+      </div>
+    </div>
+
+    <div class="endpoint" onclick="toggle(this)">
+      <div class="endpoint-header">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/admin/tenants/:id/users/:userId</span>
+        <span class="endpoint-summary">Xoá user khỏi tenant</span>
+        <span class="auth-badge">🔑 Admin Key</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="feature-bar"><span class="feature-tag highlight">Admin Dashboard</span></div>
+        <p style="color:var(--muted);font-size:13px;">Không thể xoá user cuối cùng có role admin trong tenant.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function toggle(el) {
+    el.classList.toggle('open');
+  }
+
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('.section, .hero');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>

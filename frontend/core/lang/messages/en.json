@@ -341,7 +341,11 @@
           "conflict": "This staff member already has an appointment in that time range. Choose another time or staff member.",
           "outsideHours": "The selected time is outside this staff member's working hours.",
           "breakOverlap": "The selected time overlaps this staff member's break.",
-          "dayOff": "This staff member is off on the selected date. Choose another date or staff member."
+          "dayOff": "This staff member is off on the selected date. Choose another date or staff member.",
+          "storeClosed": "The store is closed on the selected day.",
+          "outsideStoreHours": "The booking time is outside the store's operating hours. Please choose another time.",
+          "walkInNameRequired": "Please enter the walk-in guest's name.",
+          "createGuestFailed": "Could not create the guest profile. Please try again."
         }
       }
     },
