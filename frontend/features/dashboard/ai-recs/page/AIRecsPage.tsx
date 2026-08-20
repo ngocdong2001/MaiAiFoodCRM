@@ -4,6 +4,7 @@ import { Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import PageHeader from "@/shared/components/molecules/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 
 import { aiStats, aiSuggestions, defaultCampaign } from "../data/data";
@@ -35,24 +36,18 @@ const AIRecsPage = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Page Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <Sparkles className="mt-1 h-6 w-6 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#171A21]">
-              {t("dashboard.aiRecs.title")}
-            </h1>
-            <p className="mt-1 text-sm text-[#8D95A5]">
-              {t("dashboard.aiRecs.subtitle")}
-            </p>
-          </div>
-        </div>
-        <Button className="flex items-center gap-2 bg-primary text-white shadow hover:bg-primary/90">
-          <Plus className="h-4 w-4" />
-          {t("dashboard.aiRecs.newCampaign")}
-        </Button>
-      </div>
+      <PageHeader
+        size="sm"
+        title={t("dashboard.aiRecs.title")}
+        subtitle={t("dashboard.aiRecs.subtitle")}
+        icon={<Sparkles className="mt-1 h-6 w-6 text-primary" />}
+        actions={
+          <Button className="flex items-center gap-2 bg-primary text-white shadow hover:bg-primary/90">
+            <Plus className="h-4 w-4" />
+            {t("dashboard.aiRecs.newCampaign")}
+          </Button>
+        }
+      />
 
       {/* Stats */}
       <AIRecsStatsSection stats={aiStats} />

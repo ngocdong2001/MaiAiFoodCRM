@@ -3,6 +3,8 @@
 import { Mail, MapPin, Phone, Upload } from "lucide-react";
 import { useState } from "react";
 
+import SelectField from "@/shared/components/molecules/SelectField";
+
 const BusinessProfileSection = () => {
   const [form, setForm] = useState({
     salonName: "Luxe Mane Studio",
@@ -63,19 +65,21 @@ const BusinessProfileSection = () => {
                   <label className="text-sm font-medium text-[#171A21]">
                     Business Type
                   </label>
-                  <select
+                  <SelectField
                     value={form.businessType}
-                    onChange={(e) =>
-                      handleChange("businessType", e.target.value)
+                    onValueChange={(value) =>
+                      handleChange("businessType", value)
                     }
-                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
-                  >
-                    <option>Hair Salon</option>
-                    <option>Nail Salon</option>
-                    <option>Spa</option>
-                    <option>Barbershop</option>
-                    <option>Beauty Studio</option>
-                  </select>
+                    options={[
+                      "Hair Salon",
+                      "Nail Salon",
+                      "Spa",
+                      "Barbershop",
+                      "Beauty Studio",
+                    ].map((item) => ({ value: item, label: item }))}
+                    ariaLabel="Business Type"
+                    className="rounded-[10px] border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012]"
+                  />
                 </div>
 
                 {/* Contact Email */}

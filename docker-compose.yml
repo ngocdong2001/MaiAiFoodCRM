@@ -15,9 +15,9 @@ services:
     ports:
       - "${MARIADB_PORT:-3307}:3306"
     volumes:
-      - maiai-mariadb-data:/var/lib/mysql
+      - maindatabasedata:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -63,7 +63,8 @@ services:
       - maiai-net
 
 volumes:
-  maiai-mariadb-data:
+  maindatabasedata:
+    external: true
 
 networks:
   maiai-net:

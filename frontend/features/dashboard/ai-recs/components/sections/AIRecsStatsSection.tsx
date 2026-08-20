@@ -2,6 +2,8 @@
 
 import { MessageSquare, Sparkles, TrendingUp, Users } from "lucide-react";
 
+import StatCard from "@/shared/components/molecules/StatCard";
+
 import type { AIStat } from "../../types/ai-recs.types";
 
 const iconMap = {
@@ -11,32 +13,6 @@ const iconMap = {
   users: Users,
 };
 
-interface AIRecsStatCardProps {
-  stat: AIStat;
-}
-
-const AIRecsStatCard = ({ stat }: AIRecsStatCardProps) => {
-  const Icon = iconMap[stat.icon as keyof typeof iconMap] ?? Sparkles;
-
-  return (
-    <div className="flex flex-col gap-3 rounded-xl bg-white p-6 shadow-sm">
-      <div className="flex items-start justify-between">
-        <span className="text-sm font-medium text-[#8D95A5]">{stat.label}</span>
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-          <Icon className="h-6 w-6 text-primary" />
-        </div>
-      </div>
-      <span className="text-3xl font-bold tracking-tight text-[#171A21]">
-        {stat.value}
-      </span>
-      <div className="flex items-center gap-1">
-        <span className="text-xs font-medium text-[#171A21]">{stat.delta}</span>
-        <span className="text-xs text-[#8D95A5]">{stat.deltaLabel}</span>
-      </div>
-    </div>
-  );
-};
-
 interface AIRecsStatsSectionProps {
   stats: AIStat[];
 }
@@ -44,9 +20,27 @@ interface AIRecsStatsSectionProps {
 const AIRecsStatsSection = ({ stats }: AIRecsStatsSectionProps) => {
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <AIRecsStatCard key={stat.label} stat={stat} />
-      ))}
+      {stats.map((stat) => {
+        const Icon = iconMap[stat.icon as keyof typeof iconMap] ?? Sparkles;
+        return (
+          <StatCard
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+            className="p-6 shadow-sm"
+            icon={<Icon className="h-6 w-6 text-primary" />}
+            iconWrapperClassName="h-12 w-12 rounded-full bg-primary/10"
+            hint={
+              <span className="flex items-center gap-1">
+                <span className="text-[#171A21]">{stat.delta}</span>
+                <span className="font-normal text-[#8D95A5]">
+                  {stat.deltaLabel}
+                </span>
+              </span>
+            }
+          />
+        );
+      })}
     </div>
   );
 };

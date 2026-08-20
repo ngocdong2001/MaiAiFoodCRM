@@ -1,19 +1,11 @@
 "use client";
 
-import axios from "axios";
 import { useDeferredValue, useMemo, useState } from "react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/shared/components/ui/alert-dialog";
-import { Button } from "@/shared/components/ui/button";
+import SkeletonGrid from "@/shared/components/atoms/SkeletonGrid";
+import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
+import QueryErrorState from "@/shared/components/molecules/QueryErrorState";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 import StaffFormDialog from "../components/StaffFormDialog";
 import StaffGridSection from "../components/sections/StaffGridSection";
@@ -33,12 +25,8 @@ import type {
   StaffStatus,
 } from "../types/staff.types";
 
-const getApiError = (error: unknown) => {
-  if (axios.isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data.message ?? "Unable to save staff";
-  }
-  return "Unable to save staff";
-};
+const getApiError = (error: unknown) =>
+  getApiErrorMessage(error, "Unable to save staff");
 
 const toDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -49,8 +37,9 @@ const toDateKey = (date: Date) => {
 
 const toDayQueryRange = (dateKey: string) => {
   const [year, month, day] = dateKey.split("-").map(Number);
-  const start = new Date(year, month - 1, day, 0, 0, 0, 0);
-  const end = new Date(year, month - 1, day, 23, 59, 59, 999);
+  // Use UTC bounds so appointments stored in UTC are reliably included
+  const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+  const end = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
   return { startDate: start.toISOString(), endDate: end.toISOString() };
 };
 
@@ -139,25 +128,17 @@ const StaffPage = () => {
       />
 
       {staffQuery.isPending ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }, (_, index) => (
-            <div
-              key={index}
-              className="h-64 animate-pulse rounded-xl border border-[#DEE1E7] bg-white"
-            />
-          ))}
-        </div>
+        <SkeletonGrid
+          count={4}
+          className="sm:grid-cols-2 lg:grid-cols-4"
+          itemClassName="h-64"
+        />
       ) : staffQuery.isError ? (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
-          <p>Could not load staff from the database.</p>
-          <Button
-            variant="outline"
-            className="mt-3"
-            onClick={() => staffQuery.refetch()}
-          >
-            Try again
-          </Button>
-        </div>
+        <QueryErrorState
+          message="Could not load staff from the database."
+          retryLabel="Try again"
+          onRetry={() => staffQuery.refetch()}
+        />
       ) : (
         <StaffGridSection
           members={members}
@@ -187,30 +168,18 @@ const StaffPage = () => {
         onSubmit={submitStaff}
       />
 
-      <AlertDialog
+      <ConfirmDialog
         open={Boolean(deletingMember)}
+        title="Delete staff member?"
+        description={`${deletingMember?.name ?? ""}'s profile, schedules, and specialty assignments will be removed permanently.`}
+        cancelLabel="Cancel"
+        confirmLabel="Delete"
+        pendingLabel="Deleting..."
+        pending={deleteStaff.isPending}
+        destructive
         onOpenChange={(open) => !open && setDeletingMember(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete staff member?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {deletingMember?.name}&apos;s profile, schedules, and specialty
-              assignments will be removed permanently.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              disabled={deleteStaff.isPending}
-              className="bg-destructive text-white hover:bg-destructive/90"
-            >
-              {deleteStaff.isPending ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };

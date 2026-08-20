@@ -7,7 +7,11 @@ import revenueRouter from "./routes/revenue.route";
 import staffRouter from "./routes/staff.route";
 import crmRouter from "./routes/crm.route";
 import calendarRouter from "./routes/calendar.route";
+import serviceRouter from "./routes/service.route";
 import tenantAdminRouter from "./routes/tenant-admin.route";
+import overviewRouter from "./routes/overview.route";
+import settingsRouter from "./routes/settings.route";
+import reportsRouter from "./routes/reports.route";
 import { getPrismaMaster, disconnectPrismaMaster } from "./lib/prisma-master";
 import { disconnectAllTenants } from "./lib/prisma-tenant";
 
@@ -37,7 +41,11 @@ app.use("/api/revenue", revenueRouter);
 app.use("/api/staff", staffRouter);
 app.use("/api/crm", crmRouter);
 app.use("/api/calendar", calendarRouter);
+app.use("/api/services", serviceRouter);
 app.use("/api/admin", tenantAdminRouter);
+app.use("/api/overview", overviewRouter);
+app.use("/api/settings", settingsRouter);
+app.use("/api/reports", reportsRouter);
 
 // Health check
 app.get("/health", (_req, res) => {

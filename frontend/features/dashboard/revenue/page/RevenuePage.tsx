@@ -1,25 +1,20 @@
-"use client";
+﻿"use client";
 
 import {
   ArrowDownRight,
   ArrowUpRight,
-  Calendar,
-  ChevronRight,
   Download,
-  HandCoins,
-  Landmark,
-  Package,
+  DollarSign,
+  Info,
+  Search,
   SlidersHorizontal,
   TrendingUp,
-  User,
+  Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -27,6 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+
+import { Accordion } from "@/shared/components/ui/accordion";
+import { StaffRevenueAccordionItem } from "@/shared/components/revenue/StaffRevenueAccordionItem";
 
 import {
   revenueService,
@@ -58,6 +56,7 @@ const RevenuePage = () => {
     useState<RevenueFilterDraft>(EMPTY_FILTER_DRAFT);
   const [appliedFilters, setAppliedFilters] =
     useState<RevenueFilterDraft>(EMPTY_FILTER_DRAFT);
+  const [staffSearch, setStaffSearch] = useState("");
 
   const buildSummaryParams = (
     draft: RevenueFilterDraft,
@@ -66,7 +65,6 @@ const RevenuePage = () => {
       draft.staffId.trim() === ""
         ? undefined
         : Number.parseInt(draft.staffId, 10);
-
     return {
       startDate: draft.startDate || undefined,
       endDate: draft.endDate || undefined,
@@ -92,16 +90,11 @@ const RevenuePage = () => {
     void loadSummary();
   }, []);
 
-  const handleOpenFilters = () => {
-    setDraftFilters(appliedFilters);
-    setIsFilterOpen(true);
-  };
-
   const handleApplyFilters = async () => {
-    const nextAppliedFilters = { ...draftFilters };
-    setAppliedFilters(nextAppliedFilters);
+    const nextApplied = { ...draftFilters };
+    setAppliedFilters(nextApplied);
     setIsFilterOpen(false);
-    await loadSummary(buildSummaryParams(nextAppliedFilters));
+    await loadSummary(buildSummaryParams(nextApplied));
   };
 
   const handleResetFilters = async () => {
@@ -112,72 +105,22 @@ const RevenuePage = () => {
   };
 
   const handleExportExcel = async () => {
-    if (!summary) {
-      return;
-    }
-
+    if (!summary) return;
     try {
       const xlsx = await import("xlsx");
       const workbook = xlsx.utils.book_new();
-
-      const metricsSheet = xlsx.utils.json_to_sheet(
-        summary.metrics.map((metric) => ({
-          metricKey: metric.key,
-          metricLabel: metric.label,
-          value: metric.value,
-          deltaPercent: metric.deltaPercent,
-          trend: metric.trend,
-        })),
-      );
-
-      const staffSheet = xlsx.utils.json_to_sheet(
-        summary.staffRevenueRows.map((row) => ({
-          staffId: row.key,
-          staffName: row.staffName,
-          services: row.services,
-          tips: row.tips,
-          totalRevenue: row.totalRevenue,
-        })),
-      );
-
-      const paymentMethodSheet = xlsx.utils.json_to_sheet(
-        summary.paymentMethods.map((method) => ({
-          paymentMethod: method.key,
-          label: method.label,
-          amount: method.amount,
-        })),
-      );
-
-      const activitiesSheet = xlsx.utils.json_to_sheet(
-        summary.recentRevenueActivities.map((activity) => ({
-          activityId: activity.key,
-          title: activity.title,
-          subtitle: activity.subtitle,
-          amount: activity.amount,
-          time: activity.time,
-        })),
-      );
-
-      const filtersSheet = xlsx.utils.json_to_sheet([
-        {
-          summaryDate: summary.summaryDate,
-          startDate: appliedFilters.startDate || "",
-          endDate: appliedFilters.endDate || "",
-          staffId: appliedFilters.staffId || "",
-          paymentMethod: appliedFilters.paymentMethod || "",
-        },
-      ]);
-
-      xlsx.utils.book_append_sheet(workbook, metricsSheet, "Metrics");
-      xlsx.utils.book_append_sheet(workbook, staffSheet, "RevenueByStaff");
       xlsx.utils.book_append_sheet(
         workbook,
-        paymentMethodSheet,
-        "PaymentMethods",
+        xlsx.utils.json_to_sheet(
+          summary.staffRevenueRows.map((row) => ({
+            staffName: row.staffName,
+            services: row.services,
+            tips: row.tips,
+            totalRevenue: row.totalRevenue,
+          })),
+        ),
+        "RevenueByStaff",
       );
-      xlsx.utils.book_append_sheet(workbook, activitiesSheet, "RecentActivity");
-      xlsx.utils.book_append_sheet(workbook, filtersSheet, "Filters");
-
       const exportDate = new Date().toISOString().slice(0, 10);
       xlsx.writeFile(workbook, `revenue-report-${exportDate}.xlsx`);
     } catch {
@@ -193,23 +136,24 @@ const RevenuePage = () => {
       maximumFractionDigits: 0,
     }).format(value);
 
-  const formatDelta = (value: number) =>
-    `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
-
-  const totalPayment = useMemo(() => {
+  const totalRevenue = useMemo(() => {
     const metric = summary?.metrics.find(
-      (item) => item.key === "total-daily-revenue",
+      (m) => m.key === "total-daily-revenue",
     );
-    return metric ? formatCurrency(metric.value) : formatCurrency(0);
+    return metric?.value ?? 0;
+  }, [summary]);
+
+  const totalRevenueDelta = useMemo(() => {
+    const metric = summary?.metrics.find(
+      (m) => m.key === "total-daily-revenue",
+    );
+    if (!metric) return null;
+    return { percent: metric.deltaPercent, trend: metric.trend };
   }, [summary]);
 
   const summaryDateLabel = useMemo(() => {
-    if (!summary?.summaryDate) {
-      return t("dashboard.shared.sampleDate");
-    }
-
+    if (!summary?.summaryDate) return t("dashboard.shared.sampleDate");
     const locale = i18n.language === "vi" ? "vi-VN" : "en-US";
-
     return new Date(summary.summaryDate).toLocaleDateString(locale, {
       weekday: "long",
       year: "numeric",
@@ -219,22 +163,16 @@ const RevenuePage = () => {
   }, [summary, t, i18n.language]);
 
   const selectedStaffLabel = useMemo(() => {
-    if (!draftFilters.staffId) {
-      return t("dashboard.revenue.filters.allStaff");
-    }
-
-    const matchedStaff = (summary?.staffRevenueRows ?? []).find(
-      (row) => row.key === draftFilters.staffId,
+    if (!draftFilters.staffId) return t("dashboard.revenue.filters.allStaff");
+    const match = (summary?.staffRevenueRows ?? []).find(
+      (r) => r.key === draftFilters.staffId,
     );
-
-    return matchedStaff?.staffName ?? draftFilters.staffId;
+    return match?.staffName ?? draftFilters.staffId;
   }, [draftFilters.staffId, summary, t]);
 
   const selectedPaymentMethodLabel = useMemo(() => {
-    if (!draftFilters.paymentMethod) {
+    if (!draftFilters.paymentMethod)
       return t("dashboard.revenue.filters.allMethods");
-    }
-
     return t(
       `dashboard.revenue.paymentMethodLabels.${draftFilters.paymentMethod}`,
       {
@@ -243,98 +181,165 @@ const RevenuePage = () => {
     );
   }, [draftFilters.paymentMethod, t]);
 
+  const filteredStaffRows = useMemo(() => {
+    const rows = summary?.staffRevenueRows ?? [];
+    if (!staffSearch.trim()) return rows;
+    const q = staffSearch.toLowerCase();
+    return rows.filter((r) => r.staffName.toLowerCase().includes(q));
+  }, [summary, staffSearch]);
+
+  // Compute derived stats from existing API data
+  const totalOrders = useMemo(
+    () => summary?.metrics.find((m) => m.key === "total-orders")?.value ?? 0,
+    [summary],
+  );
+
+  const avgRevenuePerStaff = useMemo(() => {
+    const rows = summary?.staffRevenueRows ?? [];
+    if (rows.length === 0) return 0;
+    return rows.reduce((acc, r) => acc + r.totalRevenue, 0) / rows.length;
+  }, [summary]);
+
+  const mostPopularService = useMemo(() => {
+    const freq = new Map<string, number>();
+    (summary?.staffRevenueRows ?? []).forEach((r) =>
+      (r.recentServiceNames ?? []).forEach((s) =>
+        freq.set(s, (freq.get(s) ?? 0) + 1),
+      ),
+    );
+    (summary?.recentRevenueActivities ?? []).forEach((a) =>
+      (a.serviceTags ?? []).forEach((s) => freq.set(s, (freq.get(s) ?? 0) + 1)),
+    );
+    let best = "—";
+    let max = 0;
+    freq.forEach((count, name) => {
+      if (count > max) {
+        max = count;
+        best = name;
+      }
+    });
+    return best;
+  }, [summary]);
+
+  const avgRevenue = useMemo(() => {
+    const rows = summary?.staffRevenueRows ?? [];
+    if (rows.length === 0) return 0;
+    return rows.reduce((acc, r) => acc + r.totalRevenue, 0) / rows.length;
+  }, [summary]);
+
   return (
-    <div className="flex min-h-full flex-col gap-6 px-12 py-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#171A21]">
-            {t("dashboard.revenue.title")}
+    <div className="flex min-h-full flex-col gap-6 px-8 py-8">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0px_2px_4px_0px_#00000012]">
+        <div className="absolute right-0 top-0 h-full w-64 bg-[linear-gradient(270deg,#f04cac0d_0%,transparent_100%)]" />
+        <div className="relative px-8 py-8">
+          <h1 className="text-[32px] font-bold leading-10 tracking-tight text-[#1A1A1A]">
+            {t("dashboard.revenue.title", {
+              defaultValue: "Tổng kết doanh thu trong ngày",
+            })}
           </h1>
-          <p className="mt-1 flex items-center gap-2 text-base text-[#8D95A5]">
-            <Calendar className="h-4 w-4" />
-            {summaryDateLabel}
+          <p className="mt-1 text-sm text-[#9DA1A7]">
+            {t("dashboard.revenue.subtitle", {
+              defaultValue:
+                "Theo dõi tình hình tài chính và chi tiết giao dịch khách hàng trong ngày hôm nay.",
+            })}
           </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleOpenFilters}
-            className="h-10 gap-2 rounded-[10px] border-[#DEE1E7] bg-white px-4 py-2 text-sm font-medium text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] hover:bg-[#F9FAFB]"
-          >
-            <SlidersHorizontal className="h-4 w-4 text-[#8D95A5]" />
-            {t("dashboard.revenue.reportFilters")}
-          </Button>
-
-          <Button
-            type="button"
-            onClick={handleExportExcel}
-            disabled={!summary || isLoading}
-            className="h-10 gap-2 rounded-[10px] px-4 py-2 text-sm font-semibold shadow-[0px_4px_8px_0px_#00000014] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <Download className="h-4 w-4" />
-            {t("dashboard.revenue.exportExcel")}
-          </Button>
+          <div className="mt-3 flex items-baseline gap-3">
+            <span className="text-[42px] font-bold leading-none tracking-[-1px] text-[#f04cac]">
+              {formatCurrency(totalRevenue)}
+            </span>
+            {totalRevenueDelta && (
+              <span
+                className={`flex items-center gap-1 text-sm font-semibold ${
+                  totalRevenueDelta.trend === "down"
+                    ? "text-[#DC2626]"
+                    : "text-[#059669]"
+                }`}
+              >
+                {totalRevenueDelta.trend === "down" ? (
+                  <ArrowDownRight className="h-4 w-4" />
+                ) : (
+                  <ArrowUpRight className="h-4 w-4" />
+                )}
+                {totalRevenueDelta.trend === "down" ? "-" : "+"}
+                {Math.abs(totalRevenueDelta.percent).toFixed(1)}%{" "}
+                {t("dashboard.revenue.vsYesterday", {
+                  defaultValue: "so với hôm qua",
+                })}
+              </span>
+            )}
+          </div>
+          <div className="absolute right-8 top-8 flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setDraftFilters(appliedFilters);
+                setIsFilterOpen(!isFilterOpen);
+              }}
+              className="flex h-10 items-center gap-2 rounded-[10px] border border-[#DEE1E7] bg-white px-4 text-sm font-medium text-[#1A1A1A] shadow-[0px_2px_4px_0px_#00000012] hover:bg-[#F9FAFB]"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-[#9DA1A7]" />
+              {t("dashboard.revenue.reportFilters")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                void handleExportExcel();
+              }}
+              disabled={!summary || isLoading}
+              className="flex h-10 items-center gap-2 rounded-[10px] bg-[#f04cac] px-4 text-sm font-semibold text-white shadow-[0px_4px_8px_0px_#f04cac40] hover:bg-[#e03a9a] disabled:opacity-60"
+            >
+              <Download className="h-4 w-4" />
+              {t("dashboard.revenue.exportExcel")}
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Filter panel */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 gap-3 rounded-[10px] border border-[#DFE1E4] bg-white p-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 rounded-xl border border-[#DFE1E4] bg-white p-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="flex flex-col gap-2">
-            <Label className="text-sm text-[#1D1F23]">
+            <label className="text-sm text-[#1D1F23]">
               {t("dashboard.revenue.filters.startDate")}
-            </Label>
-            <Input
+            </label>
+            <input
               type="date"
               value={draftFilters.startDate}
-              onChange={(event) => {
-                setDraftFilters((prev) => ({
-                  ...prev,
-                  startDate: event.target.value,
-                }));
-              }}
-              className="h-9 rounded-[8px] border-[#DEE1E7] px-3 py-2 text-sm"
+              onChange={(e) =>
+                setDraftFilters((p) => ({ ...p, startDate: e.target.value }))
+              }
+              className="h-9 rounded-[8px] border border-[#DEE1E7] px-3 text-sm"
             />
           </div>
-
           <div className="flex flex-col gap-2">
-            <Label className="text-sm text-[#1D1F23]">
+            <label className="text-sm text-[#1D1F23]">
               {t("dashboard.revenue.filters.endDate")}
-            </Label>
-            <Input
+            </label>
+            <input
               type="date"
               value={draftFilters.endDate}
-              onChange={(event) => {
-                setDraftFilters((prev) => ({
-                  ...prev,
-                  endDate: event.target.value,
-                }));
-              }}
-              className="h-9 rounded-[8px] border-[#DEE1E7] px-3 py-2 text-sm"
+              onChange={(e) =>
+                setDraftFilters((p) => ({ ...p, endDate: e.target.value }))
+              }
+              className="h-9 rounded-[8px] border border-[#DEE1E7] px-3 text-sm"
             />
           </div>
-
           <div className="flex flex-col gap-2">
-            <Label className="text-sm text-[#1D1F23]">
+            <label className="text-sm text-[#1D1F23]">
               {t("dashboard.revenue.filters.staff")}
-            </Label>
+            </label>
             <Select
               value={draftFilters.staffId || "all"}
-              onValueChange={(value) => {
-                const nextValue = value ?? "all";
-                setDraftFilters((prev) => ({
-                  ...prev,
-                  staffId: nextValue === "all" ? "" : nextValue,
-                }));
-              }}
+              onValueChange={(v) =>
+                setDraftFilters((p) => ({
+                  ...p,
+                  staffId: v == null || v === "all" ? "" : v,
+                }))
+              }
             >
-              <SelectTrigger className="h-9 w-full rounded-[8px] border-[#DEE1E7] px-3 text-sm">
-                <SelectValue
-                  placeholder={t("dashboard.revenue.filters.allStaff")}
-                >
-                  {selectedStaffLabel}
-                </SelectValue>
+              <SelectTrigger className="h-9 rounded-[8px] border-[#DEE1E7] text-sm">
+                <SelectValue>{selectedStaffLabel}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
@@ -348,27 +353,21 @@ const RevenuePage = () => {
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex flex-col gap-2">
-            <Label className="text-sm text-[#1D1F23]">
+            <label className="text-sm text-[#1D1F23]">
               {t("dashboard.revenue.filters.paymentMethod")}
-            </Label>
+            </label>
             <Select
               value={draftFilters.paymentMethod || "all"}
-              onValueChange={(value) => {
-                const nextValue = value ?? "all";
-                setDraftFilters((prev) => ({
-                  ...prev,
-                  paymentMethod: nextValue === "all" ? "" : nextValue,
-                }));
-              }}
+              onValueChange={(v) =>
+                setDraftFilters((p) => ({
+                  ...p,
+                  paymentMethod: v == null || v === "all" ? "" : v,
+                }))
+              }
             >
-              <SelectTrigger className="h-9 w-full rounded-[8px] border-[#DEE1E7] px-3 text-sm">
-                <SelectValue
-                  placeholder={t("dashboard.revenue.filters.allMethods")}
-                >
-                  {selectedPaymentMethodLabel}
-                </SelectValue>
+              <SelectTrigger className="h-9 rounded-[8px] border-[#DEE1E7] text-sm">
+                <SelectValue>{selectedPaymentMethodLabel}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
@@ -384,253 +383,259 @@ const RevenuePage = () => {
               </SelectContent>
             </Select>
           </div>
-
-          <div className="flex items-center gap-2 md:col-span-2 xl:col-span-4">
-            <Button
+          <div className="flex gap-2 md:col-span-2 xl:col-span-4">
+            <button
               type="button"
               onClick={() => {
                 void handleApplyFilters();
               }}
-              className="h-9 rounded-[8px] px-4 py-2 text-sm font-semibold"
+              className="h-9 rounded-[8px] bg-[#f04cac] px-4 text-sm font-semibold text-white hover:bg-[#e03a9a]"
             >
               {t("dashboard.revenue.filters.apply")}
-            </Button>
-            <Button
+            </button>
+            <button
               type="button"
-              variant="outline"
               onClick={() => {
                 void handleResetFilters();
               }}
-              className="h-9 rounded-[8px] border-[#DEE1E7] bg-white px-4 py-2 text-sm font-semibold text-[#1D1F23]"
+              className="h-9 rounded-[8px] border border-[#DEE1E7] bg-white px-4 text-sm font-semibold text-[#1D1F23]"
             >
               {t("dashboard.revenue.filters.reset")}
-            </Button>
+            </button>
           </div>
         </div>
       )}
 
       {errorMessage && (
-        <div className="rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {errorMessage}
         </div>
       )}
-
       {isLoading && (
-        <div className="rounded-[10px] border border-[#DFE1E4] bg-white px-4 py-3 text-sm text-[#8D95A5]">
+        <div className="rounded-xl border border-[#DFE1E4] bg-white px-4 py-3 text-sm text-[#9DA1A7]">
           {t("dashboard.revenue.loading")}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {(summary?.metrics ?? []).map((metric) => (
-          <article
-            key={metric.key}
-            className="rounded-[10px] border border-[#DFE1E4] bg-[#F6F7F9] p-5 shadow-[0px_2px_4px_0px_#00000012]"
-          >
-            <div className="flex items-start justify-between">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-primary/10 text-primary">
-                {metric.key === "total-daily-revenue" && (
-                  <HandCoins className="h-5 w-5" />
-                )}
-                {metric.key === "service-revenue" && (
-                  <Landmark className="h-5 w-5" />
-                )}
-                {metric.key === "product-revenue" && (
-                  <Package className="h-5 w-5" />
-                )}
-                {metric.key === "total-orders" && (
-                  <TrendingUp className="h-5 w-5" />
-                )}
-              </span>
-              <span
-                className={
-                  metric.trend === "up"
-                    ? "inline-flex items-center gap-1 text-xs font-semibold text-[#10B981]"
-                    : "inline-flex items-center gap-1 text-xs font-semibold text-[#D64938]"
-                }
-              >
-                {metric.trend === "up" ? (
-                  <ArrowUpRight className="h-3 w-3" />
-                ) : (
-                  <ArrowDownRight className="h-3 w-3" />
-                )}
-                {formatDelta(metric.deltaPercent)}
-              </span>
+      {/* Four Stat Cards */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        {/* Card 1: Tổng khách phục vụ */}
+        <div className="rounded-[12px] bg-white p-5 shadow-[0px_2px_4px_0px_#00000012]">
+          <div className="flex items-start justify-between">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#fff3f8]/80">
+              <Users className="h-5 w-5 text-[#f04cac]" />
             </div>
-            <p className="mt-6 text-xs text-[#9DA1A7]">
-              {t(`dashboard.revenue.metrics.${metric.key}`, {
-                defaultValue: metric.label,
+            <span className="flex items-center gap-1 rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium text-[#059669]">
+              {Math.round(totalOrders)}{" "}
+              {t("dashboard.revenue.cards.ordersUnit", {
+                defaultValue: "hóa đơn",
               })}
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-[#1D1F23]">
-              {metric.key === "total-orders"
-                ? Math.round(metric.value)
-                : formatCurrency(metric.value)}
-            </p>
-          </article>
-        ))}
+            </span>
+          </div>
+          <p className="mt-5 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.cards.totalCustomers", {
+              defaultValue: "Tổng khách phục vụ",
+            })}
+          </p>
+          <p className="mt-1 text-2xl font-bold text-[#1D1F23]">
+            {Math.round(totalOrders)}
+            <span className="ml-1 text-base font-normal text-[#9DA1A7]">
+              {t("dashboard.revenue.cards.guestUnit", {
+                defaultValue: "khách",
+              })}
+            </span>
+          </p>
+          <p className="mt-2 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.cards.totalPaidOrders", {
+              defaultValue: "Số lượng hóa đơn đã thanh toán",
+            })}
+          </p>
+        </div>
+
+        {/* Card 2: Doanh thu TB / Nhân viên */}
+        <div className="rounded-[12px] bg-white p-5 shadow-[0px_2px_4px_0px_#00000012]">
+          <div className="flex items-start justify-between">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#fff3f8]/80">
+              <DollarSign className="h-5 w-5 text-[#f04cac]" />
+            </div>
+            {totalRevenueDelta && (
+              <span className="flex items-center gap-1 rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium text-[#059669]">
+                +{totalRevenueDelta.percent.toFixed(0)}%
+              </span>
+            )}
+          </div>
+          <p className="mt-5 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.cards.avgPerStaff", {
+              defaultValue: "Doanh thu TB / Nhân viên",
+            })}
+          </p>
+          <p className="mt-1 text-2xl font-bold text-[#1D1F23]">
+            {formatCurrency(avgRevenuePerStaff)}
+          </p>
+          <p className="mt-2 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.cards.avgPerStylist", {
+              defaultValue: "Trung bình trên mỗi stylist",
+            })}
+          </p>
+        </div>
+
+        {/* Card 3: Doanh thu trong ngày — PINK background */}
+        <div className="rounded-[12px] bg-[#f04cac] p-5 shadow-[0px_2px_4px_0px_#00000012]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-white/20">
+            <TrendingUp className="h-5 w-5 text-white" />
+          </div>
+          <p className="mt-5 text-xs text-white/80">
+            {t("dashboard.revenue.cards.dailyRevenue", {
+              defaultValue: "Doanh thu trong ngày",
+            })}
+          </p>
+          <p className="mt-1 text-2xl font-bold text-[#f6f7f9]">
+            {formatCurrency(totalRevenue)}
+          </p>
+          <p className="mt-2 text-xs text-white/70">
+            {t("dashboard.revenue.cards.totalReceived", {
+              defaultValue: "Tổng tiền thực thu",
+            })}
+          </p>
+        </div>
+
+        {/* Card 4: Dịch vụ phổ biến */}
+        <div className="rounded-[12px] bg-white p-5 shadow-[0px_2px_4px_0px_#00000012]">
+          <div className="flex items-start justify-between">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#fff3f8]/80">
+              <TrendingUp className="h-5 w-5 text-[#f04cac]" />
+            </div>
+            <span className="rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium text-[#059669]">
+              Hot
+            </span>
+          </div>
+          <p className="mt-5 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.cards.popularService", {
+              defaultValue: "Dịch vụ phổ biến",
+            })}
+          </p>
+          <p className="mt-1 truncate text-2xl font-bold text-[#1D1F23]">
+            {mostPopularService}
+          </p>
+          <p className="mt-2 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.cards.chosenMost", {
+              defaultValue: "Được chọn nhiều nhất hôm nay",
+            })}
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_342px]">
-        <section className="rounded-[10px] border border-[#DFE1E4] bg-[#F6F7F9] p-4 shadow-[0px_2px_4px_0px_#00000012] sm:p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-[#1D1F23]">
-              {t("dashboard.revenue.revenueByStaff")}
+      {/* Staff Revenue — Accordion */}
+      <div className="rounded-[12px] bg-white shadow-[0px_2px_4px_0px_#00000012]">
+        <div className="relative flex items-start justify-between px-6 py-5">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A]">
+              {t("dashboard.revenue.staffTable.title", {
+                defaultValue: "Chi tiết doanh thu nhân viên",
+              })}
             </h2>
-            <button className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
-              {t("dashboard.revenue.viewDetails")}
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          <div className="overflow-x-auto rounded-[8px] bg-white">
-            <table className="w-full min-w-175 border-collapse">
-              <thead>
-                <tr className="border-b border-[#DFE1E4]">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-[#9DA1A7]">
-                    {t("dashboard.revenue.table.staff")}
-                  </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-[#9DA1A7]">
-                    {t("dashboard.revenue.table.services")}
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-[#9DA1A7]">
-                    {t("dashboard.revenue.table.tips")}
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-[#9DA1A7]">
-                    {t("dashboard.revenue.table.totalRevenue")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {(summary?.staffRevenueRows ?? []).map((row) => (
-                  <tr
-                    key={row.key}
-                    className="border-b border-[#DFE1E4] last:border-b-0"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {row.avatarUrl ? (
-                          <img
-                            src={row.avatarUrl}
-                            alt={row.staffName}
-                            className="h-10 w-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <InitialsAvatar
-                            name={row.staffName}
-                            className="h-10 w-10"
-                          />
-                        )}
-                        <span className="text-sm font-medium text-[#1D1F23]">
-                          {row.staffName}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-center text-sm text-[#1D1F23]">
-                      {row.services}
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm text-[#1D1F23]">
-                      {formatCurrency(row.tips)}
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                      {formatCurrency(row.totalRevenue)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <div className="flex flex-col gap-6">
-          <section className="rounded-[10px] border border-[#DFE1E4] bg-[#F6F7F9] p-6 shadow-[0px_2px_4px_0px_#00000012]">
-            <h2 className="text-xl font-semibold uppercase tracking-tight text-[#1D1F23]">
-              {t("dashboard.revenue.paymentMethods")}
-            </h2>
-            <p className="mt-2 text-sm text-[#9DA1A7]">
-              {t("dashboard.revenue.paymentDistribution")}
+            <p className="mt-1 text-sm text-[#9DA1A7]">
+              {t("dashboard.revenue.staffTable.subtitle", {
+                defaultValue:
+                  "Thống kê chi tiết các khoản thu dựa trên người thực hiện dịch vụ.",
+              })}
             </p>
-
-            <div className="mt-6 space-y-3">
-              {(summary?.paymentMethods ?? []).map((item) => (
-                <div
-                  key={item.key}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span className="inline-flex items-center gap-2 text-[#1D1F23]">
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    {t(`dashboard.revenue.paymentMethodLabels.${item.key}`, {
-                      defaultValue: item.label,
-                    })}
-                  </span>
-                  <span className="font-medium text-[#1D1F23]">
-                    {formatCurrency(item.amount)}
-                  </span>
-                </div>
-              ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-10 items-center gap-2 rounded-[8px] border border-[#DFE1E4] bg-[#F6F7F9] px-3">
+              <Search className="h-4 w-4 text-[#9DA1A7]" />
+              <input
+                type="text"
+                value={staffSearch}
+                onChange={(e) => setStaffSearch(e.target.value)}
+                placeholder={t(
+                  "dashboard.revenue.staffTable.searchPlaceholder",
+                  { defaultValue: "Tìm nhân viên..." },
+                )}
+                className="w-48 bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9DA1A7] outline-none"
+              />
             </div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-[#DFE1E4] bg-white shadow-[0px_2px_4px_0px_#00000012]">
+              <SlidersHorizontal className="h-4 w-4 text-[#9DA1A7]" />
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-[#DFE1E4]" />
 
-            <div className="mt-4 border-t border-[#DFE1E4] pt-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-[#1D1F23]">
-                  {t("dashboard.revenue.total")}
+        <Accordion multiple={true}>
+          {filteredStaffRows.map((row, index) => (
+            <StaffRevenueAccordionItem
+              key={row.key}
+              row={row}
+              index={index}
+              isGood={row.totalRevenue >= avgRevenue}
+              dateRange={{
+                startDate: appliedFilters.startDate || undefined,
+                endDate: appliedFilters.endDate || undefined,
+              }}
+            />
+          ))}
+        </Accordion>
+      </div>
+
+      {/* Bottom widgets */}
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_443px]">
+        {/* Payment methods summary */}
+        <div className="rounded-[12px] bg-white p-6 shadow-[0px_2px_4px_0px_#00000012]">
+          <h2 className="text-base font-semibold text-[#1A1A1A]">
+            {t("dashboard.revenue.paymentMethods")}
+          </h2>
+          <p className="mt-1 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.paymentDistribution")}
+          </p>
+          <div className="mt-5 space-y-3">
+            {(summary?.paymentMethods ?? []).map((item) => (
+              <div key={item.key} className="flex items-center justify-between">
+                <span className="flex items-center gap-2 text-sm text-[#1A1A1A]">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  {t(`dashboard.revenue.paymentMethodLabels.${item.key}`, {
+                    defaultValue: item.label,
+                  })}
                 </span>
-                <span className="font-semibold text-primary">
-                  {totalPayment}
+                <span className="text-sm font-semibold text-[#1A1A1A]">
+                  {formatCurrency(item.amount)}
                 </span>
               </div>
+            ))}
+          </div>
+          <div className="mt-4 border-t border-[#F3F4F6] pt-4 flex items-center justify-between">
+            <span className="text-sm text-[#1A1A1A]">
+              {t("dashboard.revenue.total")}
+            </span>
+            <span className="text-sm font-bold text-[#f04cac]">
+              {formatCurrency(totalRevenue)}
+            </span>
+          </div>
+        </div>
+
+        {/* Info widget */}
+        <div className="rounded-[12px] border border-[#f04cac]/10 bg-[#FDF2F8] p-6">
+          <div className="flex gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f04cac]/10 shadow-[0px_1px_2px_0px_#0000000d]">
+              <Info className="h-5 w-5 text-[#f04cac]" />
             </div>
-          </section>
-
-          <section className="rounded-[10px] border border-[#DFE1E4] bg-[#F6F7F9] p-6 shadow-[0px_2px_4px_0px_#00000012]">
-            <h2 className="text-xl font-semibold uppercase tracking-tight text-[#1D1F23]">
-              {t("dashboard.revenue.latestActivity")}
-            </h2>
-
-            <ul className="mt-5 space-y-4">
-              {(summary?.recentRevenueActivities ?? []).map((activity) => (
-                <li
-                  key={activity.key}
-                  className="border-b border-[#DFE1E4] pb-4 last:border-b-0 last:pb-0"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EAECEE] text-[#9DA1A7]">
-                        <User className="h-4 w-4" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-medium text-[#1D1F23]">
-                          {activity.isWalkIn
-                            ? t("dashboard.revenue.activity.walkInGuest")
-                            : activity.title}
-                        </p>
-                        <p className="text-xs text-[#9DA1A7]">
-                          {t("dashboard.revenue.activity.paymentVia", {
-                            method: t(
-                              `dashboard.revenue.paymentMethodLabels.${activity.paymentMethod}`,
-                              { defaultValue: activity.paymentMethod },
-                            ),
-                          })}
-                        </p>
-                        <p className="mt-1 text-xs font-semibold text-[#10B981]">
-                          +{formatCurrency(activity.amount)}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-[#9DA1A7]">
-                      {new Date(activity.time).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
+            <div>
+              <p className="text-sm font-medium text-[#1A1A1A]">
+                {t("dashboard.revenue.info.title", {
+                  defaultValue: "Hướng dẫn quản trị",
+                })}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#9DA1A7]">
+                {t("dashboard.revenue.info.body", {
+                  defaultValue:
+                    "Dữ liệu doanh thu được tổng hợp tự động từ hệ thống POS. Bạn có thể nhấn vào từng nhân viên để xem lịch sử phục vụ chi tiết.",
+                })}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
