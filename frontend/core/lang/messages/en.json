@@ -262,6 +262,7 @@
       "calendar": "Calendar",
       "crm": "CRM",
       "staff": "Staff",
+      "services": "Services",
       "ai-recs": "AI Recs",
       "reports": "Reports",
       "revenue": "Revenue",
@@ -340,7 +341,11 @@
           "conflict": "This staff member already has an appointment in that time range. Choose another time or staff member.",
           "outsideHours": "The selected time is outside this staff member's working hours.",
           "breakOverlap": "The selected time overlaps this staff member's break.",
-          "dayOff": "This staff member is off on the selected date. Choose another date or staff member."
+          "dayOff": "This staff member is off on the selected date. Choose another date or staff member.",
+          "storeClosed": "The store is closed on the selected day.",
+          "outsideStoreHours": "The booking time is outside the store's operating hours. Please choose another time.",
+          "walkInNameRequired": "Please enter the walk-in guest's name.",
+          "createGuestFailed": "Could not create the guest profile. Please try again."
         }
       }
     },
@@ -483,6 +488,8 @@
     },
     "revenue": {
       "title": "Daily Revenue Summary",
+      "subtitle": "Track financial performance and customer transaction details for today.",
+      "vsYesterday": "vs yesterday",
       "reportFilters": "Report Filters",
       "exportExcel": "Export Excel",
       "loading": "Loading revenue data...",
@@ -506,6 +513,18 @@
         "product-revenue": "Product Revenue",
         "total-orders": "Total Orders"
       },
+      "cards": {
+        "totalCustomers": "Total Customers Served",
+        "ordersUnit": "invoices",
+        "guestUnit": "guests",
+        "totalPaidOrders": "Number of paid invoices",
+        "avgPerStaff": "Avg Revenue / Staff",
+        "avgPerStylist": "Average per stylist",
+        "dailyRevenue": "Daily Revenue",
+        "totalReceived": "Total amount received",
+        "popularService": "Popular Service",
+        "chosenMost": "Most chosen today"
+      },
       "paymentMethodLabels": {
         "cash": "Cash",
         "transfer": "Bank Transfer",
@@ -516,6 +535,35 @@
       "activity": {
         "walkInGuest": "Walk-in Guest",
         "paymentVia": "Payment via {{method}}"
+      },
+      "staffTable": {
+        "title": "Staff Revenue Details",
+        "subtitle": "Detailed breakdown of revenue by service provider.",
+        "searchPlaceholder": "Search staff...",
+        "colStaff": "Staff",
+        "colOrders": "Invoices",
+        "colRevenue": "Total Revenue",
+        "colServices": "Services Performed",
+        "colPerf": "Performance"
+      },
+      "subTable": {
+        "clickForDetail": "Click the ⋮ icon to view detailed service history."
+      },
+      "staffDetail": {
+        "jobHistory": "Job History",
+        "noJobs": "No jobs found for this period.",
+        "guest": "Guest",
+        "time": "Time",
+        "services": "Services",
+        "amount": "Amount",
+        "discount": "Discount",
+        "final": "Final",
+        "paymentMethod": "Payment Method",
+        "receipt": "Receipt"
+      },
+      "perf": {
+        "good": "Good",
+        "stable": "Stable"
       },
       "revenueByStaff": "Revenue by Staff",
       "viewDetails": "View details",
@@ -529,6 +577,10 @@
       "paymentDistribution": "Daily payment distribution",
       "total": "Total",
       "latestActivity": "Latest Activity",
+      "info": {
+        "title": "Management Guide",
+        "body": "Revenue data is automatically aggregated from the POS system. Click on any staff member to view their detailed service history."
+      },
       "readyForExport": "Ready for export",
       "systemSynced": "System synced",
       "versionInfo": "© 2023 MaiAI Salon Management System • Version 2.4.0"
@@ -564,6 +616,88 @@
         "emailInUse": "This email is already in use.",
         "saveError": "Unable to update your profile.",
         "loading": "Loading your profile..."
+      }
+    },
+    "services": {
+      "title": "Service price list",
+      "subtitle": "Update your services, durations and prices quickly in a spreadsheet-style table.",
+      "searchPlaceholder": "Search service name...",
+      "filterLabel": "Service filters",
+      "categoryGroup": "Category",
+      "allCategories": "All categories",
+      "statusGroup": "Status",
+      "statusAll": "All statuses",
+      "statusActive": "Published",
+      "statusInactive": "Hidden",
+      "summary": {
+        "totalLabel": "Total services",
+        "totalValue": "{{count}} items",
+        "categoryLabel": "Categories",
+        "categoryValue": "{{count}} groups",
+        "manage": "Manage",
+        "updatedLabel": "Last updated",
+        "noData": "No data yet",
+        "today": "Today, {{time}}",
+        "onDate": "{{date}}, {{time}}"
+      },
+      "table": {
+        "heading": "Price list details",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "index": "No.",
+        "name": "Service name",
+        "category": "Category",
+        "duration": "Duration",
+        "price": "List price",
+        "loading": "Loading price list...",
+        "empty": "No service matches the current filters.",
+        "namePlaceholder": "Service name",
+        "selectCategory": "Select category...",
+        "minutes": "min",
+        "currency": "đ",
+        "newRowLabel": "new row",
+        "deleteRow": "Delete {{name}}",
+        "addRowHint": "Click here to add a new service...",
+        "totalValue": "Catalog total value",
+        "averageValue": "Average per service",
+        "cancel": "Discard",
+        "addRow": "Add row",
+        "finish": "Finish setup"
+      },
+      "errors": {
+        "loadFailed": "Could not load the service price list from the database.",
+        "retry": "Try again",
+        "saveFailed": "Unable to save the service price list",
+        "rowName": "Row {{row}}: service name is required",
+        "rowCategory": "Row {{row}}: please select a category",
+        "rowDuration": "Row {{row}}: duration must be greater than 0 minutes",
+        "rowPrice": "Row {{row}}: list price is invalid"
+      },
+      "tip": {
+        "title": "Quick tip:",
+        "before": "Data syncs with MaiAI booking once you press \"Save changes\". You can press",
+        "after": "on the last row to append a new one automatically."
+      },
+      "reset": {
+        "title": "Discard unsaved changes?",
+        "description": "The price list will be restored to the data currently stored in the database.",
+        "keep": "Keep editing",
+        "confirm": "Discard changes"
+      },
+      "categoryDialog": {
+        "title": "Service categories",
+        "description": "Add, edit or delete the categories used by the service price list.",
+        "empty": "No category yet.",
+        "serviceCount": "{{count}} services",
+        "edit": "Edit {{name}}",
+        "delete": "Delete {{name}}",
+        "namePlaceholder": "Category name",
+        "descriptionPlaceholder": "Description (optional)",
+        "nameRequired": "Category name is required",
+        "cancelEdit": "Cancel edit",
+        "create": "Add category",
+        "update": "Update category",
+        "saveError": "Unable to save the service category"
       }
     },
     "staff": {

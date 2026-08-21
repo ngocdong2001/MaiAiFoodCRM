@@ -3,10 +3,10 @@ import type { PrismaClient } from "../generated/prisma-tenant/client.js";
 
 type RevenueMetric = {
   key:
-  | "total-daily-revenue"
-  | "service-revenue"
-  | "product-revenue"
-  | "total-orders";
+    | "total-daily-revenue"
+    | "service-revenue"
+    | "product-revenue"
+    | "total-orders";
   label: string;
   value: number;
   deltaPercent: number;
@@ -20,6 +20,7 @@ type StaffRevenueRow = {
   tips: number;
   totalRevenue: number;
   avatarUrl: string | null;
+  recentServiceNames: string[];
 };
 
 type PaymentMethodItem = {
@@ -37,6 +38,8 @@ type RevenueActivity = {
   amount: number;
   time: string;
   isWalkIn: boolean;
+  serviceTags: string[];
+  serviceCount: number;
 };
 
 export type RevenueSummaryResponse = {
@@ -117,7 +120,108 @@ const buildReadableMethodLabel = (value: string) =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
+export type StaffRevenueDetailJob = {
+  paymentId: number;
+  appointmentId: number;
+  paidAt: string;
+  guestName: string;
+  guestAvatarUrl: string | null;
+  services: { serviceId: number; serviceName: string; price: number }[];
+  amount: number;
+  discountAmount: number;
+  tipAmount: number;
+  finalAmount: number;
+  paymentMethod: string;
+  receiptNumber: string | null;
+};
+
+export type StaffRevenueDetailResponse = {
+  staffId: number;
+  staffName: string;
+  staffRole: string | null;
+  staffAvatarUrl: string | null;
+  totalRevenue: number;
+  totalTips: number;
+  totalJobs: number;
+  jobs: StaffRevenueDetailJob[];
+};
+
 export const RevenueModel = {
+  async getStaffDetail(
+    db: PrismaClient,
+    staffId: number,
+    filters: Pick<RevenueSummaryFilters, "startDate" | "endDate"> = {},
+  ): Promise<StaffRevenueDetailResponse | null> {
+    const staff = await db.staff.findUnique({ where: { id: staffId } });
+    if (!staff) return null;
+
+    const parsedStart = parseDateInput(filters.startDate);
+    const parsedEnd = parseDateInput(filters.endDate);
+
+    const payments = await db.payment.findMany({
+      where: {
+        staffId,
+        ...(parsedStart || parsedEnd
+          ? {
+              paidAt: {
+                ...(parsedStart ? { gte: startOfDay(parsedStart) } : {}),
+                ...(parsedEnd ? { lte: endOfDay(parsedEnd) } : {}),
+              },
+            }
+          : {}),
+      },
+      orderBy: { paidAt: "desc" },
+      include: {
+        appointment: {
+          include: {
+            guest: true,
+            appointmentservice: { include: { service: true } },
+          },
+        },
+      },
+    });
+
+    let totalRevenue = 0;
+    let totalTips = 0;
+
+    const jobs: StaffRevenueDetailJob[] = payments.map((p) => {
+      const finalAmt = decimalToNumber(p.finalAmount);
+      const tipAmt = decimalToNumber(p.tipAmount);
+      totalRevenue += finalAmt;
+      totalTips += tipAmt;
+
+      return {
+        paymentId: p.id,
+        appointmentId: p.appointmentId,
+        paidAt: p.paidAt.toISOString(),
+        guestName: p.appointment?.guest?.name ?? "Walk-in Guest",
+        guestAvatarUrl: p.appointment?.guest?.avatarUrl ?? null,
+        services: (p.appointment?.appointmentservice ?? []).map((as) => ({
+          serviceId: as.serviceId,
+          serviceName: as.service.name,
+          price: decimalToNumber(as.priceAtBooking),
+        })),
+        amount: decimalToNumber(p.amount),
+        discountAmount: decimalToNumber(p.discountAmount),
+        tipAmount: tipAmt,
+        finalAmount: finalAmt,
+        paymentMethod: p.paymentMethod,
+        receiptNumber: p.receiptNumber ?? null,
+      };
+    });
+
+    return {
+      staffId: staff.id,
+      staffName: staff.name,
+      staffRole: staff.role ?? null,
+      staffAvatarUrl: staff.avatarUrl ?? null,
+      totalRevenue,
+      totalTips,
+      totalJobs: jobs.length,
+      jobs,
+    };
+  },
+
   async getSummary(
     db: PrismaClient,
     filters: RevenueSummaryFilters = {},
@@ -250,6 +354,7 @@ export const RevenueModel = {
             appointment: {
               include: {
                 guest: true,
+                appointmentservice: { include: { service: true } },
               },
             },
           },
@@ -310,6 +415,8 @@ export const RevenueModel = {
     const staffMap = new Map<number, StaffRevenueRow>();
     const paymentMethodMap = new Map<string, PaymentMethodItem>();
 
+    const staffServiceNamesMap = new Map<number, Set<string>>();
+
     currentPayments.forEach((payment) => {
       if (payment.staffId && payment.staff) {
         const existing = staffMap.get(payment.staffId) ?? {
@@ -319,12 +426,20 @@ export const RevenueModel = {
           tips: 0,
           totalRevenue: 0,
           avatarUrl: payment.staff.avatarUrl ?? null,
+          recentServiceNames: [],
         };
 
         existing.services += 1;
         existing.tips += decimalToNumber(payment.tipAmount);
         existing.totalRevenue += decimalToNumber(payment.finalAmount);
         staffMap.set(payment.staffId, existing);
+
+        const serviceNames =
+          staffServiceNamesMap.get(payment.staffId) ?? new Set<string>();
+        (payment.appointment?.appointmentservice ?? []).forEach((as) => {
+          serviceNames.add(as.service.name);
+        });
+        staffServiceNamesMap.set(payment.staffId, serviceNames);
       }
 
       const methodKey = payment.paymentMethod;
@@ -343,6 +458,13 @@ export const RevenueModel = {
 
       methodExisting.amount += decimalToNumber(payment.finalAmount);
       paymentMethodMap.set(methodKey, methodExisting);
+    });
+
+    staffServiceNamesMap.forEach((names, staffId) => {
+      const row = staffMap.get(staffId);
+      if (row) {
+        row.recentServiceNames = Array.from(names).slice(0, 2);
+      }
     });
 
     const staffRevenueRows = Array.from(staffMap.values()).sort(
@@ -365,6 +487,10 @@ export const RevenueModel = {
           settingMap.get(WALK_IN_GUEST_KEY) ?? DEFAULT_WALK_IN_GUEST_LABEL;
         const isWalkIn = !payment.appointment?.guest?.name;
 
+        const serviceTags = (payment.appointment?.appointmentservice ?? []).map(
+          (as) => as.service.name,
+        );
+
         return {
           key: `${payment.id}`,
           title: payment.appointment?.guest?.name ?? walkInGuestLabel,
@@ -373,6 +499,8 @@ export const RevenueModel = {
           amount: decimalToNumber(payment.finalAmount),
           time: payment.paidAt.toISOString(),
           isWalkIn,
+          serviceTags,
+          serviceCount: serviceTags.length,
         };
       });
 

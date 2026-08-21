@@ -288,8 +288,500 @@ const main = async () => {
     }
   }
 
+  // ── Service Categories ────────────────────────────────────────────────────
+  const categorySeeds = [
+    {
+      name: "Nail Care",
+      description: "Basic nail care services",
+      icon: "✨",
+      sortOrder: 0,
+    },
+    {
+      name: "Nail Art",
+      description: "Creative nail art designs",
+      icon: "🎨",
+      sortOrder: 1,
+    },
+    {
+      name: "Extensions",
+      description: "Nail extension services",
+      icon: "💅",
+      sortOrder: 2,
+    },
+    {
+      name: "Pedicure",
+      description: "Foot and nail care",
+      icon: "🦶",
+      sortOrder: 3,
+    },
+  ];
+  const categories = new Map<string, number>();
+  for (const cat of categorySeeds) {
+    const c = await prisma.servicecategory.upsert({
+      where: { name: cat.name },
+      create: { ...cat, isActive: true, updatedAt: now },
+      update: { isActive: true, updatedAt: now },
+    });
+    categories.set(cat.name, c.id);
+  }
+
+  // ── Services ──────────────────────────────────────────────────────────────
+  const serviceSeeds = [
+    {
+      name: "Classic Manicure",
+      description: "Shape, file, cuticle care, and polish",
+      price: 35,
+      durationMinutes: 45,
+      category: "Nail Care",
+      sortOrder: 0,
+    },
+    {
+      name: "Gel Manicure",
+      description: "Long-lasting gel polish application",
+      price: 55,
+      durationMinutes: 60,
+      category: "Nail Care",
+      sortOrder: 1,
+    },
+    {
+      name: "French Manicure",
+      description: "Classic French tip manicure",
+      price: 45,
+      durationMinutes: 50,
+      category: "Nail Care",
+      sortOrder: 2,
+    },
+    {
+      name: "Nail Art Design",
+      description: "Custom nail art per nail",
+      price: 80,
+      durationMinutes: 90,
+      category: "Nail Art",
+      sortOrder: 0,
+    },
+    {
+      name: "Ombre Nails",
+      description: "Gradient color ombre effect",
+      price: 70,
+      durationMinutes: 75,
+      category: "Nail Art",
+      sortOrder: 1,
+    },
+    {
+      name: "Gel Extensions",
+      description: "Full set gel nail extensions",
+      price: 120,
+      durationMinutes: 120,
+      category: "Extensions",
+      sortOrder: 0,
+    },
+    {
+      name: "Acrylic Full Set",
+      description: "Full acrylic nail set",
+      price: 110,
+      durationMinutes: 110,
+      category: "Extensions",
+      sortOrder: 1,
+    },
+    {
+      name: "Classic Pedicure",
+      description: "Foot soak, scrub, massage, and polish",
+      price: 45,
+      durationMinutes: 60,
+      category: "Pedicure",
+      sortOrder: 0,
+    },
+    {
+      name: "Gel Pedicure",
+      description: "Pedicure with gel polish finish",
+      price: 65,
+      durationMinutes: 75,
+      category: "Pedicure",
+      sortOrder: 1,
+    },
+  ];
+  const services = new Map<string, number>();
+  for (const svc of serviceSeeds) {
+    const existing = await prisma.service.findFirst({
+      where: { name: svc.name, categoryId: categories.get(svc.category)! },
+    });
+    const s = existing
+      ? await prisma.service.update({
+          where: { id: existing.id },
+          data: {
+            price: svc.price,
+            durationMinutes: svc.durationMinutes,
+            isActive: true,
+            updatedAt: now,
+          },
+        })
+      : await prisma.service.create({
+          data: {
+            name: svc.name,
+            description: svc.description,
+            price: svc.price,
+            durationMinutes: svc.durationMinutes,
+            categoryId: categories.get(svc.category)!,
+            isActive: true,
+            sortOrder: svc.sortOrder,
+            updatedAt: now,
+          },
+        });
+    services.set(svc.name, s.id);
+  }
+
+  // ── Collect staff and guest IDs for appointments ──────────────────────────
+  const staffRecords = await prisma.staff.findMany({
+    select: { id: true, name: true },
+  });
+  const guestRecords = await prisma.guest.findMany({
+    select: { id: true, name: true },
+  });
+  if (staffRecords.length === 0 || guestRecords.length === 0) {
+    console.log("No staff or guests found, skipping appointment seed.");
+    return;
+  }
+
+  const staffByName = Object.fromEntries(
+    staffRecords.map((s) => [s.name, s.id]),
+  );
+  const guestByName = Object.fromEntries(
+    guestRecords.map((g) => [g.name, g.id]),
+  );
+
+  // ── Appointments ──────────────────────────────────────────────────────────
+  // Deterministic key: appointmentKey = guestName + staffName + offsetDays
+  type AppointmentSeed = {
+    key: string;
+    guestName: string;
+    staffName: string;
+    serviceName: string;
+    offsetDays: number;
+    startHour: number;
+    status: string;
+    paymentMethod?: string;
+  };
+  const appointmentSeeds: AppointmentSeed[] = [
+    // Past – completed with payment
+    {
+      key: "appt-past-1",
+      guestName: "Eleanor Vance",
+      staffName: "Sarah Jenkins",
+      serviceName: "Gel Manicure",
+      offsetDays: -14,
+      startHour: 10,
+      status: "completed",
+      paymentMethod: "credit_card",
+    },
+    {
+      key: "appt-past-2",
+      guestName: "Emma Chen",
+      staffName: "Marcus Chen",
+      serviceName: "Classic Pedicure",
+      offsetDays: -10,
+      startHour: 11,
+      status: "completed",
+      paymentMethod: "cash",
+    },
+    {
+      key: "appt-past-3",
+      guestName: "Mia Johnson",
+      staffName: "Sarah Jenkins",
+      serviceName: "Nail Art Design",
+      offsetDays: -7,
+      startHour: 14,
+      status: "completed",
+      paymentMethod: "credit_card",
+    },
+    {
+      key: "appt-past-4",
+      guestName: "Sarah Kim",
+      staffName: "Elena Rodriguez",
+      serviceName: "Classic Manicure",
+      offsetDays: -5,
+      startHour: 9,
+      status: "completed",
+      paymentMethod: "cash",
+    },
+    {
+      key: "appt-past-5",
+      guestName: "Eleanor Vance",
+      staffName: "Marcus Chen",
+      serviceName: "Gel Pedicure",
+      offsetDays: -3,
+      startHour: 13,
+      status: "completed",
+      paymentMethod: "credit_card",
+    },
+    {
+      key: "appt-past-6",
+      guestName: "Emma Chen",
+      staffName: "Elena Rodriguez",
+      serviceName: "French Manicure",
+      offsetDays: -2,
+      startHour: 10,
+      status: "cancelled",
+    },
+    {
+      key: "appt-past-7",
+      guestName: "Mia Johnson",
+      staffName: "Sarah Jenkins",
+      serviceName: "Ombre Nails",
+      offsetDays: -1,
+      startHour: 15,
+      status: "completed",
+      paymentMethod: "bank_transfer",
+    },
+    // Today
+    {
+      key: "appt-today-1",
+      guestName: "Eleanor Vance",
+      staffName: "Sarah Jenkins",
+      serviceName: "Gel Extensions",
+      offsetDays: 0,
+      startHour: 9,
+      status: "confirmed",
+    },
+    {
+      key: "appt-today-2",
+      guestName: "Emma Chen",
+      staffName: "Marcus Chen",
+      serviceName: "Gel Manicure",
+      offsetDays: 0,
+      startHour: 10,
+      status: "in_progress",
+    },
+    {
+      key: "appt-today-3",
+      guestName: "Mia Johnson",
+      staffName: "Elena Rodriguez",
+      serviceName: "Classic Pedicure",
+      offsetDays: 0,
+      startHour: 11,
+      status: "pending",
+    },
+    {
+      key: "appt-today-4",
+      guestName: "Sarah Kim",
+      staffName: "Sarah Jenkins",
+      serviceName: "Classic Manicure",
+      offsetDays: 0,
+      startHour: 14,
+      status: "pending",
+    },
+    // Future
+    {
+      key: "appt-future-1",
+      guestName: "Eleanor Vance",
+      staffName: "Marcus Chen",
+      serviceName: "Nail Art Design",
+      offsetDays: 2,
+      startHour: 10,
+      status: "confirmed",
+    },
+    {
+      key: "appt-future-2",
+      guestName: "Emma Chen",
+      staffName: "Sarah Jenkins",
+      serviceName: "Acrylic Full Set",
+      offsetDays: 3,
+      startHour: 9,
+      status: "confirmed",
+    },
+    {
+      key: "appt-future-3",
+      guestName: "Mia Johnson",
+      staffName: "Elena Rodriguez",
+      serviceName: "Ombre Nails",
+      offsetDays: 5,
+      startHour: 11,
+      status: "pending",
+    },
+    {
+      key: "appt-future-4",
+      guestName: "Sarah Kim",
+      staffName: "Sarah Jenkins",
+      serviceName: "Gel Manicure",
+      offsetDays: 7,
+      startHour: 13,
+      status: "pending",
+    },
+  ];
+
+  let appointmentCount = 0;
+  let paymentCount = 0;
+  let receiptCounter = 1;
+
+  for (const seed of appointmentSeeds) {
+    const guestId = guestByName[seed.guestName];
+    const staffId = staffByName[seed.staffName];
+    const serviceId = services.get(seed.serviceName);
+    if (!guestId || !staffId || !serviceId) continue;
+
+    const serviceData = serviceSeeds.find((s) => s.name === seed.serviceName)!;
+    const startTime = new Date(today);
+    startTime.setUTCDate(today.getUTCDate() + seed.offsetDays);
+    startTime.setUTCHours(seed.startHour, 0, 0, 0);
+    const endTime = new Date(
+      startTime.getTime() + serviceData.durationMinutes * 60 * 1000,
+    );
+
+    // Use upsert-style: find by key stored in notes, or by exact time slot
+    const existing = await prisma.appointment.findFirst({
+      where: { guestId, staffId, startTime },
+    });
+
+    const appointment = existing
+      ? await prisma.appointment.update({
+          where: { id: existing.id },
+          data: { status: seed.status, updatedAt: now },
+        })
+      : await prisma.appointment.create({
+          data: {
+            guestId,
+            staffId,
+            startTime,
+            endTime,
+            status: seed.status,
+            source: "walk_in",
+            notes: seed.key,
+            updatedAt: now,
+          },
+        });
+    appointmentCount++;
+
+    // Create appointmentservice link
+    await prisma.appointmentservice.upsert({
+      where: {
+        appointmentId_serviceId: { appointmentId: appointment.id, serviceId },
+      },
+      create: {
+        appointmentId: appointment.id,
+        serviceId,
+        staffId,
+        priceAtBooking: serviceData.price,
+        durationAtBooking: serviceData.durationMinutes,
+        status: seed.status === "completed" ? "completed" : "pending",
+      },
+      update: { status: seed.status === "completed" ? "completed" : "pending" },
+    });
+
+    // Create payment for completed appointments
+    if (seed.status === "completed" && seed.paymentMethod) {
+      const existing = await prisma.payment.findUnique({
+        where: { appointmentId: appointment.id },
+      });
+      if (!existing) {
+        const tip =
+          seed.paymentMethod === "cash"
+            ? 0
+            : Math.round(serviceData.price * 0.1);
+        await prisma.payment.create({
+          data: {
+            appointmentId: appointment.id,
+            guestId,
+            staffId,
+            amount: serviceData.price,
+            discountAmount: 0,
+            tipAmount: tip,
+            finalAmount: serviceData.price + tip,
+            paymentMethod: seed.paymentMethod,
+            paymentStatus: "paid",
+            paidAt: endTime,
+            receiptNumber: `RCP-${String(receiptCounter++).padStart(5, "0")}`,
+          },
+        });
+        paymentCount++;
+      }
+    }
+  }
+
+  // ── Historical data (5 past months) for Reports revenue chart ────────────
+  const historicalSeeds = [
+    { monthOffset: -5, count: 8,  basePrice: 45 },
+    { monthOffset: -4, count: 11, basePrice: 50 },
+    { monthOffset: -3, count: 14, basePrice: 52 },
+    { monthOffset: -2, count: 13, basePrice: 55 },
+    { monthOffset: -1, count: 18, basePrice: 58 },
+  ];
+
+  const staffIds = Object.values(staffByName);
+  const guestIds = Object.values(guestByName);
+  const allServiceIds = Array.from(services.values());
+  const allServiceSeedsArr = serviceSeeds;
+
+  for (const hist of historicalSeeds) {
+    const monthBase = new Date(today);
+    monthBase.setUTCMonth(today.getUTCMonth() + hist.monthOffset);
+    monthBase.setUTCDate(10);
+    monthBase.setUTCHours(10, 0, 0, 0);
+
+    for (let i = 0; i < hist.count; i++) {
+      const apptDate = new Date(monthBase);
+      apptDate.setUTCDate(10 + (i % 18));
+      const svcIndex = i % allServiceIds.length;
+      const svcId = allServiceIds[svcIndex];
+      const svcData = allServiceSeedsArr[svcIndex];
+      const gId = guestIds[i % guestIds.length];
+      const stId = staffIds[i % staffIds.length];
+      const endT = new Date(apptDate.getTime() + svcData.durationMinutes * 60_000);
+
+      const existing = await prisma.appointment.findFirst({
+        where: { guestId: gId, staffId: stId, startTime: apptDate },
+      });
+      const appt = existing
+        ? existing
+        : await prisma.appointment.create({
+            data: {
+              guestId: gId,
+              staffId: stId,
+              startTime: apptDate,
+              endTime: endT,
+              status: "completed",
+              notes: `hist-${hist.monthOffset}-${i}`,
+              updatedAt: now,
+            },
+          });
+
+      await prisma.appointmentservice.upsert({
+        where: { appointmentId_serviceId: { appointmentId: appt.id, serviceId: svcId } },
+        create: {
+          appointmentId: appt.id,
+          serviceId: svcId,
+          staffId: stId,
+          priceAtBooking: hist.basePrice,
+          durationAtBooking: svcData.durationMinutes,
+          status: "completed",
+        },
+        update: { status: "completed" },
+      });
+
+      const paidAt = new Date(endT);
+      const pExisting = await prisma.payment.findUnique({ where: { appointmentId: appt.id } });
+      if (!pExisting) {
+        await prisma.payment.create({
+          data: {
+            appointmentId: appt.id,
+            guestId: gId,
+            staffId: stId,
+            amount: hist.basePrice,
+            discountAmount: 0,
+            tipAmount: 0,
+            finalAmount: hist.basePrice,
+            paymentMethod: i % 2 === 0 ? "credit_card" : "cash",
+            paymentStatus: "paid",
+            paidAt,
+            receiptNumber: `RCP-H${String(receiptCounter++).padStart(5, "0")}`,
+          },
+        });
+        paymentCount++;
+      }
+      appointmentCount++;
+    }
+  }
+
   console.log(
-    `Seeded ${staffSeeds.length} staff, ${specialtyNames.length} specialties, ${guestSeeds.length} guests, and ${guestTagNames.length} guest tags.`,
+    `Seeded ${staffSeeds.length} staff, ${specialtyNames.length} specialties, ${guestSeeds.length} guests, ${guestTagNames.length} guest tags, ${categorySeeds.length} service categories, ${serviceSeeds.length} services, ${appointmentCount} appointments, ${paymentCount} payments.`,
   );
 };
 

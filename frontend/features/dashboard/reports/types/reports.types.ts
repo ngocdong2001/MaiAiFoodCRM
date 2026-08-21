@@ -3,7 +3,7 @@ export interface ReportStatMetric {
   label: string;
   value: string;
   change: string;
-  trend: "up" | "down";
+  trend: "up" | "down" | "neutral";
   icon: "revenue" | "bookings" | "ticket" | "seat";
 }
 
@@ -35,4 +35,19 @@ export interface RecentActivityItem {
   key: string;
   action: string;
   time: string;
+}
+
+// API response shape from /api/reports/summary
+export interface ReportsSummaryData {
+  metrics: Array<{
+    key: string;
+    label: string;
+    value: string;
+    rawValue: number;
+    change: string;
+    trend: "up" | "down" | "neutral";
+  }>;
+  monthlyRevenue: RevenueDataPoint[];
+  serviceBreakdown: Array<{ name: string; value: number; count: number }>;
+  weeklyUtilization: SeatUtilizationDataPoint[];
 }

@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Switch } from "@/shared/components/ui/switch";
 
-import type { DayHours } from "../../types/settings.types";
+import {
+  settingsService,
+  type DayHours,
+} from "../../services/settings.service";
 
 interface OperatingHoursSectionProps {
   initialHours: DayHours[];
@@ -14,11 +17,40 @@ const OperatingHoursSection = ({
   initialHours,
 }: OperatingHoursSectionProps) => {
   const [hours, setHours] = useState<DayHours[]>(initialHours);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    settingsService
+      .getOperatingHours()
+      .then(setHours)
+      .catch(() => {
+        /* keep initialHours on error */
+      });
+  }, []);
 
   const updateDay = (index: number, patch: Partial<DayHours>) => {
     setHours((prev) =>
       prev.map((d, i) => (i === index ? { ...d, ...patch } : d)),
     );
+    setSaveSuccess(false);
+    setSaveError(null);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+    try {
+      const saved = await settingsService.updateOperatingHours(hours);
+      setHours(saved);
+      setSaveSuccess(true);
+    } catch {
+      setSaveError("Failed to save operating hours. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -69,9 +101,19 @@ const OperatingHoursSection = ({
           ))}
         </div>
 
-        <div className="flex justify-end border-t border-[#DEE1E7] bg-[#F3F4F7]/30 px-6 py-3">
-          <button className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90">
-            Save Changes
+        <div className="flex items-center justify-between border-t border-[#DEE1E7] bg-[#F3F4F7]/30 px-6 py-3">
+          {saveError && <p className="text-sm text-destructive">{saveError}</p>}
+          {saveSuccess && (
+            <p className="text-sm text-green-600">Saved successfully.</p>
+          )}
+          {!saveError && !saveSuccess && <span />}
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90 disabled:opacity-60"
+          >
+            {isSaving ? "Saving…" : "Save Changes"}
           </button>
         </div>
       </div>

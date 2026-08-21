@@ -1,5 +1,8 @@
-import { CalendarDays, Filter, Plus, Search } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 
+import PageHeader from "@/shared/components/molecules/PageHeader";
+import SearchInput from "@/shared/components/molecules/SearchInput";
+import SelectField from "@/shared/components/molecules/SelectField";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 
@@ -39,27 +42,18 @@ const StaffToolbarSection = ({
   onAdd,
 }: StaffToolbarSectionProps) => {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-        <div>
-          <h1 className="text-[30px] font-bold tracking-tight text-[#171A21]">
-            Staff & Scheduling
-          </h1>
-          <p className="mt-1 text-base text-[#8D95A5]">
-            Manage team roster, shifts, and station assignments.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative w-full sm:w-64">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D95A5]" />
-            <Input
-              value={query}
-              onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="Search staff..."
-              className="h-10 rounded-lg border-[#DEE1E7] bg-[#F9FAFB] pl-9"
-            />
-          </div>
+    <PageHeader
+      size="lg"
+      title="Staff & Scheduling"
+      subtitle="Manage team roster, shifts, and station assignments."
+      actions={
+        <>
+          <SearchInput
+            value={query}
+            onValueChange={onQueryChange}
+            placeholder="Search staff..."
+            inputClassName="bg-[#F9FAFB]"
+          />
 
           <div className="relative">
             <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D95A5]" />
@@ -72,20 +66,18 @@ const StaffToolbarSection = ({
           </div>
 
           <div className="relative">
-            <select
+            <SelectField
               value={statusFilter}
-              onChange={(event) =>
-                onStatusFilterChange(event.target.value as "All" | StaffStatus)
+              onValueChange={(value) =>
+                onStatusFilterChange(value as "All" | StaffStatus)
               }
-              className="h-10 appearance-none rounded-lg border border-[#DEE1E7] bg-[#F9FAFB] pl-9 pr-8 text-sm font-medium text-[#171A21] outline-none"
-            >
-              {filters.map((item) => (
-                <option key={item} value={item}>
-                  {filterLabels[item]}
-                </option>
-              ))}
-            </select>
-            <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D95A5]" />
+              options={filters.map((item) => ({
+                value: item,
+                label: filterLabels[item],
+              }))}
+              ariaLabel="Filter staff by status"
+              className="h-10 w-40 rounded-lg border-[#DEE1E7] bg-[#F9FAFB] px-3 text-sm font-medium text-[#171A21]"
+            />
           </div>
 
           <Button
@@ -96,9 +88,9 @@ const StaffToolbarSection = ({
             <Plus className="h-4 w-4" />
             Add Staff
           </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 };
 

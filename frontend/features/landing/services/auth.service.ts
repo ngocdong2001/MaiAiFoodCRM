@@ -45,8 +45,10 @@ export const authService = {
       });
 
       return data;
-    } catch {
-      this.logout();
+    } catch (err: unknown) {
+      // Only invalidate session on explicit 401 Unauthorized
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 401) this.logout();
       return null;
     }
   },
@@ -64,11 +66,7 @@ export const authService = {
   },
 
   logout() {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
-      localStorage.removeItem(AUTH_TENANT_KEY);
-    }
+    useAuthStore.getState().logout();
   },
 
   refreshCurrentUser() {

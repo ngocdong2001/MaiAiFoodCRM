@@ -25,7 +25,8 @@ export const dashboardNavItems: DashboardNavItem[] = [
   { key: "calendar", label: "Calendar", href: "/dashboard/calendar" },
   { key: "crm", label: "CRM", href: "/dashboard/crm" },
   { key: "staff", label: "Staff", href: "/dashboard/staff" },
-  { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
+  { key: "services", label: "Services", href: "/dashboard/services" },
+  // { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
   { key: "reports", label: "Reports", href: "/dashboard/reports" },
   {
     key: "revenue",
@@ -38,8 +39,6 @@ export const dashboardNavItems: DashboardNavItem[] = [
     href: "/dashboard/integrations",
   },
 ];
-
-
 
 export const statCards: StatCardData[] = [
   {

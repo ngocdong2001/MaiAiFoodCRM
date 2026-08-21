@@ -4,24 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import LoginForm from "@/features/landing/components/auth/LoginForm";
-import { authService } from "@/features/landing/services/auth.service";
+import { useAuthStore } from "@/core/store/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const { hydrate, hydrated, token, user } = useAuthStore();
 
   useEffect(() => {
-    const token = authService.getStoredToken();
-    const user = authService.getStoredUser();
-    const tenant = authService.getStoredTenant();
+    if (!hydrated) {
+      hydrate();
+      return;
+    }
 
-    if (token && user && tenant) {
+    if (token && user) {
       router.replace("/dashboard/overview");
       return;
     }
 
     setReady(true);
-  }, [router]);
+  }, [hydrated, token, user, router, hydrate]);
 
   if (!ready) {
     return null;

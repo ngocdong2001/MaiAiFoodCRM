@@ -1,45 +1,108 @@
 "use client";
+import {
+  CalendarCheck2,
+  CalendarClock,
+  CheckCircle2,
+  DollarSign,
+  Users,
+  Zap,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/shared/lib/utils";
-import { statCards } from "@/features/dashboard/overview/data/data";
+import StatCard from "@/shared/components/molecules/StatCard";
+import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(n);
 
 const StatsSection = () => {
   const { t } = useTranslation();
+  const { data, isLoading } = useOverviewStats();
+  const s = data?.stats;
+
+  const cards = [
+    {
+      key: "upcoming-bookings",
+      label: t("dashboard.overview.stats.upcoming-bookings.label", {
+        defaultValue: "Upcoming Bookings",
+      }),
+      value: isLoading ? "—" : fmt(s?.upcomingBookings ?? 0),
+      hint: isLoading ? "" : `+${s?.newBookingsToday ?? 0} created today`,
+      hintTone: "positive" as const,
+      icon: CalendarClock,
+    },
+    {
+      key: "completed-today",
+      label: t("dashboard.overview.stats.completed-today.label", {
+        defaultValue: "Completed Today",
+      }),
+      value: isLoading ? "—" : fmt(s?.completedToday ?? 0),
+      hint: isLoading
+        ? ""
+        : `of ${(s?.completedToday ?? 0) + (s?.recentCheckIns ?? 0) + (s?.activePending ?? 0)} total today`,
+      hintTone: "positive" as const,
+      icon: CheckCircle2,
+    },
+    {
+      key: "today-revenue",
+      label: t("dashboard.overview.stats.today-revenue.label", {
+        defaultValue: "Today's Revenue",
+      }),
+      value: isLoading ? "—" : `$${fmt(s?.todayRevenue ?? 0)}`,
+      hint: isLoading ? "" : `from ${s?.completedToday ?? 0} paid appointments`,
+      hintTone: "positive" as const,
+      icon: DollarSign,
+    },
+    {
+      key: "active-now",
+      label: t("dashboard.overview.stats.active-now.label", {
+        defaultValue: "Active Right Now",
+      }),
+      value: isLoading ? "—" : fmt(s?.recentCheckIns ?? 0),
+      hint: "confirmed & in progress",
+      hintTone: "muted" as const,
+      icon: Zap,
+    },
+    {
+      key: "active-waitlist",
+      label: t("dashboard.overview.stats.active-waitlist.label", {
+        defaultValue: "Waiting",
+      }),
+      value: isLoading ? "—" : `${fmt(s?.activePending ?? 0)} guests`,
+      hint: "pending today",
+      hintTone: "muted" as const,
+      icon: Users,
+    },
+    {
+      key: "new-bookings",
+      label: t("dashboard.overview.stats.new-bookings.label", {
+        defaultValue: "New Bookings",
+      }),
+      value: isLoading ? "—" : fmt(s?.newBookingsToday ?? 0),
+      hint: "created today",
+      hintTone: "muted" as const,
+      icon: CalendarCheck2,
+    },
+  ];
 
   return (
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {statCards.map((card) => {
+    <section className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      {cards.map((card) => {
         const Icon = card.icon;
         return (
-          <div
+          <StatCard
             key={card.key}
-            className="rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]"
-          >
-            <div className="flex items-start justify-between">
-              <p className="text-sm font-medium text-[#8D95A5]">
-                {t(`dashboard.overview.stats.${card.key}.label`, {
-                  defaultValue: card.label,
-                })}
-              </p>
-              <Icon className="h-4 w-4 text-[#8D95A5]" />
-            </div>
-            <p className="mt-3 text-2xl font-bold text-[#171A21]">
-              {card.value}
-            </p>
-            <p
-              className={cn(
-                "mt-1 text-xs font-medium",
-                card.hintTone === "positive"
-                  ? "text-[#2FA35C]"
-                  : "text-[#8D95A5]",
-              )}
-            >
-              {t(`dashboard.overview.stats.${card.key}.hint`, {
-                defaultValue: card.hint,
-              })}
-            </p>
-          </div>
+            label={card.label}
+            value={card.value}
+            icon={<Icon className="h-4 w-4 text-[#8D95A5]" />}
+            hint={card.hint}
+            hintClassName={
+              card.hintTone === "positive" ? "text-[#2FA35C]" : "text-[#8D95A5]"
+            }
+          />
         );
       })}
     </section>

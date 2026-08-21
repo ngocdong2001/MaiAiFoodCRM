@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 
+import SelectField from "@/shared/components/molecules/SelectField";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -125,36 +126,82 @@ const StaffFormContent = ({
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Full name" required>
-              <Input value={values.name} onChange={(event) => update("name", event.target.value)} required />
+              <Input
+                value={values.name}
+                onChange={(event) => update("name", event.target.value)}
+                required
+              />
             </Field>
             <Field label="Role" required>
-              <Input value={values.role} onChange={(event) => update("role", event.target.value)} required />
+              <Input
+                value={values.role}
+                onChange={(event) => update("role", event.target.value)}
+                required
+              />
             </Field>
             <Field label="Status">
-              <select value={values.status} onChange={(event) => update("status", event.target.value as StaffStatus)} className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm outline-none">
-                <option value="active">Active</option>
-                <option value="busy">Busy</option>
-                <option value="on_leave">On Leave</option>
-              </select>
+              <SelectField
+                value={values.status}
+                onValueChange={(value) =>
+                  update("status", value as StaffStatus)
+                }
+                options={[
+                  { value: "active", label: "Active" },
+                  { value: "busy", label: "Busy" },
+                  { value: "on_leave", label: "On Leave" },
+                ]}
+                ariaLabel="Status"
+                className="h-9"
+              />
             </Field>
             <Field label="Join date">
-              <Input type="date" value={values.joinDate} onChange={(event) => update("joinDate", event.target.value)} />
+              <Input
+                type="date"
+                value={values.joinDate}
+                onChange={(event) => update("joinDate", event.target.value)}
+              />
             </Field>
             <Field label="Email">
-              <Input type="email" value={values.email} onChange={(event) => update("email", event.target.value)} />
+              <Input
+                type="email"
+                value={values.email}
+                onChange={(event) => update("email", event.target.value)}
+              />
             </Field>
             <Field label="Phone">
-              <Input value={values.phone} onChange={(event) => update("phone", event.target.value)} />
+              <Input
+                value={values.phone}
+                onChange={(event) => update("phone", event.target.value)}
+              />
             </Field>
             <Field label="Hourly rate">
-              <Input type="number" min="0" step="0.01" value={values.hourlyRate} onChange={(event) => update("hourlyRate", event.target.value)} />
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={values.hourlyRate}
+                onChange={(event) => update("hourlyRate", event.target.value)}
+              />
             </Field>
             <Field label="Commission rate (%)">
-              <Input type="number" min="0" max="100" step="0.01" value={values.commissionRate} onChange={(event) => update("commissionRate", event.target.value)} />
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={values.commissionRate}
+                onChange={(event) =>
+                  update("commissionRate", event.target.value)
+                }
+              />
             </Field>
             <div className="sm:col-span-2">
               <Field label="Avatar URL">
-                <Input type="url" value={values.avatarUrl} onChange={(event) => update("avatarUrl", event.target.value)} />
+                <Input
+                  type="url"
+                  value={values.avatarUrl}
+                  onChange={(event) => update("avatarUrl", event.target.value)}
+                />
               </Field>
             </div>
           </div>
@@ -165,11 +212,23 @@ const StaffFormContent = ({
               {specialties.map((specialty) => {
                 const checked = values.specialtyIds.includes(specialty.id);
                 return (
-                  <label key={specialty.id} className={`cursor-pointer rounded-md border px-3 py-2 text-sm ${checked ? "border-primary bg-primary/10 text-primary" : "border-[#DEE1E7]"}`}>
+                  <label
+                    key={specialty.id}
+                    className={`cursor-pointer rounded-md border px-3 py-2 text-sm ${checked ? "border-primary bg-primary/10 text-primary" : "border-[#DEE1E7]"}`}
+                  >
                     <input
                       type="checkbox"
                       checked={checked}
-                      onChange={() => update("specialtyIds", checked ? values.specialtyIds.filter((id) => id !== specialty.id) : [...values.specialtyIds, specialty.id])}
+                      onChange={() =>
+                        update(
+                          "specialtyIds",
+                          checked
+                            ? values.specialtyIds.filter(
+                                (id) => id !== specialty.id,
+                              )
+                            : [...values.specialtyIds, specialty.id],
+                        )
+                      }
                       className="sr-only"
                     />
                     {specialty.name}
@@ -182,15 +241,60 @@ const StaffFormContent = ({
           <fieldset className="rounded-lg border border-[#DEE1E7] p-4">
             <legend className="px-1 text-sm font-semibold">Schedule</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Date"><Input type="date" value={values.scheduleDate} onChange={(event) => update("scheduleDate", event.target.value)} required /></Field>
-              <Field label="Station"><Input value={values.station} onChange={(event) => update("station", event.target.value)} placeholder="Station 1" /></Field>
-              <Field label="Start time"><Input type="time" value={values.startTime} onChange={(event) => update("startTime", event.target.value)} required /></Field>
-              <Field label="End time"><Input type="time" value={values.endTime} onChange={(event) => update("endTime", event.target.value)} required /></Field>
-              <Field label="Break start"><Input type="time" value={values.breakStart} onChange={(event) => update("breakStart", event.target.value)} /></Field>
-              <Field label="Break end"><Input type="time" value={values.breakEnd} onChange={(event) => update("breakEnd", event.target.value)} /></Field>
+              <Field label="Date">
+                <Input
+                  type="date"
+                  value={values.scheduleDate}
+                  onChange={(event) =>
+                    update("scheduleDate", event.target.value)
+                  }
+                  required
+                />
+              </Field>
+              <Field label="Station">
+                <Input
+                  value={values.station}
+                  onChange={(event) => update("station", event.target.value)}
+                  placeholder="Station 1"
+                />
+              </Field>
+              <Field label="Start time">
+                <Input
+                  type="time"
+                  value={values.startTime}
+                  onChange={(event) => update("startTime", event.target.value)}
+                  required
+                />
+              </Field>
+              <Field label="End time">
+                <Input
+                  type="time"
+                  value={values.endTime}
+                  onChange={(event) => update("endTime", event.target.value)}
+                  required
+                />
+              </Field>
+              <Field label="Break start">
+                <Input
+                  type="time"
+                  value={values.breakStart}
+                  onChange={(event) => update("breakStart", event.target.value)}
+                />
+              </Field>
+              <Field label="Break end">
+                <Input
+                  type="time"
+                  value={values.breakEnd}
+                  onChange={(event) => update("breakEnd", event.target.value)}
+                />
+              </Field>
             </div>
             <label className="mt-4 flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={values.isDayOff} onChange={(event) => update("isDayOff", event.target.checked)} />
+              <input
+                type="checkbox"
+                checked={values.isDayOff}
+                onChange={(event) => update("isDayOff", event.target.checked)}
+              />
               Day off
             </label>
           </fieldset>
@@ -198,8 +302,16 @@ const StaffFormContent = ({
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <DialogFooter className="mx-0 mb-0 px-0 pb-0">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save staff"}</Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Saving..." : "Save staff"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -207,9 +319,20 @@ const StaffFormContent = ({
   );
 };
 
-const Field = ({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) => (
+const Field = ({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) => (
   <div className="space-y-1.5">
-    <Label>{label}{required ? " *" : ""}</Label>
+    <Label>
+      {label}
+      {required ? " *" : ""}
+    </Label>
     {children}
   </div>
 );

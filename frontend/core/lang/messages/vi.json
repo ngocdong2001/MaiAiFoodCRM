@@ -262,6 +262,7 @@
       "calendar": "Lịch hẹn",
       "crm": "CRM",
       "staff": "Nhân viên",
+      "services": "Dịch vụ",
       "ai-recs": "Gợi ý AI",
       "reports": "Báo cáo",
       "revenue": "Doanh thu",
@@ -340,7 +341,11 @@
           "conflict": "Nhân viên đã có lịch trong khung giờ này. Hãy chọn giờ khác hoặc đổi nhân viên.",
           "outsideHours": "Khung giờ đã chọn nằm ngoài giờ làm việc của nhân viên.",
           "breakOverlap": "Khung giờ đã chọn trùng với giờ nghỉ của nhân viên.",
-          "dayOff": "Nhân viên nghỉ vào ngày đã chọn. Hãy chọn ngày hoặc nhân viên khác."
+          "dayOff": "Nhân viên nghỉ vào ngày đã chọn. Hãy chọn ngày hoặc nhân viên khác.",
+          "storeClosed": "Cửa hàng đóng cửa vào ngày đã chọn.",
+          "outsideStoreHours": "Khung giờ đặt lịch nằm ngoài giờ hoạt động của cửa hàng. Vui lòng chọn khung giờ khác.",
+          "walkInNameRequired": "Vui lòng nhập tên khách vãng lai.",
+          "createGuestFailed": "Không thể tạo hồ sơ khách. Vui lòng thử lại."
         }
       }
     },
@@ -482,7 +487,9 @@
       "exportData": "Xuất dữ liệu"
     },
     "revenue": {
-      "title": "Tổng kết doanh thu ngày",
+      "title": "Tổng kết doanh thu trong ngày",
+      "subtitle": "Theo dõi tình hình tài chính và chi tiết giao dịch khách hàng trong ngày hôm nay.",
+      "vsYesterday": "so với hôm qua",
       "reportFilters": "Bộ lọc báo cáo",
       "exportExcel": "Xuất Excel",
       "loading": "Đang tải dữ liệu doanh thu...",
@@ -506,6 +513,18 @@
         "product-revenue": "Doanh thu sản phẩm",
         "total-orders": "Tổng đơn hàng"
       },
+      "cards": {
+        "totalCustomers": "Tổng khách phục vụ",
+        "ordersUnit": "hóa đơn",
+        "guestUnit": "khách",
+        "totalPaidOrders": "Số lượng hóa đơn đã thanh toán",
+        "avgPerStaff": "Doanh thu TB / Nhân viên",
+        "avgPerStylist": "Trung bình trên mỗi stylist",
+        "dailyRevenue": "Doanh thu trong ngày",
+        "totalReceived": "Tổng tiền thực thu",
+        "popularService": "Dịch vụ phổ biến",
+        "chosenMost": "Được chọn nhiều nhất hôm nay"
+      },
       "paymentMethodLabels": {
         "cash": "Tiền mặt",
         "transfer": "Chuyển khoản",
@@ -516,6 +535,35 @@
       "activity": {
         "walkInGuest": "Khách vãng lai",
         "paymentVia": "Thanh toán qua {{method}}"
+      },
+      "staffTable": {
+        "title": "Chi tiết doanh thu nhân viên",
+        "subtitle": "Thống kê chi tiết các khoản thu dựa trên người thực hiện dịch vụ.",
+        "searchPlaceholder": "Tìm nhân viên...",
+        "colStaff": "Nhân viên",
+        "colOrders": "Số hóa đơn",
+        "colRevenue": "Tổng doanh thu",
+        "colServices": "Dịch vụ thực hiện",
+        "colPerf": "Hiệu suất"
+      },
+      "subTable": {
+        "clickForDetail": "Nhấn biểu tượng ⋮ để xem chi tiết lịch sử phục vụ."
+      },
+      "staffDetail": {
+        "jobHistory": "Lịch sử phục vụ",
+        "noJobs": "Không có hóa đơn nào trong kỳ này.",
+        "guest": "Khách",
+        "time": "Thời gian",
+        "services": "Dịch vụ",
+        "amount": "Số tiền",
+        "discount": "Giảm giá",
+        "final": "Thực thu",
+        "paymentMethod": "Phương thức thanh toán",
+        "receipt": "Hóa đơn"
+      },
+      "perf": {
+        "good": "Tốt",
+        "stable": "Ổn định"
       },
       "revenueByStaff": "Doanh thu theo nhân viên",
       "viewDetails": "Xem chi tiết",
@@ -529,6 +577,10 @@
       "paymentDistribution": "Phân bổ thanh toán trong ngày",
       "total": "Tổng",
       "latestActivity": "Hoạt động mới nhất",
+      "info": {
+        "title": "Hướng dẫn quản trị",
+        "body": "Dữ liệu doanh thu được tổng hợp tự động từ hệ thống POS. Bạn có thể nhấn vào từng nhân viên để xem lịch sử phục vụ chi tiết."
+      },
       "readyForExport": "Sẵn sàng xuất",
       "systemSynced": "Đã đồng bộ hệ thống",
       "versionInfo": "© 2023 MaiAI Salon Management System • Phiên bản 2.4.0"
@@ -564,6 +616,88 @@
         "emailInUse": "Email này đã được sử dụng.",
         "saveError": "Không thể cập nhật hồ sơ.",
         "loading": "Đang tải hồ sơ..."
+      }
+    },
+    "services": {
+      "title": "Bảng giá dịch vụ",
+      "subtitle": "Cập nhật danh sách dịch vụ, thời gian thực hiện và đơn giá nhanh chóng theo dạng bảng tính.",
+      "searchPlaceholder": "Tìm tên dịch vụ...",
+      "filterLabel": "Bộ lọc dịch vụ",
+      "categoryGroup": "Nhóm dịch vụ",
+      "allCategories": "Tất cả nhóm",
+      "statusGroup": "Trạng thái",
+      "statusAll": "Tất cả trạng thái",
+      "statusActive": "Đang mở bán",
+      "statusInactive": "Đang tạm ẩn",
+      "summary": {
+        "totalLabel": "Tổng số dịch vụ",
+        "totalValue": "{{count}} hạng mục",
+        "categoryLabel": "Nhóm dịch vụ",
+        "categoryValue": "{{count}} phân loại",
+        "manage": "Quản lý",
+        "updatedLabel": "Cập nhật cuối",
+        "noData": "Chưa có dữ liệu",
+        "today": "Hôm nay, {{time}}",
+        "onDate": "{{date}}, {{time}}"
+      },
+      "table": {
+        "heading": "Chi tiết bảng giá",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "index": "STT",
+        "name": "Tên dịch vụ",
+        "category": "Nhóm dịch vụ",
+        "duration": "Thời lượng",
+        "price": "Giá niêm yết (đ)",
+        "loading": "Đang tải bảng giá...",
+        "empty": "Chưa có dịch vụ nào khớp với bộ lọc hiện tại.",
+        "namePlaceholder": "Tên dịch vụ",
+        "selectCategory": "Chọn nhóm...",
+        "minutes": "phút",
+        "currency": "đ",
+        "newRowLabel": "dòng mới",
+        "deleteRow": "Xóa {{name}}",
+        "addRowHint": "Bấm vào đây để thêm dịch vụ mới...",
+        "totalValue": "Tổng giá trị danh mục",
+        "averageValue": "Trung bình/dịch vụ",
+        "cancel": "Hủy bỏ",
+        "addRow": "Thêm dòng mới",
+        "finish": "Hoàn tất thiết lập"
+      },
+      "errors": {
+        "loadFailed": "Không tải được bảng giá dịch vụ từ cơ sở dữ liệu.",
+        "retry": "Thử lại",
+        "saveFailed": "Không thể lưu bảng giá dịch vụ",
+        "rowName": "Dòng {{row}}: cần nhập tên dịch vụ",
+        "rowCategory": "Dòng {{row}}: cần chọn nhóm dịch vụ",
+        "rowDuration": "Dòng {{row}}: thời lượng phải lớn hơn 0 phút",
+        "rowPrice": "Dòng {{row}}: giá niêm yết không hợp lệ"
+      },
+      "tip": {
+        "title": "Mẹo quản lý nhanh:",
+        "before": "Dữ liệu được đồng bộ với hệ thống đặt lịch MaiAI sau khi bạn nhấn \"Lưu thay đổi\". Bạn có thể nhấn",
+        "after": "ở dòng cuối cùng để tự động thêm dòng mới."
+      },
+      "reset": {
+        "title": "Hủy các thay đổi chưa lưu?",
+        "description": "Bảng giá sẽ được khôi phục về dữ liệu đang lưu trong cơ sở dữ liệu.",
+        "keep": "Giữ lại",
+        "confirm": "Hủy thay đổi"
+      },
+      "categoryDialog": {
+        "title": "Nhóm dịch vụ",
+        "description": "Thêm, sửa hoặc xóa các phân loại dùng cho bảng giá dịch vụ.",
+        "empty": "Chưa có nhóm dịch vụ nào.",
+        "serviceCount": "{{count}} dịch vụ",
+        "edit": "Sửa {{name}}",
+        "delete": "Xóa {{name}}",
+        "namePlaceholder": "Tên nhóm dịch vụ",
+        "descriptionPlaceholder": "Mô tả (tùy chọn)",
+        "nameRequired": "Tên nhóm dịch vụ là bắt buộc",
+        "cancelEdit": "Hủy sửa",
+        "create": "Thêm nhóm",
+        "update": "Cập nhật nhóm",
+        "saveError": "Không thể lưu nhóm dịch vụ"
       }
     },
     "staff": {
