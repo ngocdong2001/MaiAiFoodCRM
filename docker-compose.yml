@@ -36,13 +36,13 @@ services:
     environment:
       DATABASE_URL: mysql://maiai:maiai@mariadb:3306/maiai_crm
       DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@mariadb:3306/maiai_master}"
-      PORT: "3001"
+      PORT: "3002"
       NODE_ENV: production
       JWT_SECRET: "${JWT_SECRET:-maiai-jwt-secret-change-in-production}"
       GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
     ports:
-      - "${BACKEND_PORT:-3001}:3001"
+      - "${BACKEND_PORT:-3002}:3002"
     networks:
       - maiai-net
 
