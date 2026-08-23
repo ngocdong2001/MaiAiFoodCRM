@@ -88,4 +88,48 @@ export const SettingsController = {
         .json({ success: false, message: "Failed to update operating hours" });
     }
   },
+
+  // ── Salon settings (timezone etc.) ──────────────────────────────
+
+  async getSalonSettings(req: Request, res: Response): Promise<void> {
+    const db = req.tenantClient!;
+    try {
+      const tzRow = await db.setting.findUnique({
+        where: { key: "salon_timezone" },
+      });
+      const timezone = tzRow?.value || "UTC";
+      res.status(200).json({ success: true, data: { timezone } });
+    } catch (error) {
+      console.error("Failed to load salon settings", error);
+      res.status(500).json({ success: false, message: "Failed to load salon settings" });
+    }
+  },
+
+  async updateSalonSettings(req: Request, res: Response): Promise<void> {
+    const db = req.tenantClient!;
+    const { timezone } = req.body as { timezone?: string };
+    if (!timezone || typeof timezone !== "string") {
+      return void res
+        .status(400)
+        .json({ success: false, message: "timezone is required" });
+    }
+    try {
+      await db.setting.upsert({
+        where: { key: "salon_timezone" },
+        update: { value: timezone, updatedAt: new Date() },
+        create: {
+          key: "salon_timezone",
+          value: timezone,
+          group: "business",
+          dataType: "string",
+          label: "Salon Timezone",
+          updatedAt: new Date(),
+        },
+      });
+      res.status(200).json({ success: true, data: { timezone } });
+    } catch (error) {
+      console.error("Failed to update salon settings", error);
+      res.status(500).json({ success: false, message: "Failed to update salon settings" });
+    }
+  },
 };

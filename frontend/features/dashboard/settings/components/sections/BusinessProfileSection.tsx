@@ -1,9 +1,33 @@
 "use client";
 
 import { Mail, MapPin, Phone, Upload } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import SelectField from "@/shared/components/molecules/SelectField";
+import { settingsService } from "../../services/settings.service";
+
+const TIMEZONE_OPTIONS = [
+  "UTC",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Toronto",
+  "America/Sao_Paulo",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Europe/Moscow",
+  "Asia/Dubai",
+  "Asia/Kolkata",
+  "Asia/Bangkok",
+  "Asia/Ho_Chi_Minh",
+  "Asia/Shanghai",
+  "Asia/Tokyo",
+  "Asia/Seoul",
+  "Australia/Sydney",
+  "Pacific/Auckland",
+].map((tz) => ({ value: tz, label: tz.replace(/_/g, " ") }));
 
 const BusinessProfileSection = () => {
   const [form, setForm] = useState({
@@ -13,6 +37,11 @@ const BusinessProfileSection = () => {
     phone: "(555) 123-4567",
     address: "123 Elegance Blvd, Suite 200, Beverly Hills, CA 90210",
   });
+  const [timezone, setTimezone] = useState("UTC");
+
+  useEffect(() => {
+    settingsService.getSalonSettings().then((s) => setTimezone(s.timezone));
+  }, []);
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -115,6 +144,25 @@ const BusinessProfileSection = () => {
                 </div>
               </div>
 
+              {/* Salon Timezone */}
+              <div className="grid grid-cols-2 gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-[#171A21]">
+                    Salon Timezone
+                  </label>
+                  <SelectField
+                    value={timezone}
+                    onValueChange={setTimezone}
+                    options={TIMEZONE_OPTIONS}
+                    ariaLabel="Salon Timezone"
+                    className="rounded-[10px] border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012]"
+                  />
+                  <span className="text-xs text-[#8D95A5]">
+                    Used by the voice agent to convert booking times correctly.
+                  </span>
+                </div>
+              </div>
+
               {/* Physical Address */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-[#171A21]">
@@ -136,7 +184,10 @@ const BusinessProfileSection = () => {
 
         {/* Footer */}
         <div className="flex justify-end border-t border-[#DEE1E7] bg-[#F3F4F7]/30 px-6 py-3">
-          <button className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90">
+          <button
+            onClick={() => settingsService.updateSalonSettings({ timezone })}
+            className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90"
+          >
             Save Changes
           </button>
         </div>

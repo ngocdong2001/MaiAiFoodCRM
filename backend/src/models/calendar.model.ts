@@ -1,5 +1,6 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import type { PrismaClient } from "../generated/prisma-tenant/client.js";
+import { resolveDayScheduleFromWeekly, type DaySchedule } from "./schedule.helpers.js";
 
 export const APPOINTMENT_STATUSES = [
   "pending",
@@ -118,7 +119,7 @@ const validateRelationsAndAvailability = async (
   const datePart = input.startTime.slice(0, 10);
   const scheduleDate = new Date(`${datePart}T00:00:00.000Z`);
 
-  const [guest, staff, services, schedule, storeHoursSetting] =
+  const [guest, staff, services, overrideSchedule, storeHoursSetting] =
     await Promise.all([
       transaction.guest.findUnique({
         where: { id: input.guestId },
@@ -126,7 +127,7 @@ const validateRelationsAndAvailability = async (
       }),
       transaction.staff.findUnique({
         where: { id: input.staffId },
-        select: { status: true },
+        select: { status: true, weeklySchedule: true },
       }),
       transaction.service.findMany({
         where: { id: { in: input.serviceIds }, isActive: true },
@@ -170,33 +171,60 @@ const validateRelationsAndAvailability = async (
       );
   }
 
-  if (schedule?.isDayOff)
+  // Resolve staff schedule: override > weekly template > error
+  let resolvedSchedule: DaySchedule | null = null;
+
+  if (overrideSchedule?.isDayOff) {
     throw new CalendarDomainError("Staff is off on the selected date", 409);
-  if (schedule) {
+  }
+
+  if (overrideSchedule) {
+    // Per-day override takes priority
+    resolvedSchedule = {
+      startTime: overrideSchedule.startTime,
+      endTime: overrideSchedule.endTime,
+      breakStart: overrideSchedule.breakStart,
+      breakEnd: overrideSchedule.breakEnd,
+      station: overrideSchedule.note,
+    };
+  } else if (staff?.weeklySchedule) {
+    // Fallback to weekly template
+    resolvedSchedule = resolveDayScheduleFromWeekly(
+      staff.weeklySchedule as any,
+      datePart,
+    );
+  }
+
+  // No schedule found means staff not available
+  if (!resolvedSchedule) {
+    throw new CalendarDomainError("Staff has no working schedule for the selected date", 409);
+  }
+
+  // Validate booking against resolved schedule
+  if (
+    bookingStart < parseTime(resolvedSchedule.startTime) ||
+    bookingEnd > parseTime(resolvedSchedule.endTime)
+  )
+    throw new CalendarDomainError(
+      "Appointment is outside staff working hours",
+      409,
+    );
+
+  if (resolvedSchedule.breakStart && resolvedSchedule.breakEnd) {
+    const breakS = parseTime(resolvedSchedule.breakStart);
+    const breakE = parseTime(resolvedSchedule.breakEnd);
+    // Only validate if break data is coherent and within the shift
     if (
-      bookingStart < parseTime(schedule.startTime) ||
-      bookingEnd > parseTime(schedule.endTime)
+      breakS < breakE &&
+      breakS >= parseTime(resolvedSchedule.startTime) &&
+      breakE <= parseTime(resolvedSchedule.endTime) &&
+      bookingStart < breakE &&
+      bookingEnd > breakS
     )
       throw new CalendarDomainError(
-        "Appointment is outside staff working hours",
+        `Appointment overlaps the staff break (${resolvedSchedule.breakStart}–${resolvedSchedule.breakEnd})`,
         409,
       );
-    if (schedule.breakStart && schedule.breakEnd) {
-      const breakS = parseTime(schedule.breakStart);
-      const breakE = parseTime(schedule.breakEnd);
-      // Only validate if break data is coherent and within the shift
-      if (
-        breakS < breakE &&
-        breakS >= parseTime(schedule.startTime) &&
-        breakE <= parseTime(schedule.endTime) &&
-        bookingStart < breakE &&
-        bookingEnd > breakS
-      )
-        throw new CalendarDomainError(
-          `Appointment overlaps the staff break (${schedule.breakStart}–${schedule.breakEnd})`,
-          409,
-        );
-    }
   }
   return services;
 };

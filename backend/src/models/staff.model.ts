@@ -1,5 +1,6 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import type { PrismaClient } from "../generated/prisma-tenant/client.js";
+import { validateWeeklySchedule, getDefaultWeeklySchedule, type WeeklySchedule } from "./schedule.helpers.js";
 
 export const STAFF_STATUSES = ["active", "busy", "on_leave", "inactive"] as const;
 
@@ -26,7 +27,8 @@ export type StaffInput = {
   commissionRate?: number | null;
   joinDate?: string | null;
   specialtyIds?: number[];
-  schedule?: StaffScheduleInput | null;
+  weeklySchedule?: WeeklySchedule | null; // New: weekly template
+  schedule?: StaffScheduleInput | null; // Legacy: per-day override
 };
 
 export type StaffListFilters = {
@@ -63,6 +65,7 @@ const serializeStaff = (staff: any) => ({
   commissionRate:
     staff.commissionRate === null ? null : Number(staff.commissionRate),
   joinDate: staff.joinDate?.toISOString().slice(0, 10) ?? null,
+  weeklySchedule: staff.weeklySchedule ?? null,
   specialties: staff.staffspecialtymapping.map(
     (mapping: any) => mapping.staffspecialty,
   ),
@@ -74,18 +77,27 @@ const serializeStaff = (staff: any) => ({
   updatedAt: staff.updatedAt,
 });
 
-const buildStaffData = (input: StaffInput) => ({
-  name: input.name.trim(),
-  role: input.role.trim(),
-  status: input.status ?? "active",
-  phone: nullableText(input.phone),
-  email: nullableText(input.email)?.toLowerCase() ?? null,
-  avatarUrl: nullableText(input.avatarUrl),
-  hourlyRate: input.hourlyRate ?? null,
-  commissionRate: input.commissionRate ?? null,
-  joinDate: input.joinDate ? parseDate(input.joinDate) : null,
-  updatedAt: new Date(),
-});
+const buildStaffData = (input: StaffInput) => {
+  const data: any = {
+    name: input.name.trim(),
+    role: input.role.trim(),
+    status: input.status ?? "active",
+    phone: nullableText(input.phone),
+    email: nullableText(input.email)?.toLowerCase() ?? null,
+    avatarUrl: nullableText(input.avatarUrl),
+    hourlyRate: input.hourlyRate ?? null,
+    commissionRate: input.commissionRate ?? null,
+    joinDate: input.joinDate ? parseDate(input.joinDate) : null,
+    updatedAt: new Date(),
+  };
+
+  // Only include weeklySchedule if it's provided (Prisma JSON field handling)
+  if (input.weeklySchedule !== undefined) {
+    data.weeklySchedule = input.weeklySchedule;
+  }
+
+  return data;
+};
 
 export const StaffModel = {
   async getAll(db: PrismaClient, filters: StaffListFilters) {

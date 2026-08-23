@@ -6,7 +6,8 @@ import {
   StaffModel,
   type StaffInput,
   type StaffStatus,
-} from "../models/staff.model";
+} from "../models/staff.model.js";
+import { validateWeeklySchedule } from "../models/schedule.helpers.js";
 
 const getDb = (req: Request) => req.tenantClient!;
 
@@ -45,6 +46,14 @@ const validateInput = (body: StaffInput): string | null => {
 
   if (body.joinDate && !ISO_DATE_PATTERN.test(body.joinDate)) {
     return "Join date must use YYYY-MM-DD format";
+  }
+
+  // Validate weekly schedule if provided
+  if (body.weeklySchedule !== undefined && body.weeklySchedule !== null) {
+    const weeklyError = validateWeeklySchedule(body.weeklySchedule);
+    if (weeklyError) {
+      return `Weekly schedule error: ${weeklyError}`;
+    }
   }
 
   if (body.schedule) {

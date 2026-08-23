@@ -36,13 +36,14 @@ services:
     environment:
       DATABASE_URL: mysql://maiai:maiai@mariadb:3306/maiai_crm
       DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@mariadb:3306/maiai_master}"
-      PORT: "3002"
+      PORT: "3001"
       NODE_ENV: production
       JWT_SECRET: "${JWT_SECRET:-maiai-jwt-secret-change-in-production}"
+      VOICE_AGENT_API_KEY: "${VOICE_AGENT_API_KEY:-maiai-voice-agent-key-local-testing}"
       GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
     ports:
-      - "${BACKEND_PORT:-3002}:3002"
+      - "${BACKEND_PORT:-3001}:3001"
     networks:
       - maiai-net
 
@@ -64,6 +65,7 @@ services:
 
 volumes:
   maindatabasedata:
-    external: true
 
-network_mode: host
+networks:
+  maiai-net:
+    driver: bridge

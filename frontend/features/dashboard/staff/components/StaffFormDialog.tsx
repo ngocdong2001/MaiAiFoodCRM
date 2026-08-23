@@ -20,7 +20,9 @@ import type {
   StaffMember,
   StaffSpecialty,
   StaffStatus,
+  WeeklySchedule,
 } from "../types/staff.types";
+import { WeeklyScheduleSection } from "./WeeklyScheduleSection";
 
 type StaffFormDialogProps = {
   open: boolean;
@@ -44,6 +46,15 @@ const emptyValues = (date: string): StaffFormValues => ({
   commissionRate: "",
   joinDate: new Date().toISOString().slice(0, 10),
   specialtyIds: [],
+  weeklySchedule: {
+    monday: { active: true, startTime: "09:00", endTime: "17:00", breakStart: "12:00", breakEnd: "13:00", station: null },
+    tuesday: { active: true, startTime: "09:00", endTime: "17:00", breakStart: "12:00", breakEnd: "13:00", station: null },
+    wednesday: { active: true, startTime: "09:00", endTime: "17:00", breakStart: "12:00", breakEnd: "13:00", station: null },
+    thursday: { active: true, startTime: "09:00", endTime: "17:00", breakStart: "12:00", breakEnd: "13:00", station: null },
+    friday: { active: true, startTime: "09:00", endTime: "17:00", breakStart: "12:00", breakEnd: "13:00", station: null },
+    saturday: { active: false },
+    sunday: { active: false },
+  },
   scheduleDate: date,
   startTime: "09:00",
   endTime: "17:00",
@@ -66,6 +77,7 @@ const memberValues = (member: StaffMember, date: string): StaffFormValues => {
     commissionRate: member.commissionRate?.toString() ?? "",
     joinDate: member.joinDate ?? "",
     specialtyIds: member.specialties.map((specialty) => specialty.id),
+    weeklySchedule: member.weeklySchedule,
     scheduleDate: date,
     startTime: schedule?.startTime ?? "09:00",
     endTime: schedule?.endTime ?? "17:00",
@@ -119,7 +131,7 @@ const StaffFormContent = ({
         <DialogHeader>
           <DialogTitle>{member ? "Edit staff" : "Add staff"}</DialogTitle>
           <DialogDescription>
-            Manage profile, specialties, and the selected day&apos;s schedule.
+            Manage profile, specialties, and working hours. Set a weekly schedule once, then override for specific dates as needed.
           </DialogDescription>
         </DialogHeader>
 
@@ -239,7 +251,21 @@ const StaffFormContent = ({
           </fieldset>
 
           <fieldset className="rounded-lg border border-[#DEE1E7] p-4">
-            <legend className="px-1 text-sm font-semibold">Schedule</legend>
+            <legend className="px-1 text-sm font-semibold">Weekly Schedule Template</legend>
+            <p className="mb-4 text-xs text-gray-600">
+              Set your default working hours for each day of the week. This will be used for all appointments unless overridden.
+            </p>
+            <WeeklyScheduleSection
+              weeklySchedule={values.weeklySchedule}
+              onChange={(schedule) => update("weeklySchedule", schedule)}
+            />
+          </fieldset>
+
+          <fieldset className="rounded-lg border border-[#DEE1E7] p-4">
+            <legend className="px-1 text-sm font-semibold">Per-Date Override (Optional)</legend>
+            <p className="mb-4 text-xs text-gray-600">
+              Set a different schedule for a specific date (e.g., special shift, holiday). Leave empty to use weekly schedule.
+            </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Date">
                 <Input
@@ -248,7 +274,6 @@ const StaffFormContent = ({
                   onChange={(event) =>
                     update("scheduleDate", event.target.value)
                   }
-                  required
                 />
               </Field>
               <Field label="Station">
@@ -263,7 +288,6 @@ const StaffFormContent = ({
                   type="time"
                   value={values.startTime}
                   onChange={(event) => update("startTime", event.target.value)}
-                  required
                 />
               </Field>
               <Field label="End time">
@@ -271,7 +295,6 @@ const StaffFormContent = ({
                   type="time"
                   value={values.endTime}
                   onChange={(event) => update("endTime", event.target.value)}
-                  required
                 />
               </Field>
               <Field label="Break start">
@@ -295,7 +318,7 @@ const StaffFormContent = ({
                 checked={values.isDayOff}
                 onChange={(event) => update("isDayOff", event.target.checked)}
               />
-              Day off
+              Mark as day off
             </label>
           </fieldset>
 
