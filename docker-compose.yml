@@ -43,7 +43,7 @@ services:
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.maiai-backend.rule=Host(`${TRAEFIK_MAIAI_BACKEND_HOST:-api.maiai.tech}`)"
+      - "traefik.http.routers.maiai-backend.rule=Host(`${TRAEFIK_MAIAI_BACKEND_HOST:-crmapi.maiai.tech}`)"
       - "traefik.http.routers.maiai-backend.entrypoints=websecure"
       - "traefik.http.routers.maiai-backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.maiai-backend.loadbalancer.server.port=3002"
@@ -53,14 +53,14 @@ services:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-api.maiai.tech}/api}"
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-crmapi.maiai.tech}/api}"
     container_name: maiai-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
       PORT: "3006"
-      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-api.maiai.tech}/api}"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-crmapi.maiai.tech}/api}"
       HOSTNAME: "0.0.0.0"
     labels:
       - "traefik.enable=true"
