@@ -79,6 +79,7 @@ export type StaffCountAggregateOutputType = {
   hourlyRate: number
   commissionRate: number
   joinDate: number
+  weeklySchedule: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -138,6 +139,7 @@ export type StaffCountAggregateInputType = {
   hourlyRate?: true
   commissionRate?: true
   joinDate?: true
+  weeklySchedule?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -240,6 +242,7 @@ export type StaffGroupByOutputType = {
   hourlyRate: runtime.Decimal | null
   commissionRate: runtime.Decimal | null
   joinDate: Date | null
+  weeklySchedule: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: StaffCountAggregateOutputType | null
@@ -278,6 +281,7 @@ export type staffWhereInput = {
   hourlyRate?: Prisma.DecimalNullableFilter<"staff"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.DecimalNullableFilter<"staff"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.DateTimeNullableFilter<"staff"> | Date | string | null
+  weeklySchedule?: Prisma.JsonNullableFilter<"staff">
   createdAt?: Prisma.DateTimeFilter<"staff"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"staff"> | Date | string
   appointment?: Prisma.AppointmentListRelationFilter
@@ -298,6 +302,7 @@ export type staffOrderByWithRelationInput = {
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
   commissionRate?: Prisma.SortOrderInput | Prisma.SortOrder
   joinDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  weeklySchedule?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   appointment?: Prisma.appointmentOrderByRelationAggregateInput
@@ -322,6 +327,7 @@ export type staffWhereUniqueInput = Prisma.AtLeast<{
   hourlyRate?: Prisma.DecimalNullableFilter<"staff"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.DecimalNullableFilter<"staff"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.DateTimeNullableFilter<"staff"> | Date | string | null
+  weeklySchedule?: Prisma.JsonNullableFilter<"staff">
   createdAt?: Prisma.DateTimeFilter<"staff"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"staff"> | Date | string
   appointment?: Prisma.AppointmentListRelationFilter
@@ -342,6 +348,7 @@ export type staffOrderByWithAggregationInput = {
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
   commissionRate?: Prisma.SortOrderInput | Prisma.SortOrder
   joinDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  weeklySchedule?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.staffCountOrderByAggregateInput
@@ -365,6 +372,7 @@ export type staffScalarWhereWithAggregatesInput = {
   hourlyRate?: Prisma.DecimalNullableWithAggregatesFilter<"staff"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.DecimalNullableWithAggregatesFilter<"staff"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.DateTimeNullableWithAggregatesFilter<"staff"> | Date | string | null
+  weeklySchedule?: Prisma.JsonNullableWithAggregatesFilter<"staff">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"staff"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"staff"> | Date | string
 }
@@ -379,6 +387,7 @@ export type staffCreateInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentCreateNestedManyWithoutStaffInput
@@ -399,6 +408,7 @@ export type staffUncheckedCreateInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentUncheckedCreateNestedManyWithoutStaffInput
@@ -418,6 +428,7 @@ export type staffUpdateInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUpdateManyWithoutStaffNestedInput
@@ -438,6 +449,7 @@ export type staffUncheckedUpdateInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUncheckedUpdateManyWithoutStaffNestedInput
@@ -458,6 +470,7 @@ export type staffCreateManyInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
 }
@@ -472,6 +485,7 @@ export type staffUpdateManyMutationInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -487,6 +501,7 @@ export type staffUncheckedUpdateManyInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -518,6 +533,7 @@ export type staffCountOrderByAggregateInput = {
   hourlyRate?: Prisma.SortOrder
   commissionRate?: Prisma.SortOrder
   joinDate?: Prisma.SortOrder
+  weeklySchedule?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -648,6 +664,7 @@ export type staffCreateWithoutAppointmentInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointmentservice?: Prisma.appointmentserviceCreateNestedManyWithoutStaffInput
@@ -667,6 +684,7 @@ export type staffUncheckedCreateWithoutAppointmentInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointmentservice?: Prisma.appointmentserviceUncheckedCreateNestedManyWithoutStaffInput
@@ -701,6 +719,7 @@ export type staffUpdateWithoutAppointmentInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointmentservice?: Prisma.appointmentserviceUpdateManyWithoutStaffNestedInput
@@ -720,6 +739,7 @@ export type staffUncheckedUpdateWithoutAppointmentInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointmentservice?: Prisma.appointmentserviceUncheckedUpdateManyWithoutStaffNestedInput
@@ -738,6 +758,7 @@ export type staffCreateWithoutAppointmentserviceInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentCreateNestedManyWithoutStaffInput
@@ -757,6 +778,7 @@ export type staffUncheckedCreateWithoutAppointmentserviceInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentUncheckedCreateNestedManyWithoutStaffInput
@@ -791,6 +813,7 @@ export type staffUpdateWithoutAppointmentserviceInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUpdateManyWithoutStaffNestedInput
@@ -810,6 +833,7 @@ export type staffUncheckedUpdateWithoutAppointmentserviceInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUncheckedUpdateManyWithoutStaffNestedInput
@@ -828,6 +852,7 @@ export type staffCreateWithoutPaymentInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentCreateNestedManyWithoutStaffInput
@@ -847,6 +872,7 @@ export type staffUncheckedCreateWithoutPaymentInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentUncheckedCreateNestedManyWithoutStaffInput
@@ -881,6 +907,7 @@ export type staffUpdateWithoutPaymentInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUpdateManyWithoutStaffNestedInput
@@ -900,6 +927,7 @@ export type staffUncheckedUpdateWithoutPaymentInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUncheckedUpdateManyWithoutStaffNestedInput
@@ -918,6 +946,7 @@ export type staffCreateWithoutStaffscheduleInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentCreateNestedManyWithoutStaffInput
@@ -937,6 +966,7 @@ export type staffUncheckedCreateWithoutStaffscheduleInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentUncheckedCreateNestedManyWithoutStaffInput
@@ -971,6 +1001,7 @@ export type staffUpdateWithoutStaffscheduleInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUpdateManyWithoutStaffNestedInput
@@ -990,6 +1021,7 @@ export type staffUncheckedUpdateWithoutStaffscheduleInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUncheckedUpdateManyWithoutStaffNestedInput
@@ -1008,6 +1040,7 @@ export type staffCreateWithoutStaffspecialtymappingInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentCreateNestedManyWithoutStaffInput
@@ -1027,6 +1060,7 @@ export type staffUncheckedCreateWithoutStaffspecialtymappingInput = {
   hourlyRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt: Date | string
   appointment?: Prisma.appointmentUncheckedCreateNestedManyWithoutStaffInput
@@ -1061,6 +1095,7 @@ export type staffUpdateWithoutStaffspecialtymappingInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUpdateManyWithoutStaffNestedInput
@@ -1080,6 +1115,7 @@ export type staffUncheckedUpdateWithoutStaffspecialtymappingInput = {
   hourlyRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weeklySchedule?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.appointmentUncheckedUpdateManyWithoutStaffNestedInput
@@ -1166,6 +1202,7 @@ export type staffSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   hourlyRate?: boolean
   commissionRate?: boolean
   joinDate?: boolean
+  weeklySchedule?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   appointment?: boolean | Prisma.staff$appointmentArgs<ExtArgs>
@@ -1189,11 +1226,12 @@ export type staffSelectScalar = {
   hourlyRate?: boolean
   commissionRate?: boolean
   joinDate?: boolean
+  weeklySchedule?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type staffOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "role" | "status" | "phone" | "email" | "avatarUrl" | "hourlyRate" | "commissionRate" | "joinDate" | "createdAt" | "updatedAt", ExtArgs["result"]["staff"]>
+export type staffOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "role" | "status" | "phone" | "email" | "avatarUrl" | "hourlyRate" | "commissionRate" | "joinDate" | "weeklySchedule" | "createdAt" | "updatedAt", ExtArgs["result"]["staff"]>
 export type staffInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   appointment?: boolean | Prisma.staff$appointmentArgs<ExtArgs>
   appointmentservice?: boolean | Prisma.staff$appointmentserviceArgs<ExtArgs>
@@ -1223,6 +1261,7 @@ export type $staffPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     hourlyRate: runtime.Decimal | null
     commissionRate: runtime.Decimal | null
     joinDate: Date | null
+    weeklySchedule: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["staff"]>
@@ -1609,6 +1648,7 @@ export interface staffFieldRefs {
   readonly hourlyRate: Prisma.FieldRef<"staff", 'Decimal'>
   readonly commissionRate: Prisma.FieldRef<"staff", 'Decimal'>
   readonly joinDate: Prisma.FieldRef<"staff", 'DateTime'>
+  readonly weeklySchedule: Prisma.FieldRef<"staff", 'Json'>
   readonly createdAt: Prisma.FieldRef<"staff", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"staff", 'DateTime'>
 }

@@ -524,10 +524,10 @@ export const CalendarModel = {
     const targetDate = new Date(`${params.date}T00:00:00.000Z`);
     const dayOfWeek = targetDate.getDay();
 
-    // Get active staff and their schedules
+    // Get active staff with their weeklySchedule template
     const staffList = await db.staff.findMany({
       where: { status: { notIn: ["inactive", "on_leave"] } },
-      select: { id: true, name: true, role: true },
+      select: { id: true, name: true, role: true, weeklySchedule: true },
     });
 
     const staffIds = staffList.map((s) => s.id);
@@ -539,7 +539,7 @@ export const CalendarModel = {
       ? staffIds.filter((id) => id === params.staffId)
       : staffIds;
 
-    // Get staff schedules for the day
+    // Get per-date overrides from staffschedule
     const schedules = await db.staffschedule.findMany({
       where: {
         staffId: { in: effectiveStaffIds },
@@ -547,7 +547,7 @@ export const CalendarModel = {
       },
     });
 
-    const scheduleMap = new Map(
+    const overrideMap = new Map(
       schedules.map((s) => [
         s.staffId,
         {
@@ -559,6 +559,31 @@ export const CalendarModel = {
         },
       ]),
     );
+
+    // Resolve schedule per staff: per-date override > weeklySchedule template
+    const datePart = params.date;
+    const scheduleMap = new Map<number, { startTime: string; endTime: string; isDayOff: boolean; breakStart: string | null; breakEnd: string | null }>();
+    for (const staff of staffList) {
+      if (!effectiveStaffIds.includes(staff.id)) continue;
+
+      const override = overrideMap.get(staff.id);
+      if (override) {
+        // Per-date override takes priority
+        scheduleMap.set(staff.id, override);
+      } else if (staff.weeklySchedule) {
+        // Fallback to weekly template
+        const resolved = resolveDayScheduleFromWeekly(staff.weeklySchedule as any, datePart);
+        if (resolved) {
+          scheduleMap.set(staff.id, {
+            startTime: resolved.startTime,
+            endTime: resolved.endTime,
+            isDayOff: false,
+            breakStart: resolved.breakStart ?? null,
+            breakEnd: resolved.breakEnd ?? null,
+          });
+        }
+      }
+    }
 
     // Get existing appointments for the date
     const dayStart = new Date(`${params.date}T00:00:00.000Z`);

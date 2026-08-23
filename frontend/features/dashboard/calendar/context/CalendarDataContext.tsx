@@ -72,7 +72,9 @@ export const CalendarDataProvider = ({ children }: { children: ReactNode }) => {
   );
   const events = useMemo(
     () =>
-      (appointments.data ?? []).map((appointment) => {
+      (appointments.data ?? [])
+        .filter((appointment) => appointment.status !== "cancelled")
+        .map((appointment) => {
         const startTime = new Date(appointment.startTime);
         const endTime = new Date(appointment.endTime);
         return {
