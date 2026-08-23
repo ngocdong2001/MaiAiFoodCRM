@@ -1,5 +1,5 @@
 services:
-  mariadb:
+  maiai-mariadb:
     image: mariadb:11.8
     container_name: maiai-mariadb
     restart: unless-stopped
@@ -9,11 +9,10 @@ services:
       MYSQL_PASSWORD: maiai
       MYSQL_ROOT_PASSWORD: rootpassword
     command:
+      - --port=3308
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --max-connections=200
-    ports:
-      - "${MARIADB_PORT:-3307}:3306"
     volumes:
       - maindatabasedata:/var/lib/mysql
     healthcheck:
@@ -22,8 +21,7 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-    networks:
-      - maiai-net
+    network_mode: host
 
   backend:
     build:
@@ -34,38 +32,31 @@ services:
       mariadb:
         condition: service_healthy
     environment:
-      DATABASE_URL: mysql://maiai:maiai@mariadb:3306/maiai_crm
-      DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@mariadb:3306/maiai_master}"
-      PORT: "3001"
+      DATABASE_URL: "${DATABASE_URL:-mysql://maiai:maiai@127.0.0.1:3308/maiai_crm}"
+      DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@127.0.0.1:3308/maiai_master}"
+      DATABASE_URL_TENANT: "${DATABASE_URL_TENANT:-mysql://maiai:maiai@127.0.0.1:3308/maiai_crm_1}"
+      PORT: "3002"
       NODE_ENV: production
       JWT_SECRET: "${JWT_SECRET:-maiai-jwt-secret-change-in-production}"
       VOICE_AGENT_API_KEY: "${VOICE_AGENT_API_KEY:-maiai-voice-agent-key-local-testing}"
       GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
-    ports:
-      - "${BACKEND_PORT:-3001}:3001"
-    networks:
-      - maiai-net
+    network_mode: host
 
   frontend:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}"
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
     container_name: maiai-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}"
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-    networks:
-      - maiai-net
+      PORT: "3006"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
+      HOSTNAME: "0.0.0.0"
+    network_mode: host
 
 volumes:
   maindatabasedata:
-
-networks:
-  maiai-net:
-    driver: bridge
