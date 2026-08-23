@@ -41,21 +41,33 @@ services:
       VOICE_AGENT_API_KEY: "${VOICE_AGENT_API_KEY:-maiai-voice-agent-key-local-testing}"
       GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maiai-backend.rule=Host(`${TRAEFIK_MAIAI_BACKEND_HOST:-api.maiai.tech}`)"
+      - "traefik.http.routers.maiai-backend.entrypoints=websecure"
+      - "traefik.http.routers.maiai-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.maiai-backend.loadbalancer.server.port=3002"
     network_mode: host
 
   frontend:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-api.maiai.tech}/api}"
     container_name: maiai-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
       PORT: "3006"
-      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-api.maiai.tech}/api}"
       HOSTNAME: "0.0.0.0"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maiai-frontend.rule=Host(`${TRAEFIK_MAIAI_FRONTEND_HOST:-crm.maiai.tech}`)"
+      - "traefik.http.routers.maiai-frontend.entrypoints=websecure"
+      - "traefik.http.routers.maiai-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.maiai-frontend.loadbalancer.server.port=3006"
     network_mode: host
 
 volumes:
