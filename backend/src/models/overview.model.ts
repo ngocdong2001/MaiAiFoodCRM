@@ -14,6 +14,7 @@ export type QueueItem = {
   guestName: string;
   serviceName: string;
   startTime: string;
+  notes: string | null;
   status: string;
   urgent: boolean;
 };
@@ -122,6 +123,7 @@ export const OverviewModel = {
         select: {
           id: true,
           startTime: true,
+          notes: true,
           status: true,
           guest: { select: { name: true } },
           appointmentservice: {
@@ -159,7 +161,12 @@ export const OverviewModel = {
       }),
       // Staff on duty today — match staffschedule.date (stored as UTC midnight DATE)
       prisma.staffschedule.findMany({
-        where: { date: new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z"), isDayOff: false },
+        where: {
+          date: new Date(
+            new Date().toISOString().slice(0, 10) + "T00:00:00.000Z",
+          ),
+          isDayOff: false,
+        },
         select: {
           staff: {
             select: {
@@ -188,6 +195,7 @@ export const OverviewModel = {
       guestName: row.guest?.name ?? "Walk-in Guest",
       serviceName: row.appointmentservice[0]?.service.name ?? "—",
       startTime: row.startTime.toISOString(),
+      notes: row.notes,
       status: row.status,
       urgent: row.startTime <= urgentThreshold,
     }));

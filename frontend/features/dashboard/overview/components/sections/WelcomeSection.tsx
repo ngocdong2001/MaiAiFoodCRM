@@ -9,7 +9,7 @@ import { BookingFormContent } from "@/features/dashboard/calendar/components/Boo
 const WelcomeSection = () => {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
-  const firstName = user?.name?.split(" ")[0] ?? "there";
+  const firstName = user?.name?.split(" ")[0] ?? t("dashboard.overview.welcome.fallbackName");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [openAsWalkIn, setOpenAsWalkIn] = useState(false);
 

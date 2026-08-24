@@ -1,4 +1,5 @@
 {
+  "nullText": "Trống",
   "header": {
     "nav": {
       "features": "Tính năng",
@@ -351,100 +352,88 @@
     },
     "overview": {
       "welcome": {
-        "title": "Chào mừng, {{name}}!",
-        "subtitle": "Đây là tổng quan tiệm của bạn trong hôm nay, ngày 24 tháng 9 năm 2023.",
-        "newBooking": "Tạo lịch hẹn",
-        "addWalkIn": "Thêm khách vãng lai"
+        "title": "Xin chào, {{name}}!",
+        "subtitle": "Đây là tổng quan salon của bạn hôm nay, ngày 24 tháng 9 năm 2023.",
+        "newBooking": "Đặt lịch mới",
+        "addWalkIn": "Khách vãng lai",
+        "fallbackName": "bạn"
       },
       "alerts": {
-        "title": "Cảnh báo quan trọng",
-        "message": "Kết nối lịch với Google Calendar đang bị lệch đồng bộ. Vui lòng kiểm tra cài đặt để xử lý.",
+        "title": "Thông báo quan trọng",
+        "message": "Tích hợp Google Calendar của bạn đang bị mất đồng bộ. Vui lòng kiểm tra cài đặt để khắc phục.",
         "reviewSettings": "Xem cài đặt"
       },
       "stats": {
         "upcoming-bookings": {
           "label": "Lịch hẹn sắp tới",
-          "hint": "+5 hôm nay"
+          "hint": "+{{count}} hôm nay"
         },
         "seat-utilization": {
-          "label": "Tỷ lệ sử dụng ghế hôm nay",
-          "hint": "Tăng 12% so với trung bình"
+          "label": "Hiệu suất chỗ ngồi",
+          "hint": "Tăng {{percent}}% so với TB"
         },
-        "active-waitlist": {
-          "label": "Khách chờ hiện tại",
-          "hint": "Không đổi"
+        "waitlist": {
+          "label": "Danh sách chờ",
+          "value": "Khách",
+          "hint": "Không thay đổi"
         },
         "guest-activity": {
-          "label": "Hoạt động khách gần đây",
+          "label": "Hoạt động khách hàng",
+          "value": "lượt check-in",
           "hint": "24 giờ qua"
         }
       },
       "snapshot": {
-        "title": "Tổng quan hôm nay",
-        "subtitle": "Lịch hẹn sắp tới và ca làm của nhân viên",
-        "items": {
-          "haircut-style": {
-            "title": "Cắt và tạo kiểu cùng Emily"
-          },
-          "mani-pedi": {
-            "title": "Làm tay và chân cùng Sophia"
-          },
-          "lunch-break": {
-            "title": "Nghỉ trưa (Emily)!"
-          },
-          "color-treatment": {
-            "title": "Nhuộm tóc cùng Emily"
-          },
-          "stylist-arrives": {
-            "title": "Stylist Sophia bắt đầu ca"
-          }
-        }
+        "title": "Tổng quan lịch trình",
+        "subtitle": "Lịch hẹn sắp tới và ca làm việc",
+        "loading": "Đang tải…",
+        "empty": "Không có lịch hẹn nào cho hôm nay."
       },
       "queue": {
-        "title": "Hàng chờ trực tiếp",
-        "subtitle": "Khách đang chờ hoặc vừa check-in",
-        "viewFullQueue": "Xem toàn bộ hàng chờ",
-        "items": {
-          "oliver-chen": {
-            "service": "Cắt tóc vãng lai",
-            "status": "10 phút"
-          },
-          "chloe-davis": {
-            "service": "Tư vấn nhuộm",
-            "status": "5 phút"
-          },
-          "liam-white": {
-            "service": "Gội và sấy",
-            "status": "Sẵn sàng"
-          },
-          "ava-martinez": {
-            "service": "Dưỡng sâu",
-            "status": "15 phút"
-          },
-          "noah-brown": {
-            "service": "Tỉa tóc vãng lai",
-            "status": "Mới"
-          }
+        "title": "Hàng đợi Trực tiếp",
+        "subtitle": "Theo dõi và quản lý lịch hẹn trong ngày hôm nay",
+        "viewFullQueue": "Xem toàn bộ hàng đợi",
+        "loading": "Đang tải…",
+        "empty": "Không có lịch hẹn nào hôm nay.",
+        "col": {
+          "guest": "Tên Khách Hàng",
+          "service": "Loại Dịch Vụ/Hẹn",
+          "notes": "Ghi chú/Yêu cầu đặc biệt",
+          "status": "Trạng thái"
+        },
+        "status": {
+          "waiting": "Đang chờ",
+          "ready": "Sẵn sàng"
         }
       },
       "recentGuests": {
-        "title": "Khách gần đây",
-        "subtitle": "Tương tác khách mới nhất",
+        "title": "Khách hàng Gần đây",
+        "subtitle": "Các tương tác khách hàng mới nhất",
         "viewAll": "Xem tất cả khách",
-        "items": {
-          "emily-chen": {
-            "meta": "2 giờ trước"
-          },
-          "david-kim": {
-            "meta": "Hôm qua"
-          },
-          "sophia-miller": {
-            "meta": "3 ngày trước"
-          },
-          "michael-lee": {
-            "meta": "Tuần trước"
-          }
+        "loading": "Đang tải…",
+        "empty": "Không có khách gần đây.",
+        "time": {
+          "minAgo": "{{count}} phút trước",
+          "hourAgo": "{{count}} giờ trước",
+          "hoursAgo": "{{count}} giờ trước",
+          "yesterday": "Hôm qua",
+          "daysAgo": "{{count}} ngày trước",
+          "lastWeek": "Tuần trước"
         }
+      },
+      "staffOnDuty": {
+        "title": "Nhân viên đang làm",
+        "subtitle": "Đội ngũ trực hôm nay",
+        "loading": "Đang tải…",
+        "empty": "Không có nhân viên trực hôm nay.",
+        "status": {
+          "active": "Sẵn sàng",
+          "busy": "Bận",
+          "on_leave": "Nghỉ phép",
+          "inactive": "Nghỉ"
+        },
+        "active": "đang làm",
+        "appointments": "lịch hẹn"
       },
       "aiRecommendations": {
         "title": "Gợi ý AI",
@@ -523,7 +512,8 @@
         "dailyRevenue": "Doanh thu trong ngày",
         "totalReceived": "Tổng tiền thực thu",
         "popularService": "Dịch vụ phổ biến",
-        "chosenMost": "Được chọn nhiều nhất hôm nay"
+        "chosenMost": "Được chọn nhiều nhất hôm nay",
+        "hot": "Nổi bật"
       },
       "paymentMethodLabels": {
         "cash": "Tiền mặt",
@@ -683,6 +673,12 @@
         "description": "Bảng giá sẽ được khôi phục về dữ liệu đang lưu trong cơ sở dữ liệu.",
         "keep": "Giữ lại",
         "confirm": "Hủy thay đổi"
+      },
+      "deleteConfirm": {
+        "title": "Xóa dịch vụ?",
+        "description": "Bạn có chắc chắn muốn xóa \"{{name}}\"? Hành động này không thể hoàn tác.",
+        "cancel": "Hủy",
+        "confirm": "Xóa"
       },
       "categoryDialog": {
         "title": "Nhóm dịch vụ",

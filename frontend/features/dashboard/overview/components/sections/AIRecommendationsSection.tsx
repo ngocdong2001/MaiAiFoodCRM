@@ -31,17 +31,11 @@ const AIRecommendationsSection = () => {
                   <p className="text-sm font-medium text-[#171A21]">
                     {t(
                       `dashboard.overview.aiRecommendations.items.${rec.key}.title`,
-                      {
-                        defaultValue: rec.title,
-                      },
                     )}
                   </p>
                   <p className="mt-0.5 text-xs text-[#8D95A5]">
                     {t(
                       `dashboard.overview.aiRecommendations.items.${rec.key}.description`,
-                      {
-                        defaultValue: rec.description,
-                      },
                     )}
                   </p>
                 </div>

@@ -1,7 +1,6 @@
 "use client";
 
-import { Lightbulb } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
@@ -104,7 +103,11 @@ const ServicesPage = () => {
     () => signature(services.map(toDraftRow)),
     [services],
   );
-  const isDirty = signature(rows) !== baseline || removedIds.length > 0;
+  // Blank draft rows (no name yet) don't count as a real change, so they never
+  // trigger autosave/refetch while the user is still filling them in.
+  const meaningfulRows = rows.filter((row) => row.id !== null || row.name.trim());
+  const meaningfulSignature = signature(meaningfulRows);
+  const isDirty = meaningfulSignature !== baseline || removedIds.length > 0;
 
   const visibleRows = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -162,11 +165,10 @@ const ServicesPage = () => {
   };
 
   const save = async () => {
-    for (const [index, row] of rows.entries()) {
-      if (!row.name.trim()) {
-        setError(t("dashboard.services.errors.rowName", { row: index + 1 }));
-        return;
-      }
+    // Filter out rows with empty names (silently skip them)
+    const validRows = rows.filter((row) => row.name.trim());
+
+    for (const [index, row] of validRows.entries()) {
       if (!row.categoryId) {
         setError(
           t("dashboard.services.errors.rowCategory", { row: index + 1 }),
@@ -188,7 +190,7 @@ const ServicesPage = () => {
     setError(null);
     try {
       await bulkSave.mutateAsync({
-        upserts: rows.map((row, index) => ({
+        upserts: validRows.map((row, index) => ({
           ...(row.id ? { id: row.id } : {}),
           name: row.name.trim(),
           description: row.description,
@@ -208,6 +210,20 @@ const ServicesPage = () => {
       );
     }
   };
+
+  // Auto-save when changes are detected (debounced 800ms)
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!isDirty) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => {
+      save();
+    }, 800);
+    return () => {
+      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDirty, meaningfulSignature, removedIds]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -250,24 +266,6 @@ const ServicesPage = () => {
           onReset={() => setPendingReset(true)}
         />
       )}
-
-      <div className="flex items-start gap-3 rounded-xl border border-[#F6D6E3] bg-[#FDF2F7] px-5 py-4">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F9D3E1] text-[#E5397F]">
-          <Lightbulb className="h-4 w-4" />
-        </span>
-        <div>
-          <p className="text-sm font-semibold text-[#171A21]">
-            {t("dashboard.services.tip.title")}
-          </p>
-          <p className="mt-1 text-sm text-[#8D95A5]">
-            {t("dashboard.services.tip.before")}{" "}
-            <kbd className="rounded border border-[#DEE1E7] bg-white px-1.5 py-0.5 text-[11px] text-[#171A21]">
-              Enter
-            </kbd>{" "}
-            {t("dashboard.services.tip.after")}
-          </p>
-        </div>
-      </div>
 
       <ServiceCategoryDialog
         open={categoryDialogOpen}

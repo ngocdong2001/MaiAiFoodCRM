@@ -2,7 +2,6 @@
 
 import {
   Banknote,
-  ChevronRight,
   CreditCard,
   Smartphone,
   Star,
@@ -14,11 +13,6 @@ import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import { Badge } from "@/shared/components/ui/badge";
-import {
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/shared/components/ui/accordion";
 import {
   Dialog,
   DialogContent,
@@ -198,25 +192,20 @@ function JobDetailDialog({ job, onClose }: JobDialogProps) {
   );
 }
 
-// ── Main accordion item ────────────────────────────────────────────────────────
+// ── Main row (always expanded) ────────────────────────────────────────────────
 interface Props {
   row: StaffRevenueRow;
-  index: number;
-  isGood: boolean;
   dateRange?: { startDate?: string; endDate?: string };
 }
 
 export function StaffRevenueAccordionItem({
   row,
-  index,
-  isGood,
   dateRange,
 }: Props) {
   const { t } = useTranslation();
   const [detail, setDetail] = useState<StaffRevenueDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fetched, setFetched] = useState(false);
   const [selectedJob, setSelectedJob] = useState<StaffRevenueDetailJob | null>(
     null,
   );
@@ -231,236 +220,133 @@ export function StaffRevenueAccordionItem({
       .finally(() => setIsLoading(false));
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open || fetched) return;
-    setFetched(true);
-    fetchDetail();
-  };
-
-  // Re-fetch when dateRange changes after first open
   useEffect(() => {
-    if (!fetched) return;
     fetchDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange?.startDate, dateRange?.endDate]);
+  }, [row.key, dateRange?.startDate, dateRange?.endDate]);
 
   return (
     <>
-      <AccordionItem
-        value={row.key}
-        onOpenChange={handleOpenChange}
-        className="border-b border-[#DFE1E4] last:border-b-0"
-      >
-        <AccordionTrigger className="items-center px-0 py-0 hover:no-underline [&_[data-slot=accordion-trigger-icon]]:ml-0 [&_[data-slot=accordion-trigger-icon]]:mr-4 [&_[data-slot=accordion-trigger-icon]]:text-[#C4C9D4]">
-          <div className="flex w-full items-center gap-0 transition-colors hover:bg-[#FFF3F8]/40">
-            {/* Rank badge */}
-            <div className="flex w-10 shrink-0 items-center justify-center self-stretch bg-[#FAFAFA] text-sm font-bold text-[#9DA1A7]">
-              {index + 1}
-            </div>
-
-            {/* Avatar + name */}
-            <div className="flex flex-1 items-center gap-3 px-4 py-4">
-              {row.avatarUrl ? (
-                <img
-                  src={row.avatarUrl}
-                  alt={row.staffName}
-                  className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-[#f04cac]/10"
-                />
-              ) : (
-                <InitialsAvatar
-                  name={row.staffName}
-                  className="h-10 w-10 shrink-0"
-                />
-              )}
-              <div className="min-w-0 text-left">
-                <p className="truncate text-sm font-semibold text-[#1A1A1A]">
-                  {row.staffName}
-                </p>
-                {(row.recentServiceNames ?? []).length > 0 && (
-                  <div className="mt-0.5 flex flex-wrap gap-1">
-                    {row.recentServiceNames.slice(0, 2).map((name) => (
-                      <span
-                        key={name}
-                        className="rounded-full bg-[#EAECEE]/80 px-2 py-px text-[10px] text-[#6B7280]"
-                      >
-                        {name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="h-10 w-px shrink-0 bg-[#F3F4F6]" />
-
-            {/* Stat: orders */}
-            <div className="hidden w-32 shrink-0 flex-col items-center px-4 py-4 sm:flex">
-              <p className="text-lg font-bold text-[#1A1A1A]">{row.services}</p>
-              <p className="text-[11px] text-[#9DA1A7]">
-                {t("dashboard.revenue.cards.ordersUnit")}
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div className="hidden h-10 w-px shrink-0 bg-[#F3F4F6] sm:block" />
-
-            {/* Stat: revenue */}
-            <div className="flex w-36 shrink-0 flex-col items-center px-4 py-4">
-              <p className="text-lg font-bold text-[#f04cac]">
-                {fmt(row.totalRevenue)}
-              </p>
-              <p className="text-[11px] text-[#9DA1A7]">
-                {t("dashboard.revenue.staffTable.colRevenue")}
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div className="h-10 w-px shrink-0 bg-[#F3F4F6]" />
-
-            {/* Perf badge */}
-            <div className="flex w-28 shrink-0 items-center justify-center px-4 py-4">
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                  isGood
-                    ? "bg-[#ECFDF5] text-[#059669]"
-                    : "bg-[#FFF7ED] text-[#EA580C]"
-                }`}
-              >
-                {isGood
-                  ? t("dashboard.revenue.perf.good")
-                  : t("dashboard.revenue.perf.stable")}
-              </span>
-            </div>
+      {/* Data row */}
+      <div className="flex w-full items-center border-b border-[#DFE1E4] last:border-b-0">
+        {/* Nhân viên */}
+        <div className="flex w-[320px] shrink-0 items-center gap-3 px-6 py-4">
+          {row.avatarUrl ? (
+            <img
+              src={row.avatarUrl}
+              alt={row.staffName}
+              className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-[#f04cac]/10"
+            />
+          ) : (
+            <InitialsAvatar name={row.staffName} className="h-10 w-10 shrink-0" />
+          )}
+          <div className="min-w-0 text-left">
+            <p className="truncate text-sm font-semibold text-[#1A1A1A]">{row.staffName}</p>
+            <p className="text-xs text-[#9DA1A7]">
+              ID: #{row.key}
+            </p>
           </div>
-        </AccordionTrigger>
+        </div>
 
-        <AccordionContent className="pb-4 pt-0">
-          {isLoading && (
-            <p className="px-6 py-3 text-sm text-[#9DA1A7]">
-              {t("dashboard.revenue.loading")}
-            </p>
-          )}
-          {error && <p className="px-6 py-3 text-sm text-red-600">{error}</p>}
-          {detail && detail.jobs.length === 0 && (
-            <p className="px-6 py-3 text-sm text-[#9DA1A7]">
-              {t("dashboard.revenue.staffDetail.noJobs", {
-                defaultValue: "No jobs found.",
-              })}
-            </p>
-          )}
+        {/* Số hóa đơn */}
+        <div className="flex w-35 shrink-0 items-center justify-center px-4 py-4">
+          <span className="text-sm font-bold text-[#1D1F23]">{row.services}</span>
+          <span className="ml-1 text-xs text-[#9DA1A7]">
+            {t("dashboard.revenue.staffTable.colOrders")}
+          </span>
+        </div>
 
-          {(detail?.jobs ?? []).length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-y border-[#F3F4F6] bg-[#FAFAFA]">
-                    <th className="px-6 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-                      {t("dashboard.revenue.staffDetail.guest", {
-                        defaultValue: "Khách",
-                      })}
-                    </th>
-                    <th className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-                      {t("dashboard.revenue.staffDetail.services", {
-                        defaultValue: "Dịch vụ",
-                      })}
-                    </th>
-                    <th className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-                      {t("dashboard.revenue.staffDetail.paymentMethod", {
-                        defaultValue: "Thanh toán",
-                      })}
-                    </th>
-                    <th className="px-4 py-2.5 text-right text-[11px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-                      {t("dashboard.revenue.staffDetail.final", {
-                        defaultValue: "Thực thu",
-                      })}
-                    </th>
-                    <th className="px-4 py-2.5 text-right text-[11px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-                      {t("dashboard.revenue.staffDetail.time", {
-                        defaultValue: "Thời gian",
-                      })}
-                    </th>
-                    <th className="w-10 px-2" />
+        {/* Tổng doanh thu */}
+        <div className="flex w-40 shrink-0 items-center px-4 py-4">
+          <span className="text-sm font-bold text-[#f04cac]">{fmt(row.totalRevenue)}</span>
+        </div>
+
+        {/* Dịch vụ thực hiện */}
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 px-4 py-4">
+          {(row.recentServiceNames ?? []).slice(0, 2).map((name) => (
+            <span
+              key={name}
+              className="shrink-0 rounded-full bg-[#EAECEE]/80 px-2.5 py-1 text-[11px] text-[#1D1F23]"
+            >
+              {name}
+            </span>
+          ))}
+        </div>
+
+        {/* Menu */}
+        <div className="flex w-10 shrink-0 items-center justify-center">
+          <button className="flex h-8 w-8 items-center justify-center rounded-[6px] transition-colors hover:bg-[#F3F4F6]">
+            <span className="text-lg leading-none text-[#9DA1A7]">⋮</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Detail section */}
+      <div className="border-t border-[#F3F4F6] bg-[#FAFAFA]/50">
+        {isLoading && (
+          <p className="px-6 py-3 text-sm text-[#9DA1A7]">
+            {t("dashboard.revenue.loading")}
+          </p>
+        )}
+        {error && <p className="px-6 py-3 text-sm text-red-600">{error}</p>}
+        {detail && detail.jobs.length === 0 && (
+          <p className="px-6 py-3 text-sm text-[#9DA1A7]">
+            {t("dashboard.revenue.staffDetail.noJobs")}
+          </p>
+        )}
+
+        {(detail?.jobs ?? []).length > 0 && (
+          <div className="overflow-x-auto px-6 py-4">
+            <table className="w-full border-collapse overflow-hidden rounded-[6px]">
+              <thead>
+                <tr>
+                  <th className="px-4 py-1 text-left text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
+                    {t("dashboard.revenue.staffDetail.guest")}
+                  </th>
+                  <th className="px-4 py-1 text-left text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
+                    {t("dashboard.revenue.staffTable.colServices")}
+                  </th>
+                  <th className="px-4 py-1 text-right text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
+                    {t("dashboard.revenue.table.totalRevenue")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {detail!.jobs.map((job) => (
+                  <tr
+                    key={job.paymentId}
+                    onClick={() => setSelectedJob(job)}
+                    className="h-9 cursor-pointer border-b border-[#DFE1E4] transition-colors last:border-b-0 hover:bg-white"
+                  >
+                    <td className="px-4 text-sm font-medium text-[#1D1F23]">
+                      {job.guestName}
+                    </td>
+                    <td className="px-4">
+                      <div className="flex flex-wrap gap-1">
+                        {job.services.length > 0 ? (
+                          job.services.map((s) => (
+                            <span key={s.serviceId} className="text-sm text-[#1D1F23]">
+                              {s.serviceName}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-sm text-[#9DA1A7]">—</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 text-right text-sm font-bold text-[#1D1F23]">
+                      {fmt(job.finalAmount)}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {detail!.jobs.map((job) => (
-                    <tr
-                      key={job.paymentId}
-                      onClick={() => setSelectedJob(job)}
-                      className="cursor-pointer border-b border-[#F3F4F6] transition-colors hover:bg-[#FFF3F8]/40 last:border-b-0"
-                    >
-                      <td className="px-6 py-3">
-                        <div className="flex items-center gap-2.5">
-                          {job.guestAvatarUrl ? (
-                            <img
-                              src={job.guestAvatarUrl}
-                              alt={job.guestName}
-                              className="h-8 w-8 shrink-0 rounded-full object-cover"
-                            />
-                          ) : (
-                            <InitialsAvatar
-                              name={job.guestName}
-                              className="h-8 w-8 shrink-0 text-xs"
-                            />
-                          )}
-                          <span className="text-sm font-medium text-[#1A1A1A]">
-                            {job.guestName}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="max-w-[220px] px-4 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {job.services.length > 0 ? (
-                            job.services.map((s) => (
-                              <span
-                                key={s.serviceId}
-                                className="rounded-full bg-[#EAECEE]/80 px-2 py-0.5 text-[11px] text-[#1D1F23]"
-                              >
-                                {s.serviceName}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-xs text-[#9DA1A7]">—</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${PAYMENT_COLOR[job.paymentMethod] ?? "bg-gray-100 text-gray-700"}`}
-                        >
-                          {PAYMENT_ICON[job.paymentMethod]}
-                          {t(
-                            `dashboard.revenue.paymentMethodLabels.${job.paymentMethod}`,
-                            {
-                              defaultValue: job.paymentMethod,
-                            },
-                          )}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right text-sm font-bold text-[#f04cac]">
-                        {fmt(job.finalAmount)}
-                      </td>
-                      <td className="px-4 py-3 text-right text-xs text-[#9DA1A7]">
-                        {fmtTime(job.paidAt)}
-                      </td>
-                      <td className="px-2 py-3">
-                        <ChevronRight className="h-4 w-4 text-[#9DA1A7]" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </AccordionContent>
-      </AccordionItem>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {selectedJob && (
-        <JobDetailDialog
-          job={selectedJob}
-          onClose={() => setSelectedJob(null)}
-        />
+        <JobDetailDialog job={selectedJob} onClose={() => setSelectedJob(null)} />
       )}
     </>
   );

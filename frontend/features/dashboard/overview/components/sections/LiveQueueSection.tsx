@@ -2,20 +2,23 @@
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/shared/lib/utils";
+import { NULL_TEXT_KEY } from "@/shared/lib/constants";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
-const statusLabel = (item: {
-  status: string;
-  startTime: string;
-  urgent: boolean;
-}) => {
-  if (item.status === "in_progress") return "Now";
-  if (item.urgent) return "Soon";
-  const mins = Math.round(
-    (new Date(item.startTime).getTime() - Date.now()) / 60000,
-  );
-  if (mins <= 0) return "Overdue";
-  return `${mins} min`;
+const statusBadge = (status: string, t: (key: string) => string) => {
+  switch (status) {
+    case "waiting":
+      return {
+        label: t("dashboard.overview.queue.status.waiting"),
+        className: "bg-[#F97316] text-white",
+      };
+    case "ready":
+    default:
+      return {
+        label: t("dashboard.overview.queue.status.ready"),
+        className: "bg-primary text-white",
+      };
+  }
 };
 
 const LiveQueueSection = () => {
@@ -25,7 +28,7 @@ const LiveQueueSection = () => {
 
   return (
     <section className="rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]">
-      <h2 className="text-base font-semibold text-[#171A21]">
+      <h2 className="text-lg font-semibold text-[#171A21]">
         {t("dashboard.overview.queue.title")}
       </h2>
       <p className="mt-0.5 text-sm text-[#8D95A5]">
@@ -33,52 +36,62 @@ const LiveQueueSection = () => {
       </p>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">Loading…</p>
+        <p className="mt-4 text-sm text-[#8D95A5]">
+          {t("dashboard.overview.queue.loading")}
+        </p>
       ) : queue.length === 0 ? (
         <p className="mt-4 text-sm text-[#8D95A5]">
-          No active appointments today.
+          {t("dashboard.overview.queue.empty")}
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-[#EEF0F3]">
-          {queue.map((guest) => {
-            const label = statusLabel(guest);
-            return (
-              <li
-                key={guest.id}
-                className="flex items-center justify-between gap-3 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={cn(
-                      "h-2 w-2 shrink-0 rounded-full",
-                      guest.urgent ? "bg-primary" : "bg-transparent",
-                    )}
-                  />
-                  <div>
-                    <p className="text-sm font-medium text-[#171A21]">
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[640px]">
+            <thead>
+              <tr className="border-b border-[#DEE1E7]">
+                <th className="pb-2 text-left text-[13px] font-medium text-[#8D95A5]">
+                  {t("dashboard.overview.queue.col.guest")}
+                </th>
+                <th className="pb-2 text-left text-[13px] font-medium text-[#8D95A5]">
+                  {t("dashboard.overview.queue.col.service")}
+                </th>
+                <th className="pb-2 text-left text-[13px] font-medium text-[#8D95A5]">
+                  {t("dashboard.overview.queue.col.notes")}
+                </th>
+                <th className="pb-2 text-right text-[13px] font-medium text-[#8D95A5]">
+                  {t("dashboard.overview.queue.col.status")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#EEF0F3]">
+              {queue.map((guest) => {
+                const badge = statusBadge(guest.status, t);
+                return (
+                  <tr key={guest.id} className="group">
+                    <td className="py-3 text-base font-medium text-[#171A21]">
                       {guest.guestName}
-                    </p>
-                    <p className="text-xs text-[#8D95A5]">
+                    </td>
+                    <td className="py-3 text-base text-[#171A21]">
                       {guest.serviceName}
-                    </p>
-                  </div>
-                </div>
-                <span
-                  className={cn(
-                    "text-sm font-medium",
-                    label === "Now"
-                      ? "text-[#2FA35C]"
-                      : guest.urgent
-                        ? "text-primary"
-                        : "text-[#8D95A5]",
-                  )}
-                >
-                  {label}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+                    </td>
+                    <td className="py-3 text-base italic text-[#8D95A5]">
+                      {guest.notes || t(NULL_TEXT_KEY)}
+                    </td>
+                    <td className="py-3 text-right">
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold",
+                          badge.className,
+                        )}
+                      >
+                        {badge.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <a

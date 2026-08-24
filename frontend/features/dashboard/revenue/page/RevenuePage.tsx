@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   Download,
   DollarSign,
-  Info,
   Search,
   SlidersHorizontal,
   TrendingUp,
@@ -23,8 +22,8 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 
-import { Accordion } from "@/shared/components/ui/accordion";
 import { StaffRevenueAccordionItem } from "@/shared/components/revenue/StaffRevenueAccordionItem";
+import { NULL_TEXT_KEY } from "@/shared/lib/constants";
 
 import {
   revenueService,
@@ -210,7 +209,7 @@ const RevenuePage = () => {
     (summary?.recentRevenueActivities ?? []).forEach((a) =>
       (a.serviceTags ?? []).forEach((s) => freq.set(s, (freq.get(s) ?? 0) + 1)),
     );
-    let best = "—";
+    let best = t(NULL_TEXT_KEY);
     let max = 0;
     freq.forEach((count, name) => {
       if (count > max) {
@@ -219,7 +218,7 @@ const RevenuePage = () => {
       }
     });
     return best;
-  }, [summary]);
+  }, [summary, t]);
 
   const avgRevenue = useMemo(() => {
     const rows = summary?.staffRevenueRows ?? [];
@@ -506,7 +505,7 @@ const RevenuePage = () => {
               <TrendingUp className="h-5 w-5 text-[#f04cac]" />
             </div>
             <span className="rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium text-[#059669]">
-              Hot
+              {t("dashboard.revenue.cards.hot")}
             </span>
           </div>
           <p className="mt-5 text-xs text-[#9DA1A7]">
@@ -530,15 +529,10 @@ const RevenuePage = () => {
         <div className="relative flex items-start justify-between px-6 py-5">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A]">
-              {t("dashboard.revenue.staffTable.title", {
-                defaultValue: "Chi tiết doanh thu nhân viên",
-              })}
+              {t("dashboard.revenue.staffTable.title")}
             </h2>
             <p className="mt-1 text-sm text-[#9DA1A7]">
-              {t("dashboard.revenue.staffTable.subtitle", {
-                defaultValue:
-                  "Thống kê chi tiết các khoản thu dựa trên người thực hiện dịch vụ.",
-              })}
+              {t("dashboard.revenue.staffTable.subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -562,20 +556,35 @@ const RevenuePage = () => {
         </div>
         <div className="border-t border-[#DFE1E4]" />
 
-        <Accordion multiple={true}>
+        {/* Table header row */}
+        <div className="flex w-full items-center bg-[#FAFAFA]">
+          <div className="w-[320px] shrink-0 px-6 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+            {t("dashboard.revenue.staffTable.colStaff")}
+          </div>
+          <div className="w-35 shrink-0 px-4 py-3 text-center text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+            {t("dashboard.revenue.staffTable.colOrders")}
+          </div>
+          <div className="w-40 shrink-0 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+            {t("dashboard.revenue.staffTable.colRevenue")}
+          </div>
+          <div className="flex-1 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+            {t("dashboard.revenue.staffTable.colServices")}
+          </div>
+          <div className="w-10 shrink-0" />
+        </div>
+
+        <div>
           {filteredStaffRows.map((row, index) => (
             <StaffRevenueAccordionItem
               key={row.key}
               row={row}
-              index={index}
-              isGood={row.totalRevenue >= avgRevenue}
               dateRange={{
                 startDate: appliedFilters.startDate || undefined,
                 endDate: appliedFilters.endDate || undefined,
               }}
             />
           ))}
-        </Accordion>
+        </div>
       </div>
 
       {/* Bottom widgets */}
@@ -613,28 +622,6 @@ const RevenuePage = () => {
             <span className="text-sm font-bold text-[#f04cac]">
               {formatCurrency(totalRevenue)}
             </span>
-          </div>
-        </div>
-
-        {/* Info widget */}
-        <div className="rounded-[12px] border border-[#f04cac]/10 bg-[#FDF2F8] p-6">
-          <div className="flex gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f04cac]/10 shadow-[0px_1px_2px_0px_#0000000d]">
-              <Info className="h-5 w-5 text-[#f04cac]" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#1A1A1A]">
-                {t("dashboard.revenue.info.title", {
-                  defaultValue: "Hướng dẫn quản trị",
-                })}
-              </p>
-              <p className="mt-1 text-xs leading-5 text-[#9DA1A7]">
-                {t("dashboard.revenue.info.body", {
-                  defaultValue:
-                    "Dữ liệu doanh thu được tổng hợp tự động từ hệ thống POS. Bạn có thể nhấn vào từng nhân viên để xem lịch sử phục vụ chi tiết.",
-                })}
-              </p>
-            </div>
           </div>
         </div>
       </div>

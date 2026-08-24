@@ -1,9 +1,10 @@
 "use client";
 
-import { Check, Clock, DollarSign, Plus, Save, Trash2 } from "lucide-react";
-import { useMemo, type KeyboardEvent } from "react";
+import { Clock, DollarSign, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 
+import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
 import SelectField from "@/shared/components/molecules/SelectField";
 import { Button } from "@/shared/components/ui/button";
 
@@ -61,13 +62,68 @@ const ServicePriceTableSection = ({
   );
   const averageValue = rows.length ? Math.round(totalValue / rows.length) : 0;
 
-  const handleLastRowEnter = (
+  const [deleteConfirmKey, setDeleteConfirmKey] = useState<string | null>(null);
+  const deleteTarget = useMemo(
+    () => rows.find((row) => row.key === deleteConfirmKey),
+    [rows, deleteConfirmKey],
+  );
+
+  const lastRowRef = useRef<HTMLInputElement | null>(null);
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  // Only auto-focus the newly added row's input when a row was explicitly
+  // added by the user (button click, Enter key, or auto-add on blur) —
+  // never on other row-count changes (e.g. removals or a data refresh).
+  const shouldFocusNewRowRef = useRef(false);
+
+  useEffect(() => {
+    if (shouldFocusNewRowRef.current && lastRowRef.current) {
+      lastRowRef.current.focus();
+    }
+    shouldFocusNewRowRef.current = false;
+  }, [rows.length]);
+
+  const handleAddRow = () => {
+    shouldFocusNewRowRef.current = true;
+    onAddRow();
+  };
+
+  const handleLastRowKeyDown = (
     event: KeyboardEvent<HTMLInputElement>,
     index: number,
   ) => {
     if (event.key !== "Enter" || index !== visibleRows.length - 1) return;
     event.preventDefault();
-    onAddRow();
+    handleAddRow();
+  };
+
+  const handleBlurName = (
+    event: FocusEvent<HTMLInputElement>,
+    key: string,
+    name: string,
+  ) => {
+    // If focus moved to another element inside the table, don't do anything
+    // (e.g., focus moved to a newly added row's input, or another input in the table)
+    const relatedTarget = event.relatedTarget as Node | null;
+    if (relatedTarget && tableRef.current?.contains(relatedTarget)) {
+      return;
+    }
+
+    if (!name.trim()) {
+      // Empty name → remove the row silently (focus left the table)
+      onRemoveRow(key);
+      return;
+    }
+    const idx = visibleRows.findIndex((r) => r.key === key);
+    if (idx === visibleRows.length - 1) {
+      handleAddRow();
+    }
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirmKey) {
+      onRemoveRow(deleteConfirmKey);
+      setDeleteConfirmKey(null);
+    }
   };
 
   return (
@@ -76,17 +132,6 @@ const ServicePriceTableSection = ({
         <h2 className="text-base font-semibold text-[#171A21]">
           {t("dashboard.services.table.heading")}
         </h2>
-        <Button
-          type="button"
-          onClick={onSave}
-          disabled={!isDirty || isSaving}
-          className="h-9 gap-2 bg-[#F9D3E1] px-4 text-[#B5316A] hover:bg-[#F4BDD2] disabled:opacity-60"
-        >
-          <Save className="h-4 w-4" />
-          {isSaving
-            ? t("dashboard.services.table.saving")
-            : t("dashboard.services.table.save")}
-        </Button>
       </header>
 
       {error ? (
@@ -96,7 +141,7 @@ const ServicePriceTableSection = ({
       ) : null}
 
       <div className="overflow-x-auto border-t border-[#EDEFF3]">
-        <table className="w-full min-w-[880px] border-collapse">
+        <table ref={tableRef} className="w-full min-w-[880px] border-collapse">
           <thead>
             <tr className="bg-[#FBFCFD] text-left text-[11px] uppercase tracking-wide text-[#9AA1AE]">
               <th className="w-14 px-6 py-3 font-medium">
@@ -151,12 +196,14 @@ const ServicePriceTableSection = ({
 
                 <td className="px-4 py-3">
                   <input
+                    ref={index === visibleRows.length - 1 ? lastRowRef : undefined}
                     value={row.name}
                     placeholder={t("dashboard.services.table.namePlaceholder")}
                     onChange={(event) =>
                       onChangeRow(row.key, { name: event.target.value })
                     }
-                    onKeyDown={(event) => handleLastRowEnter(event, index)}
+                    onKeyDown={(event) => handleLastRowKeyDown(event, index)}
+                    onBlur={(event) => handleBlurName(event, row.key, row.name)}
                     className={cellInput}
                   />
                 </td>
@@ -188,7 +235,7 @@ const ServicePriceTableSection = ({
                           durationMinutes: event.target.value,
                         })
                       }
-                      onKeyDown={(event) => handleLastRowEnter(event, index)}
+                      onKeyDown={(event) => handleLastRowKeyDown(event, index)}
                       className={`${cellInput} w-16 font-medium`}
                     />
                     <span className="text-xs">
@@ -208,7 +255,7 @@ const ServicePriceTableSection = ({
                       onChange={(event) =>
                         onChangeRow(row.key, { price: event.target.value })
                       }
-                      onKeyDown={(event) => handleLastRowEnter(event, index)}
+                      onKeyDown={(event) => handleLastRowKeyDown(event, index)}
                       className={`${cellInput} w-28 font-semibold text-[#171A21]`}
                     />
                     <span className="text-xs">
@@ -226,7 +273,7 @@ const ServicePriceTableSection = ({
                       name:
                         row.name || t("dashboard.services.table.newRowLabel"),
                     })}
-                    onClick={() => onRemoveRow(row.key)}
+                    onClick={() => setDeleteConfirmKey(row.key)}
                     className="h-8 w-8 text-[#B4BAC5] hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -239,7 +286,7 @@ const ServicePriceTableSection = ({
               <td colSpan={6} className="px-6 py-3">
                 <button
                   type="button"
-                  onClick={onAddRow}
+                  onClick={handleAddRow}
                   className="flex w-full items-center gap-3 text-left text-sm italic text-[#B4BAC5] hover:text-[#8D95A5]"
                 >
                   <Plus className="h-4 w-4" />
@@ -286,23 +333,27 @@ const ServicePriceTableSection = ({
           <Button
             type="button"
             variant="outline"
-            onClick={onAddRow}
+            onClick={handleAddRow}
             className="h-10 gap-2 border-[#DEE1E7]"
           >
             <Plus className="h-4 w-4" />
             {t("dashboard.services.table.addRow")}
           </Button>
-          <Button
-            type="button"
-            onClick={onSave}
-            disabled={isSaving}
-            className="h-10 gap-2 bg-[#E5397F] px-5 text-white hover:bg-[#CF2F71]"
-          >
-            <Check className="h-4 w-4" />
-            {t("dashboard.services.table.finish")}
-          </Button>
         </div>
       </footer>
+
+      <ConfirmDialog
+        open={deleteConfirmKey !== null}
+        title={t("dashboard.services.deleteConfirm.title")}
+        description={t("dashboard.services.deleteConfirm.description", {
+          name: deleteTarget?.name || t("dashboard.services.table.newRowLabel"),
+        })}
+        confirmLabel={t("dashboard.services.deleteConfirm.confirm")}
+        cancelLabel={t("dashboard.services.deleteConfirm.cancel")}
+        destructive
+        onOpenChange={(open) => !open && setDeleteConfirmKey(null)}
+        onConfirm={confirmDelete}
+      />
     </section>
   );
 };

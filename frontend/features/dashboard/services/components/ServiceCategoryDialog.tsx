@@ -4,6 +4,7 @@ import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
 import EmptyState from "@/shared/components/molecules/EmptyState";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -113,6 +114,13 @@ const ServiceCategoryDialog = ({
     }
   };
 
+  const [deleteConfirmCategory, setDeleteConfirmCategory] = useState<ServiceCategory | null>(null);
+
+  const handleBlurAdd = () => {
+    if (!form.name.trim()) return;
+    submit();
+  };
+
   return (
     <Dialog
       open={open}
@@ -175,7 +183,7 @@ const ServiceCategoryDialog = ({
                     name: category.name,
                   })}
                   disabled={deleteCategory.isPending}
-                  onClick={() => remove(category)}
+                  onClick={() => setDeleteConfirmCategory(category)}
                   className="h-8 w-8 text-[#8D95A5] hover:bg-destructive/10 hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -192,6 +200,7 @@ const ServiceCategoryDialog = ({
             onChange={(event) =>
               setForm((current) => ({ ...current, name: event.target.value }))
             }
+            onBlur={handleBlurAdd}
           />
           <Input
             value={form.description}
@@ -234,6 +243,22 @@ const ServiceCategoryDialog = ({
           </div>
         </div>
       </DialogContent>
+
+      <ConfirmDialog
+        open={deleteConfirmCategory !== null}
+        title={t("dashboard.services.deleteConfirm.title")}
+        description={t("dashboard.services.deleteConfirm.description", {
+          name: deleteConfirmCategory?.name ?? "",
+        })}
+        confirmLabel={t("dashboard.services.deleteConfirm.confirm")}
+        cancelLabel={t("dashboard.services.deleteConfirm.cancel")}
+        destructive
+        onOpenChange={(open) => !open && setDeleteConfirmCategory(null)}
+        onConfirm={() => {
+          if (deleteConfirmCategory) remove(deleteConfirmCategory);
+          setDeleteConfirmCategory(null);
+        }}
+      />
     </Dialog>
   );
 };

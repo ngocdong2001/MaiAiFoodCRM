@@ -1,6 +1,5 @@
 import LiveQueueSection from "../components/sections/LiveQueueSection";
 import RecentGuestsSection from "../components/sections/RecentGuestsSection";
-import StaffOnDutySection from "../components/sections/StaffOnDutySection";
 import StatsSection from "../components/sections/StatsSection";
 import TodaysSnapshotSection from "../components/sections/TodaysSnapshotSection";
 import WelcomeSection from "../components/sections/WelcomeSection";
@@ -11,18 +10,17 @@ const DashboardPage = () => {
       {/* Row 1: Greeting + quick actions */}
       <WelcomeSection />
 
-      {/* Row 2: 6 KPI cards */}
+      {/* Row 2: 4 KPI cards */}
       <StatsSection />
 
-      {/* Row 3: 3-column main content */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <TodaysSnapshotSection />
-        <LiveQueueSection />
-        <StaffOnDutySection />
-      </div>
+      {/* Row 3: Live queue table */}
+      <LiveQueueSection />
 
-      {/* Row 4: Recent guests full-width */}
-      <RecentGuestsSection />
+      {/* Row 4: Recent guests + schedule overview */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <RecentGuestsSection />
+        <TodaysSnapshotSection />
+      </div>
     </div>
   );
 };

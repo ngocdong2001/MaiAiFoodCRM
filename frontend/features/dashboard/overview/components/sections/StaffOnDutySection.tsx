@@ -12,13 +12,6 @@ const statusColor: Record<string, string> = {
   inactive: "bg-[#DEE1E7]",
 };
 
-const statusLabel: Record<string, string> = {
-  active: "Available",
-  busy: "Busy",
-  on_leave: "On Leave",
-  inactive: "Off",
-};
-
 const StaffOnDutySection = () => {
   const { t } = useTranslation();
   const { data, isLoading } = useOverviewStats();
@@ -29,14 +22,10 @@ const StaffOnDutySection = () => {
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-[#171A21]">
-            {t("dashboard.overview.staffOnDuty.title", {
-              defaultValue: "Staff on Duty",
-            })}
+            {t("dashboard.overview.staffOnDuty.title")}
           </h2>
           <p className="mt-0.5 text-sm text-[#8D95A5]">
-            {t("dashboard.overview.staffOnDuty.subtitle", {
-              defaultValue: "Today's scheduled team",
-            })}
+            {t("dashboard.overview.staffOnDuty.subtitle")}
           </p>
         </div>
         {!isLoading && (
@@ -45,15 +34,19 @@ const StaffOnDutySection = () => {
               staff.filter((s) => s.status === "active" || s.status === "busy")
                 .length
             }{" "}
-            active
+            {t("dashboard.overview.staffOnDuty.active")}
           </span>
         )}
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">Loading…</p>
+        <p className="mt-4 text-sm text-[#8D95A5]">
+          {t("dashboard.overview.staffOnDuty.loading")}
+        </p>
       ) : staff.length === 0 ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">No staff scheduled today.</p>
+        <p className="mt-4 text-sm text-[#8D95A5]">
+          {t("dashboard.overview.staffOnDuty.empty")}
+        </p>
       ) : (
         <ul className="mt-4 space-y-3">
           {staff.map((member) => (
@@ -77,7 +70,9 @@ const StaffOnDutySection = () => {
                 <p className="text-sm font-semibold text-[#171A21]">
                   {member.appointmentCountToday}
                 </p>
-                <p className="text-xs text-[#8D95A5]">appts</p>
+                <p className="text-xs text-[#8D95A5]">
+                  {t("dashboard.overview.staffOnDuty.appointments")}
+                </p>
               </div>
             </li>
           ))}

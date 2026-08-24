@@ -3,7 +3,7 @@ import { getStoredAuthToken, useAuthStore } from "@/core/store/authStore";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-const normalizeUrl = (url: string) => {
+export const getApiUrl = (url: string) => {
   const baseUrl = BASE_URL.replace(/\/+$/, "");
   const path = url.startsWith("/") ? url : `/${url}`;
 
@@ -90,7 +90,7 @@ export const apiClient = {
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.get<T>(normalizeUrl(url), config);
+    return axiosInstance.get<T>(getApiUrl(url), config);
   },
 
   post: <T = any>(
@@ -98,7 +98,7 @@ export const apiClient = {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.post<T>(normalizeUrl(url), data, config);
+    return axiosInstance.post<T>(getApiUrl(url), data, config);
   },
 
   put: <T = any>(
@@ -106,7 +106,7 @@ export const apiClient = {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.put<T>(normalizeUrl(url), data, config);
+    return axiosInstance.put<T>(getApiUrl(url), data, config);
   },
 
   patch: <T = any>(
@@ -114,14 +114,14 @@ export const apiClient = {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.patch<T>(normalizeUrl(url), data, config);
+    return axiosInstance.patch<T>(getApiUrl(url), data, config);
   },
 
   delete: <T = any>(
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> => {
-    return axiosInstance.delete<T>(normalizeUrl(url), config);
+    return axiosInstance.delete<T>(getApiUrl(url), config);
   },
 };
 

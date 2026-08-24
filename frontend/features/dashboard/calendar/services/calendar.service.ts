@@ -29,6 +29,7 @@ export const calendarService = {
     serviceIds: number[];
     status?: string;
     priority?: string;
+    source?: string;
     notes?: string;
   }) {
     const response = await apiClient.post<ApiResponse<ApiAppointment>>(
@@ -47,6 +48,7 @@ export const calendarService = {
       serviceIds: number[];
       status?: string;
       priority?: string;
+      source?: string;
       notes?: string;
     },
   ) {

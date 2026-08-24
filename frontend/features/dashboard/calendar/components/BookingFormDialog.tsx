@@ -77,7 +77,11 @@ export const BookingFormContent = ({
   initialDate,
   onCreated,
   defaultWalkIn = false,
-}: Props & { initialDate: Date; onCreated: (date: Date) => void; defaultWalkIn?: boolean }) => {
+}: Props & {
+  initialDate: Date;
+  onCreated: (date: Date) => void;
+  defaultWalkIn?: boolean;
+}) => {
   const options = useCalendarOptions();
   const create = useCreateAppointment();
   const queryClient = useQueryClient();
@@ -163,6 +167,7 @@ export const BookingFormContent = ({
         serviceIds: values.serviceIds,
         status: values.status,
         priority: values.priority,
+        source: isWalkIn ? "walk_in" : "dashboard",
         notes: values.notes.trim() || undefined,
       },
       {

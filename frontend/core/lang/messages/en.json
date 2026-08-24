@@ -1,4 +1,5 @@
 {
+  "nullText": "Empty",
   "header": {
     "nav": {
       "features": "Features",
@@ -351,37 +352,42 @@
     },
     "overview": {
       "welcome": {
-        "title": "Welcome, {{name}}!",
-        "subtitle": "Here's your salon's overview for today, September 24, 2023.",
+        "title": "Hello, {{name}}!",
+        "subtitle": "Here's your salon overview for today, September 24, 2023.",
         "newBooking": "New Booking",
-        "addWalkIn": "Add Walk-in"
+        "addWalkIn": "Walk-in Guest",
+        "fallbackName": "there"
       },
       "alerts": {
-        "title": "Important Alerts",
-        "message": "Your calendar integration with Google Calendar is out of sync. Please check settings to resolve.",
+        "title": "Important Notice",
+        "message": "Your Google Calendar integration is out of sync. Please check settings to resolve.",
         "reviewSettings": "Review settings"
       },
       "stats": {
         "upcoming-bookings": {
           "label": "Upcoming Bookings",
-          "hint": "+5 today"
+          "hint": "+{{count}} today"
         },
         "seat-utilization": {
-          "label": "Today's Seat Utilization",
-          "hint": "Up 12% from avg"
+          "label": "Seat Utilization",
+          "hint": "Up {{percent}}% vs average"
         },
-        "active-waitlist": {
-          "label": "Active Waitlist",
+        "waitlist": {
+          "label": "Waitlist",
+          "value": "guests",
           "hint": "No change"
         },
         "guest-activity": {
-          "label": "Recent Guest Activity",
-          "hint": "Last 24h"
+          "label": "Guest Activity",
+          "value": "check-ins",
+          "hint": "Last 24 hours"
         }
       },
       "snapshot": {
         "title": "Today's Snapshot",
         "subtitle": "Upcoming appointments and staff shifts",
+        "loading": "Loading…",
+        "empty": "No appointments scheduled for today.",
         "items": {
           "haircut-style": {
             "title": "Haircut & Style with Emily"
@@ -404,6 +410,14 @@
         "title": "Live Queue",
         "subtitle": "Guests waiting or recently checked-in",
         "viewFullQueue": "View Full Queue",
+        "loading": "Loading…",
+        "empty": "No active appointments today.",
+        "status": {
+          "now": "Now",
+          "soon": "Soon",
+          "overdue": "Overdue",
+          "min": "min"
+        },
         "items": {
           "oliver-chen": {
             "service": "Walk-in Haircut",
@@ -431,6 +445,16 @@
         "title": "Recent Guests",
         "subtitle": "Latest guest interactions",
         "viewAll": "View All Guests",
+        "loading": "Loading…",
+        "empty": "No recent guests.",
+        "time": {
+          "minAgo": "{{count}} min ago",
+          "hourAgo": "{{count}} hour ago",
+          "hoursAgo": "{{count}} hours ago",
+          "yesterday": "Yesterday",
+          "daysAgo": "{{count}} days ago",
+          "lastWeek": "Last week"
+        },
         "items": {
           "emily-chen": {
             "meta": "2 hours ago"
@@ -445,6 +469,20 @@
             "meta": "Last week"
           }
         }
+      },
+      "staffOnDuty": {
+        "title": "Staff on Duty",
+        "subtitle": "Today's scheduled team",
+        "loading": "Loading…",
+        "empty": "No staff scheduled today.",
+        "status": {
+          "active": "Available",
+          "busy": "Busy",
+          "on_leave": "On Leave",
+          "inactive": "Off"
+        },
+        "active": "active",
+        "appointments": "appts"
       },
       "aiRecommendations": {
         "title": "AI Recommendations",
@@ -523,7 +561,8 @@
         "dailyRevenue": "Daily Revenue",
         "totalReceived": "Total amount received",
         "popularService": "Popular Service",
-        "chosenMost": "Most chosen today"
+        "chosenMost": "Most chosen today",
+        "hot": "Hot"
       },
       "paymentMethodLabels": {
         "cash": "Cash",
@@ -683,6 +722,12 @@
         "description": "The price list will be restored to the data currently stored in the database.",
         "keep": "Keep editing",
         "confirm": "Discard changes"
+      },
+      "deleteConfirm": {
+        "title": "Delete service?",
+        "description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
       },
       "categoryDialog": {
         "title": "Service categories",
