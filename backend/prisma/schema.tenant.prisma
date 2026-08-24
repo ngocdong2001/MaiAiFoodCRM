@@ -176,11 +176,28 @@ model payment {
   guest          guest       @relation(fields: [guestId], references: [id], map: "Payment_guestId_fkey")
   staff          staff?      @relation(fields: [staffId], references: [id], map: "Payment_staffId_fkey")
   refund         refund[]
+  paymentdetail  paymentdetail[]
 
   @@index([guestId], map: "Payment_guestId_idx")
   @@index([paidAt], map: "Payment_paidAt_idx")
   @@index([paymentMethod], map: "Payment_paymentMethod_idx")
   @@index([staffId], map: "Payment_staffId_fkey")
+}
+
+// One row per service within a Payment (Payment = one Booking checkout, PaymentDetail = one Service line item)
+model paymentdetail {
+  id        Int      @id @default(autoincrement())
+  paymentId Int
+  serviceId Int
+  price     Decimal  @db.Decimal(10, 2)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  payment   payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade, map: "PaymentDetail_paymentId_fkey")
+  service   service  @relation(fields: [serviceId], references: [id], map: "PaymentDetail_serviceId_fkey")
+
+  @@unique([paymentId, serviceId], map: "PaymentDetail_paymentId_serviceId_key")
+  @@index([paymentId], map: "PaymentDetail_paymentId_idx")
+  @@index([serviceId], map: "PaymentDetail_serviceId_idx")
 }
 
 model refund {
@@ -211,6 +228,7 @@ model service {
   updatedAt          DateTime
   airecommendation   airecommendation[]
   appointmentservice appointmentservice[]
+  paymentdetail      paymentdetail[]
   servicecategory    servicecategory      @relation(fields: [categoryId], references: [id], map: "Service_categoryId_fkey")
 
   @@index([categoryId], map: "Service_categoryId_idx")

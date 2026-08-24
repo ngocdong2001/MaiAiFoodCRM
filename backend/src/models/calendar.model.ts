@@ -110,6 +110,80 @@ const dayNameFromDateStr = (datePart: string): string => {
 
 type DayHours = { day: string; open: boolean; from: string; to: string };
 
+// Idempotently creates the Payment + PaymentDetail rows for a completed booking.
+// Safe to call repeatedly: never duplicates Payment or PaymentDetail rows.
+const ensurePaymentForCompletedAppointment = async (
+  transaction: Prisma.TransactionClient,
+  appointment: { id: number; guestId: number; staffId: number },
+) => {
+  const services = await transaction.appointmentservice.findMany({
+    where: { appointmentId: appointment.id },
+  });
+  if (services.length === 0) {
+    throw new CalendarDomainError(
+      "Cannot mark a booking with no services as completed",
+    );
+  }
+
+  const totalAmount = services.reduce(
+    (sum, item) => sum + Number(item.priceAtBooking),
+    0,
+  );
+
+  let payment = await transaction.payment.findUnique({
+    where: { appointmentId: appointment.id },
+  });
+
+  if (!payment) {
+    try {
+      payment = await transaction.payment.create({
+        data: {
+          appointmentId: appointment.id,
+          guestId: appointment.guestId,
+          staffId: appointment.staffId,
+          amount: totalAmount,
+          finalAmount: totalAmount,
+          paymentMethod: "cash",
+          paymentStatus: "paid",
+        },
+      });
+    } catch (error) {
+      // Concurrent request already created it — recover instead of duplicating.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        payment = await transaction.payment.findUniqueOrThrow({
+          where: { appointmentId: appointment.id },
+        });
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  const existingDetails = await transaction.paymentdetail.findMany({
+    where: { paymentId: payment.id },
+    select: { serviceId: true },
+  });
+  const existingServiceIds = new Set(existingDetails.map((d) => d.serviceId));
+  const missingServices = services.filter(
+    (item) => !existingServiceIds.has(item.serviceId),
+  );
+
+  if (missingServices.length > 0) {
+    await transaction.paymentdetail.createMany({
+      data: missingServices.map((item) => ({
+        paymentId: payment!.id,
+        serviceId: item.serviceId,
+        price: item.priceAtBooking,
+        quantity: 1,
+      })),
+      skipDuplicates: true,
+    });
+  }
+};
+
 const validateRelationsAndAvailability = async (
   transaction: Prisma.TransactionClient,
   input: AppointmentInput,
@@ -400,7 +474,7 @@ export const CalendarModel = {
         input,
       );
       await ensureNoConflict(transaction, input, id);
-      await transaction.appointment.update({
+      const updated = await transaction.appointment.update({
         where: { id },
         data: {
           guestId: input.guestId,
@@ -430,6 +504,10 @@ export const CalendarModel = {
           },
         },
       });
+
+      if (updated.status === "completed") {
+        await ensurePaymentForCompletedAppointment(transaction, updated);
+      }
     });
     return this.getById(db, id);
   },
@@ -439,18 +517,28 @@ export const CalendarModel = {
     status: AppointmentStatus,
     cancelReason?: string,
   ) {
-    const appointment = await db.appointment.update({
-      where: { id },
-      data: {
-        status,
-        cancelReason:
-          status === "cancelled"
-            ? cancelReason?.trim() || "Cancelled from calendar"
-            : null,
-        updatedAt: new Date(),
-        appointmentservice: { updateMany: { where: {}, data: { status } } },
-      },
-      include,
+    const appointment = await db.$transaction(async (transaction) => {
+      const updated = await transaction.appointment.update({
+        where: { id },
+        data: {
+          status,
+          cancelReason:
+            status === "cancelled"
+              ? cancelReason?.trim() || "Cancelled from calendar"
+              : null,
+          updatedAt: new Date(),
+          appointmentservice: { updateMany: { where: {}, data: { status } } },
+        },
+      });
+
+      if (status === "completed") {
+        await ensurePaymentForCompletedAppointment(transaction, updated);
+      }
+
+      return transaction.appointment.findUniqueOrThrow({
+        where: { id },
+        include,
+      });
     });
     return serialize(appointment);
   },

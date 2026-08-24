@@ -311,6 +311,18 @@
         "emptyTitle": "Queue is looking good!",
         "emptyDescription": "New requests will appear here instantly."
       },
+      "statusControl": {
+        "label": "Status",
+        "waiting": "Pending",
+        "ready": "Ready",
+        "completed": "Completed",
+        "updating": "Updating...",
+        "error": "Failed to update status. Please try again.",
+        "confirmTitle": "Confirm status change",
+        "confirmDescription": "Are you sure you want to change this booking's status to \"{{status}}\"?",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      },
       "booking": {
         "title": "New booking",
         "description": "Create an appointment using live guest, staff, and service availability.",
@@ -416,7 +428,11 @@
           "now": "Now",
           "soon": "Soon",
           "overdue": "Overdue",
-          "min": "min"
+          "min": "min",
+          "waiting": "Pending",
+          "ready": "Ready",
+          "completed": "Completed",
+          "error": "Failed to update status. Please try again."
         },
         "items": {
           "oliver-chen": {

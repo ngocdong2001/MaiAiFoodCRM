@@ -23,6 +23,7 @@ type SelectFieldProps = {
   size?: "sm" | "default";
   className?: string;
   contentClassName?: string;
+  disabled?: boolean;
 };
 
 const SelectField = ({
@@ -34,6 +35,7 @@ const SelectField = ({
   size = "default",
   className,
   contentClassName,
+  disabled,
 }: SelectFieldProps) => {
   const selected = options.find((option) => option.value === value);
 
@@ -41,6 +43,7 @@ const SelectField = ({
     <Select
       value={value}
       onValueChange={(next) => onValueChange((next as string) ?? "")}
+      disabled={disabled}
     >
       <SelectTrigger
         size={size}

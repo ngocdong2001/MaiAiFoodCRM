@@ -282,6 +282,7 @@ export type serviceWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"service"> | Date | string
   airecommendation?: Prisma.AirecommendationListRelationFilter
   appointmentservice?: Prisma.AppointmentserviceListRelationFilter
+  paymentdetail?: Prisma.PaymentdetailListRelationFilter
   servicecategory?: Prisma.XOR<Prisma.ServicecategoryScalarRelationFilter, Prisma.servicecategoryWhereInput>
 }
 
@@ -299,6 +300,7 @@ export type serviceOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   airecommendation?: Prisma.airecommendationOrderByRelationAggregateInput
   appointmentservice?: Prisma.appointmentserviceOrderByRelationAggregateInput
+  paymentdetail?: Prisma.paymentdetailOrderByRelationAggregateInput
   servicecategory?: Prisma.servicecategoryOrderByWithRelationInput
   _relevance?: Prisma.serviceOrderByRelevanceInput
 }
@@ -320,6 +322,7 @@ export type serviceWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"service"> | Date | string
   airecommendation?: Prisma.AirecommendationListRelationFilter
   appointmentservice?: Prisma.AppointmentserviceListRelationFilter
+  paymentdetail?: Prisma.PaymentdetailListRelationFilter
   servicecategory?: Prisma.XOR<Prisma.ServicecategoryScalarRelationFilter, Prisma.servicecategoryWhereInput>
 }, "id">
 
@@ -371,6 +374,7 @@ export type serviceCreateInput = {
   updatedAt: Date | string
   airecommendation?: Prisma.airecommendationCreateNestedManyWithoutServiceInput
   appointmentservice?: Prisma.appointmentserviceCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailCreateNestedManyWithoutServiceInput
   servicecategory: Prisma.servicecategoryCreateNestedOneWithoutServiceInput
 }
 
@@ -388,6 +392,7 @@ export type serviceUncheckedCreateInput = {
   updatedAt: Date | string
   airecommendation?: Prisma.airecommendationUncheckedCreateNestedManyWithoutServiceInput
   appointmentservice?: Prisma.appointmentserviceUncheckedCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type serviceUpdateInput = {
@@ -402,6 +407,7 @@ export type serviceUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   airecommendation?: Prisma.airecommendationUpdateManyWithoutServiceNestedInput
   appointmentservice?: Prisma.appointmentserviceUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUpdateManyWithoutServiceNestedInput
   servicecategory?: Prisma.servicecategoryUpdateOneRequiredWithoutServiceNestedInput
 }
 
@@ -419,6 +425,7 @@ export type serviceUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   airecommendation?: Prisma.airecommendationUncheckedUpdateManyWithoutServiceNestedInput
   appointmentservice?: Prisma.appointmentserviceUncheckedUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type serviceCreateManyInput = {
@@ -568,6 +575,20 @@ export type serviceUpdateOneRequiredWithoutAppointmentserviceNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.serviceUpdateToOneWithWhereWithoutAppointmentserviceInput, Prisma.serviceUpdateWithoutAppointmentserviceInput>, Prisma.serviceUncheckedUpdateWithoutAppointmentserviceInput>
 }
 
+export type serviceCreateNestedOneWithoutPaymentdetailInput = {
+  create?: Prisma.XOR<Prisma.serviceCreateWithoutPaymentdetailInput, Prisma.serviceUncheckedCreateWithoutPaymentdetailInput>
+  connectOrCreate?: Prisma.serviceCreateOrConnectWithoutPaymentdetailInput
+  connect?: Prisma.serviceWhereUniqueInput
+}
+
+export type serviceUpdateOneRequiredWithoutPaymentdetailNestedInput = {
+  create?: Prisma.XOR<Prisma.serviceCreateWithoutPaymentdetailInput, Prisma.serviceUncheckedCreateWithoutPaymentdetailInput>
+  connectOrCreate?: Prisma.serviceCreateOrConnectWithoutPaymentdetailInput
+  upsert?: Prisma.serviceUpsertWithoutPaymentdetailInput
+  connect?: Prisma.serviceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.serviceUpdateToOneWithWhereWithoutPaymentdetailInput, Prisma.serviceUpdateWithoutPaymentdetailInput>, Prisma.serviceUncheckedUpdateWithoutPaymentdetailInput>
+}
+
 export type serviceCreateNestedManyWithoutServicecategoryInput = {
   create?: Prisma.XOR<Prisma.serviceCreateWithoutServicecategoryInput, Prisma.serviceUncheckedCreateWithoutServicecategoryInput> | Prisma.serviceCreateWithoutServicecategoryInput[] | Prisma.serviceUncheckedCreateWithoutServicecategoryInput[]
   connectOrCreate?: Prisma.serviceCreateOrConnectWithoutServicecategoryInput | Prisma.serviceCreateOrConnectWithoutServicecategoryInput[]
@@ -621,6 +642,7 @@ export type serviceCreateWithoutAirecommendationInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   appointmentservice?: Prisma.appointmentserviceCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailCreateNestedManyWithoutServiceInput
   servicecategory: Prisma.servicecategoryCreateNestedOneWithoutServiceInput
 }
 
@@ -637,6 +659,7 @@ export type serviceUncheckedCreateWithoutAirecommendationInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   appointmentservice?: Prisma.appointmentserviceUncheckedCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type serviceCreateOrConnectWithoutAirecommendationInput = {
@@ -666,6 +689,7 @@ export type serviceUpdateWithoutAirecommendationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointmentservice?: Prisma.appointmentserviceUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUpdateManyWithoutServiceNestedInput
   servicecategory?: Prisma.servicecategoryUpdateOneRequiredWithoutServiceNestedInput
 }
 
@@ -682,6 +706,7 @@ export type serviceUncheckedUpdateWithoutAirecommendationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointmentservice?: Prisma.appointmentserviceUncheckedUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type serviceCreateWithoutAppointmentserviceInput = {
@@ -695,6 +720,7 @@ export type serviceCreateWithoutAppointmentserviceInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   airecommendation?: Prisma.airecommendationCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailCreateNestedManyWithoutServiceInput
   servicecategory: Prisma.servicecategoryCreateNestedOneWithoutServiceInput
 }
 
@@ -711,6 +737,7 @@ export type serviceUncheckedCreateWithoutAppointmentserviceInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   airecommendation?: Prisma.airecommendationUncheckedCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type serviceCreateOrConnectWithoutAppointmentserviceInput = {
@@ -740,6 +767,7 @@ export type serviceUpdateWithoutAppointmentserviceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   airecommendation?: Prisma.airecommendationUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUpdateManyWithoutServiceNestedInput
   servicecategory?: Prisma.servicecategoryUpdateOneRequiredWithoutServiceNestedInput
 }
 
@@ -756,6 +784,85 @@ export type serviceUncheckedUpdateWithoutAppointmentserviceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   airecommendation?: Prisma.airecommendationUncheckedUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUncheckedUpdateManyWithoutServiceNestedInput
+}
+
+export type serviceCreateWithoutPaymentdetailInput = {
+  name: string
+  description?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  durationMinutes: number
+  imageUrl?: string | null
+  isActive?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  updatedAt: Date | string
+  airecommendation?: Prisma.airecommendationCreateNestedManyWithoutServiceInput
+  appointmentservice?: Prisma.appointmentserviceCreateNestedManyWithoutServiceInput
+  servicecategory: Prisma.servicecategoryCreateNestedOneWithoutServiceInput
+}
+
+export type serviceUncheckedCreateWithoutPaymentdetailInput = {
+  id?: number
+  name: string
+  description?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  durationMinutes: number
+  categoryId: number
+  imageUrl?: string | null
+  isActive?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  updatedAt: Date | string
+  airecommendation?: Prisma.airecommendationUncheckedCreateNestedManyWithoutServiceInput
+  appointmentservice?: Prisma.appointmentserviceUncheckedCreateNestedManyWithoutServiceInput
+}
+
+export type serviceCreateOrConnectWithoutPaymentdetailInput = {
+  where: Prisma.serviceWhereUniqueInput
+  create: Prisma.XOR<Prisma.serviceCreateWithoutPaymentdetailInput, Prisma.serviceUncheckedCreateWithoutPaymentdetailInput>
+}
+
+export type serviceUpsertWithoutPaymentdetailInput = {
+  update: Prisma.XOR<Prisma.serviceUpdateWithoutPaymentdetailInput, Prisma.serviceUncheckedUpdateWithoutPaymentdetailInput>
+  create: Prisma.XOR<Prisma.serviceCreateWithoutPaymentdetailInput, Prisma.serviceUncheckedCreateWithoutPaymentdetailInput>
+  where?: Prisma.serviceWhereInput
+}
+
+export type serviceUpdateToOneWithWhereWithoutPaymentdetailInput = {
+  where?: Prisma.serviceWhereInput
+  data: Prisma.XOR<Prisma.serviceUpdateWithoutPaymentdetailInput, Prisma.serviceUncheckedUpdateWithoutPaymentdetailInput>
+}
+
+export type serviceUpdateWithoutPaymentdetailInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  airecommendation?: Prisma.airecommendationUpdateManyWithoutServiceNestedInput
+  appointmentservice?: Prisma.appointmentserviceUpdateManyWithoutServiceNestedInput
+  servicecategory?: Prisma.servicecategoryUpdateOneRequiredWithoutServiceNestedInput
+}
+
+export type serviceUncheckedUpdateWithoutPaymentdetailInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  airecommendation?: Prisma.airecommendationUncheckedUpdateManyWithoutServiceNestedInput
+  appointmentservice?: Prisma.appointmentserviceUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type serviceCreateWithoutServicecategoryInput = {
@@ -770,6 +877,7 @@ export type serviceCreateWithoutServicecategoryInput = {
   updatedAt: Date | string
   airecommendation?: Prisma.airecommendationCreateNestedManyWithoutServiceInput
   appointmentservice?: Prisma.appointmentserviceCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailCreateNestedManyWithoutServiceInput
 }
 
 export type serviceUncheckedCreateWithoutServicecategoryInput = {
@@ -785,6 +893,7 @@ export type serviceUncheckedCreateWithoutServicecategoryInput = {
   updatedAt: Date | string
   airecommendation?: Prisma.airecommendationUncheckedCreateNestedManyWithoutServiceInput
   appointmentservice?: Prisma.appointmentserviceUncheckedCreateNestedManyWithoutServiceInput
+  paymentdetail?: Prisma.paymentdetailUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type serviceCreateOrConnectWithoutServicecategoryInput = {
@@ -855,6 +964,7 @@ export type serviceUpdateWithoutServicecategoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   airecommendation?: Prisma.airecommendationUpdateManyWithoutServiceNestedInput
   appointmentservice?: Prisma.appointmentserviceUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUpdateManyWithoutServiceNestedInput
 }
 
 export type serviceUncheckedUpdateWithoutServicecategoryInput = {
@@ -870,6 +980,7 @@ export type serviceUncheckedUpdateWithoutServicecategoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   airecommendation?: Prisma.airecommendationUncheckedUpdateManyWithoutServiceNestedInput
   appointmentservice?: Prisma.appointmentserviceUncheckedUpdateManyWithoutServiceNestedInput
+  paymentdetail?: Prisma.paymentdetailUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type serviceUncheckedUpdateManyWithoutServicecategoryInput = {
@@ -893,11 +1004,13 @@ export type serviceUncheckedUpdateManyWithoutServicecategoryInput = {
 export type ServiceCountOutputType = {
   airecommendation: number
   appointmentservice: number
+  paymentdetail: number
 }
 
 export type ServiceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   airecommendation?: boolean | ServiceCountOutputTypeCountAirecommendationArgs
   appointmentservice?: boolean | ServiceCountOutputTypeCountAppointmentserviceArgs
+  paymentdetail?: boolean | ServiceCountOutputTypeCountPaymentdetailArgs
 }
 
 /**
@@ -924,6 +1037,13 @@ export type ServiceCountOutputTypeCountAppointmentserviceArgs<ExtArgs extends ru
   where?: Prisma.appointmentserviceWhereInput
 }
 
+/**
+ * ServiceCountOutputType without action
+ */
+export type ServiceCountOutputTypeCountPaymentdetailArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.paymentdetailWhereInput
+}
+
 
 export type serviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -939,6 +1059,7 @@ export type serviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   airecommendation?: boolean | Prisma.service$airecommendationArgs<ExtArgs>
   appointmentservice?: boolean | Prisma.service$appointmentserviceArgs<ExtArgs>
+  paymentdetail?: boolean | Prisma.service$paymentdetailArgs<ExtArgs>
   servicecategory?: boolean | Prisma.servicecategoryDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ServiceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["service"]>
@@ -963,6 +1084,7 @@ export type serviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type serviceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   airecommendation?: boolean | Prisma.service$airecommendationArgs<ExtArgs>
   appointmentservice?: boolean | Prisma.service$appointmentserviceArgs<ExtArgs>
+  paymentdetail?: boolean | Prisma.service$paymentdetailArgs<ExtArgs>
   servicecategory?: boolean | Prisma.servicecategoryDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ServiceCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -972,6 +1094,7 @@ export type $servicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     airecommendation: Prisma.$airecommendationPayload<ExtArgs>[]
     appointmentservice: Prisma.$appointmentservicePayload<ExtArgs>[]
+    paymentdetail: Prisma.$paymentdetailPayload<ExtArgs>[]
     servicecategory: Prisma.$servicecategoryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1328,6 +1451,7 @@ export interface Prisma__serviceClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   airecommendation<T extends Prisma.service$airecommendationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.service$airecommendationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$airecommendationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   appointmentservice<T extends Prisma.service$appointmentserviceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.service$appointmentserviceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$appointmentservicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  paymentdetail<T extends Prisma.service$paymentdetailArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.service$paymentdetailArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$paymentdetailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   servicecategory<T extends Prisma.servicecategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.servicecategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__servicecategoryClient<runtime.Types.Result.GetResult<Prisma.$servicecategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1762,6 +1886,30 @@ export type service$appointmentserviceArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.AppointmentserviceScalarFieldEnum | Prisma.AppointmentserviceScalarFieldEnum[]
+}
+
+/**
+ * service.paymentdetail
+ */
+export type service$paymentdetailArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the paymentdetail
+   */
+  select?: Prisma.paymentdetailSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the paymentdetail
+   */
+  omit?: Prisma.paymentdetailOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.paymentdetailInclude<ExtArgs> | null
+  where?: Prisma.paymentdetailWhereInput
+  orderBy?: Prisma.paymentdetailOrderByWithRelationInput | Prisma.paymentdetailOrderByWithRelationInput[]
+  cursor?: Prisma.paymentdetailWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentdetailScalarFieldEnum | Prisma.PaymentdetailScalarFieldEnum[]
 }
 
 /**

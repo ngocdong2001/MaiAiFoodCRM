@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
   CalendarDays,
@@ -38,6 +38,8 @@ export type WeeklyScheduleSlot = {
   slotType?: "work" | "break";
   note?: string;
   workItems?: ScheduleSlotWorkItem[];
+  // Feature-specific content rendered below the default popover body (e.g. a status control)
+  extra?: ReactNode;
 };
 
 type PositionedSlot = WeeklyScheduleSlot & {
@@ -448,6 +450,7 @@ const WeeklySchedule = ({
                             note={slot.note}
                             workItems={slot.workItems ?? []}
                           />
+                          {slot.extra}
                         </PopoverContent>
                       </Popover>
                     );

@@ -60,6 +60,7 @@ export const ModelName = {
   guesttag: 'guesttag',
   guesttagmapping: 'guesttagmapping',
   payment: 'payment',
+  paymentdetail: 'paymentdetail',
   refund: 'refund',
   service: 'service',
   servicecategory: 'servicecategory',
@@ -230,6 +231,18 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const PaymentdetailScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  serviceId: 'serviceId',
+  price: 'price',
+  quantity: 'quantity',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentdetailScalarFieldEnum = (typeof PaymentdetailScalarFieldEnum)[keyof typeof PaymentdetailScalarFieldEnum]
 
 
 export const RefundScalarFieldEnum = {

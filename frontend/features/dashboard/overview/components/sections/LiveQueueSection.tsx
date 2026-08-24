@@ -1,25 +1,10 @@
 "use client";
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/shared/lib/utils";
 import { NULL_TEXT_KEY } from "@/shared/lib/constants";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
-const statusBadge = (status: string, t: (key: string) => string) => {
-  switch (status) {
-    case "waiting":
-      return {
-        label: t("dashboard.overview.queue.status.waiting"),
-        className: "bg-[#F97316] text-white",
-      };
-    case "ready":
-    default:
-      return {
-        label: t("dashboard.overview.queue.status.ready"),
-        className: "bg-primary text-white",
-      };
-  }
-};
+import QueueStatusCell from "./QueueStatusCell";
 
 const LiveQueueSection = () => {
   const { t } = useTranslation();
@@ -64,7 +49,6 @@ const LiveQueueSection = () => {
             </thead>
             <tbody className="divide-y divide-[#EEF0F3]">
               {queue.map((guest) => {
-                const badge = statusBadge(guest.status, t);
                 return (
                   <tr key={guest.id} className="group">
                     <td className="py-3 text-base font-medium text-[#171A21]">
@@ -77,14 +61,10 @@ const LiveQueueSection = () => {
                       {guest.notes || t(NULL_TEXT_KEY)}
                     </td>
                     <td className="py-3 text-right">
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold",
-                          badge.className,
-                        )}
-                      >
-                        {badge.label}
-                      </span>
+                      <QueueStatusCell
+                        appointmentId={guest.id}
+                        status={guest.status}
+                      />
                     </td>
                   </tr>
                 );

@@ -311,6 +311,18 @@
         "emptyTitle": "Hàng chờ đang ổn!",
         "emptyDescription": "Yêu cầu mới sẽ xuất hiện ngay tại đây."
       },
+      "statusControl": {
+        "label": "Trạng thái",
+        "waiting": "Đang chờ",
+        "ready": "Sẵn sàng",
+        "completed": "Hoàn thành",
+        "updating": "Đang cập nhật...",
+        "error": "Cập nhật trạng thái thất bại. Vui lòng thử lại.",
+        "confirmTitle": "Xác nhận đổi trạng thái",
+        "confirmDescription": "Bạn có chắc muốn chuyển trạng thái lịch hẹn sang \"{{status}}\" không?",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận"
+      },
       "booking": {
         "title": "Tạo lịch hẹn",
         "description": "Tạo lịch từ dữ liệu khách hàng, nhân viên và dịch vụ hiện có.",
@@ -403,7 +415,9 @@
         },
         "status": {
           "waiting": "Đang chờ",
-          "ready": "Sẵn sàng"
+          "ready": "Sẵn sàng",
+          "completed": "Hoàn thành",
+          "error": "Cập nhật trạng thái thất bại. Vui lòng thử lại."
         }
       },
       "recentGuests": {

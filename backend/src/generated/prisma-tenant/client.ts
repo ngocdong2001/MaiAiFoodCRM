@@ -12,8 +12,6 @@
 
 import * as process from 'node:process'
 import * as path from 'node:path'
-import { fileURLToPath } from 'node:url'
-globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
 
 import * as runtime from "@prisma/client/runtime/client"
 import * as $Enums from "./enums"
@@ -86,6 +84,11 @@ export type guesttagmapping = Prisma.guesttagmappingModel
  * 
  */
 export type payment = Prisma.paymentModel
+/**
+ * Model paymentdetail
+ * 
+ */
+export type paymentdetail = Prisma.paymentdetailModel
 /**
  * Model refund
  * 

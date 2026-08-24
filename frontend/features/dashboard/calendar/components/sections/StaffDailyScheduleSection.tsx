@@ -6,6 +6,7 @@ import WeeklySchedule, {
 } from "@/shared/components/molecules/WeeklySchedule";
 
 import { useCalendarData } from "../../context/CalendarDataContext";
+import BookingStatusControl from "./BookingStatusControl";
 import WeeklyAppointmentBoard from "./WeeklyAppointmentBoard";
 
 const DEFAULT_START_HOUR = 8;
@@ -21,8 +22,12 @@ const getWeekStart = (date: Date) => {
 };
 
 const StaffDailyScheduleSection = () => {
-  const { appointments: schedulerEvents, staffMembers, cursorDate, setCursorDate } =
-    useCalendarData();
+  const {
+    appointments: schedulerEvents,
+    staffMembers,
+    cursorDate,
+    setCursorDate,
+  } = useCalendarData();
   const [viewMode, setViewMode] = useState<WeeklyScheduleViewMode>("day");
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith("vi") ? "vi-VN" : "en-US";
@@ -50,9 +55,13 @@ const StaffDailyScheduleSection = () => {
     dayEnd.setHours(23, 59, 59, 999);
 
     return schedulerEvents.filter((event) => {
-        const eventDate = new Date(event.year, event.month, event.day);
-        return Boolean(event.resourceKey) && eventDate >= dayStart && eventDate <= dayEnd;
-      });
+      const eventDate = new Date(event.year, event.month, event.day);
+      return (
+        Boolean(event.resourceKey) &&
+        eventDate >= dayStart &&
+        eventDate <= dayEnd
+      );
+    });
   }, [cursorDate, schedulerEvents]);
 
   const resources = useMemo(() => {
@@ -71,6 +80,12 @@ const StaffDailyScheduleSection = () => {
         endHour: event.endHour,
         label: `${event.title} · ${event.detail.timeRange}`,
         sublabel: event.subtitle,
+        extra: (
+          <BookingStatusControl
+            appointmentId={Number(event.key)}
+            status={event.detail.status}
+          />
+        ),
       })),
     [visibleEvents],
   );
@@ -107,16 +122,20 @@ const StaffDailyScheduleSection = () => {
         weekStart={weekStart}
         events={weekEvents}
         onDayView={() => setViewMode("day")}
-        onPrevious={() => setCursorDate((current) => {
-          const next = new Date(current);
-          next.setDate(current.getDate() - 7);
-          return next;
-        })}
-        onNext={() => setCursorDate((current) => {
-          const next = new Date(current);
-          next.setDate(current.getDate() + 7);
-          return next;
-        })}
+        onPrevious={() =>
+          setCursorDate((current) => {
+            const next = new Date(current);
+            next.setDate(current.getDate() - 7);
+            return next;
+          })
+        }
+        onNext={() =>
+          setCursorDate((current) => {
+            const next = new Date(current);
+            next.setDate(current.getDate() + 7);
+            return next;
+          })
+        }
       />
     );
   }

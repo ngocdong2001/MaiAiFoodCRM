@@ -406,6 +406,7 @@ export const ModelName = {
   guesttag: 'guesttag',
   guesttagmapping: 'guesttagmapping',
   payment: 'payment',
+  paymentdetail: 'paymentdetail',
   refund: 'refund',
   service: 'service',
   servicecategory: 'servicecategory',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "airecommendation" | "appointment" | "appointmentservice" | "auditlog" | "guest" | "guestnote" | "guesttag" | "guesttagmapping" | "payment" | "refund" | "service" | "servicecategory" | "setting" | "staff" | "staffschedule" | "staffspecialty" | "staffspecialtymapping" | "upsellcampaign"
+    modelProps: "airecommendation" | "appointment" | "appointmentservice" | "auditlog" | "guest" | "guestnote" | "guesttag" | "guesttagmapping" | "payment" | "paymentdetail" | "refund" | "service" | "servicecategory" | "setting" | "staff" | "staffschedule" | "staffspecialty" | "staffspecialtymapping" | "upsellcampaign"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1025,6 +1026,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.paymentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PaymentCountAggregateOutputType> | number
+        }
+      }
+    }
+    paymentdetail: {
+      payload: Prisma.$paymentdetailPayload<ExtArgs>
+      fields: Prisma.paymentdetailFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.paymentdetailFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.paymentdetailFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>
+        }
+        findFirst: {
+          args: Prisma.paymentdetailFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.paymentdetailFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>
+        }
+        findMany: {
+          args: Prisma.paymentdetailFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>[]
+        }
+        create: {
+          args: Prisma.paymentdetailCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>
+        }
+        createMany: {
+          args: Prisma.paymentdetailCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.paymentdetailDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>
+        }
+        update: {
+          args: Prisma.paymentdetailUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>
+        }
+        deleteMany: {
+          args: Prisma.paymentdetailDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.paymentdetailUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.paymentdetailUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$paymentdetailPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentdetailAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentdetail>
+        }
+        groupBy: {
+          args: Prisma.paymentdetailGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentdetailGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.paymentdetailCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentdetailCountAggregateOutputType> | number
         }
       }
     }
@@ -1806,6 +1873,18 @@ export const PaymentScalarFieldEnum = {
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
+export const PaymentdetailScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  serviceId: 'serviceId',
+  price: 'price',
+  quantity: 'quantity',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentdetailScalarFieldEnum = (typeof PaymentdetailScalarFieldEnum)[keyof typeof PaymentdetailScalarFieldEnum]
+
+
 export const RefundScalarFieldEnum = {
   id: 'id',
   paymentId: 'paymentId',
@@ -2320,6 +2399,7 @@ export type GlobalOmitConfig = {
   guesttag?: Prisma.guesttagOmit
   guesttagmapping?: Prisma.guesttagmappingOmit
   payment?: Prisma.paymentOmit
+  paymentdetail?: Prisma.paymentdetailOmit
   refund?: Prisma.refundOmit
   service?: Prisma.serviceOmit
   servicecategory?: Prisma.servicecategoryOmit
