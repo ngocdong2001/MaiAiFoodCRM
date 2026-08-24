@@ -1,10 +1,5 @@
 "use client";
-import {
-  CalendarDays,
-  Clock,
-  Gauge,
-  Users,
-} from "lucide-react";
+import { CalendarDays, Clock, Gauge, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import StatCard from "@/shared/components/molecules/StatCard";
