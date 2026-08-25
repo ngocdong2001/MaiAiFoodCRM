@@ -3,7 +3,14 @@ import { apiClient } from "@/core/config/axios.config";
 export type DayHours = { day: string; open: boolean; from: string; to: string };
 type ApiResponse<T> = { success: boolean; data: T };
 
-export type SalonSettings = { timezone: string };
+export type SalonSettings = {
+  salonName: string;
+  businessType: string;
+  email: string;
+  phone: string;
+  address: string;
+  timezone: string;
+};
 
 export const settingsService = {
   async getOperatingHours(): Promise<DayHours[]> {
