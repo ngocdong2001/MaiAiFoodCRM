@@ -91,19 +91,19 @@ export const SettingsController = {
 
   // ── Salon / Business profile settings ─────────────────────────
 
-  private static readonly SALON_SETTING_KEYS = [
+  SALON_SETTING_KEYS: [
     { key: "salon_name",      label: "Salon Name" },
     { key: "salon_business_type", label: "Business Type" },
     { key: "salon_email",     label: "Contact Email" },
     { key: "salon_phone",     label: "Primary Phone" },
     { key: "salon_address",   label: "Physical Address" },
     { key: "salon_timezone",  label: "Salon Timezone" },
-  ] as const;
+  ] as const,
 
   async getSalonSettings(req: Request, res: Response): Promise<void> {
     const db = req.tenantClient!;
     try {
-      const keys = SettingsController.SALON_SETTING_KEYS.map((k) => k.key);
+      const keys = ["salon_name", "salon_business_type", "salon_email", "salon_phone", "salon_address", "salon_timezone"];
       const rows = await db.setting.findMany({
         where: { key: { in: keys } },
       });
