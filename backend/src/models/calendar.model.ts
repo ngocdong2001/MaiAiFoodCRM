@@ -393,7 +393,13 @@ export const CalendarModel = {
       }),
       db.service.findMany({
         where: { isActive: true },
-        select: { id: true, name: true, price: true, durationMinutes: true },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          durationMinutes: true,
+          servicecategory: { select: { name: true } },
+        },
         orderBy: { name: "asc" },
       }),
       db.setting.findUnique({ where: { key: "operating_hours" } }),
@@ -417,6 +423,7 @@ export const CalendarModel = {
       services: services.map((service) => ({
         ...service,
         price: Number(service.price),
+        category: service.servicecategory?.name ?? null,
       })),
       operatingHours,
     };
@@ -563,5 +570,165 @@ export const CalendarModel = {
     }
     await db.appointment.delete({ where: { id } });
     return { cancelled: false };
+  },
+
+  async getAvailability(
+    db: PrismaClient,
+    params: {
+      date: string;
+      service?: string;
+      staffId?: number;
+      preferredTime?: string;
+    },
+  ) {
+    const targetDate = new Date(`${params.date}T00:00:00.000Z`);
+    const dayOfWeek = targetDate.getDay();
+
+    // Get active staff and their schedules
+    const staffList = await db.staff.findMany({
+      where: { status: { notIn: ["inactive", "on_leave"] } },
+      select: { id: true, name: true, role: true },
+    });
+
+    const staffIds = staffList.map((s) => s.id);
+    if (params.staffId && staffIds.includes(params.staffId)) {
+      // filter to requested staff only
+    }
+
+    const effectiveStaffIds = params.staffId
+      ? staffIds.filter((id) => id === params.staffId)
+      : staffIds;
+
+    // Get staff schedules for the day
+    const schedules = await db.staffschedule.findMany({
+      where: {
+        staffId: { in: effectiveStaffIds },
+        date: targetDate,
+      },
+    });
+
+    const scheduleMap = new Map(
+      schedules.map((s) => [
+        s.staffId,
+        {
+          startTime: s.startTime,
+          endTime: s.endTime,
+          isDayOff: s.isDayOff,
+          breakStart: s.breakStart,
+          breakEnd: s.breakEnd,
+        },
+      ]),
+    );
+
+    // Get existing appointments for the date
+    const dayStart = new Date(`${params.date}T00:00:00.000Z`);
+    const dayEnd = new Date(`${params.date}T23:59:59.999Z`);
+    const existingAppointments = await db.appointment.findMany({
+      where: {
+        staffId: { in: effectiveStaffIds },
+        status: { notIn: ["cancelled"] },
+        startTime: { gte: dayStart, lte: dayEnd },
+      },
+      select: { staffId: true, startTime: true, endTime: true },
+    });
+
+    // Find service duration if specified
+    let durationMinutes = 30; // default
+    if (params.service) {
+      const services = await db.service.findMany({
+        where: { isActive: true },
+        select: { name: true, durationMinutes: true },
+      });
+      const match = services.find(s => s.name.toLowerCase().includes(params.service!.toLowerCase()));
+      if (match) durationMinutes = match.durationMinutes;
+    }
+
+    // Generate available slots for each staff member
+    const availableSlots: Array<{
+      time: string;
+      end_time: string;
+      staff_id: number;
+      staff_name: string;
+    }> = [];
+
+    for (const staff of staffList) {
+      if (!effectiveStaffIds.includes(staff.id)) continue;
+      const schedule = scheduleMap.get(staff.id);
+      if (!schedule || schedule.isDayOff) continue;
+
+      const staffStart = parseTime(schedule.startTime);
+      const staffEnd = parseTime(schedule.endTime);
+      const breakStart = schedule.breakStart ? parseTime(schedule.breakStart) : null;
+      const breakEnd = schedule.breakEnd ? parseTime(schedule.breakEnd) : null;
+
+      // Get staff's appointments for the day
+      const staffAppts = existingAppointments.filter((a) => a.staffId === staff.id);
+
+      // Generate 30-min slots within working hours
+      for (let startMin = staffStart; startMin + durationMinutes <= staffEnd; startMin += 30) {
+        const endMin = startMin + durationMinutes;
+
+        // Check break overlap
+        if (
+          breakStart !== null &&
+          breakEnd !== null &&
+          startMin < breakEnd &&
+          endMin > breakStart
+        ) {
+          continue;
+        }
+
+        // Check appointment overlap
+        const slotStart = new Date(`${params.date}T00:00:00.000Z`);
+        slotStart.setMinutes(startMin);
+        const slotEnd = new Date(`${params.date}T00:00:00.000Z`);
+        slotEnd.setMinutes(endMin);
+
+        const hasConflict = staffAppts.some((appt) => {
+          const apptStart = new Date(appt.startTime);
+          const apptEnd = new Date(appt.endTime);
+          return apptStart < slotEnd && apptEnd > slotStart;
+        });
+
+        if (!hasConflict) {
+          const hours = Math.floor(startMin / 60);
+          const mins = startMin % 60;
+          const endHours = Math.floor(endMin / 60);
+          const endMins = endMin % 60;
+          availableSlots.push({
+            time: `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`,
+            end_time: `${String(endHours).padStart(2, "0")}:${String(endMins).padStart(2, "0")}`,
+            staff_id: staff.id,
+            staff_name: staff.name,
+          });
+        }
+      }
+    }
+
+    // Check preferred_time if specified
+    let preferredAvailable = undefined;
+    if (params.preferredTime) {
+      preferredAvailable = availableSlots.some(
+        (slot) => slot.time === params.preferredTime,
+      );
+    }
+
+    // Suggest times: first available per staff
+    const suggestedTimes: string[] = [];
+    const seenStaff = new Set<number>();
+    for (const slot of availableSlots) {
+      if (!seenStaff.has(slot.staff_id)) {
+        seenStaff.add(slot.staff_id);
+        suggestedTimes.push(slot.time);
+      }
+    }
+
+    return {
+      date: params.date,
+      available: availableSlots.length > 0,
+      available_slots: availableSlots,
+      suggested_times: suggestedTimes,
+      ...(params.preferredTime ? { preferred_time: params.preferredTime, available: preferredAvailable } : {}),
+    };
   },
 };

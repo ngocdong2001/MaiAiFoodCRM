@@ -13,18 +13,18 @@ MariaDB Server (mariadb-crm :3307)
 │       Roles: admin | manager | staff
 │       Constraint: @@unique([tenantId, email])
 │
-├── maiai_crm_1 (Tenant 1 - Isolated)
+├── maiai_crm_{slug} (Tenant 1 - Isolated, e.g. maiai_crm_maiai_reception)
 │   ├── guest, guestnote, guesttag, guesttagmapping
 │   ├── appointment, appointmentservice
 │   ├── staff, staffschedule, staffspecialty, staffspecialtymapping
 │   ├── service, servicecategory
 │   ├── payment, refund
-│   ├── setting, auditlog
+│   ├── setting, salonsettings, auditlog
 │   ├── airecommendation, upsellcampaign
-│   └── (19 tables: business + tenant users)
+│   └── (21 tables: business + _prisma_migrations)
 │
-└── maiai_crm_N (Tenant N - Isolated)
-    └── (same 19 tables, fully isolated)
+└── maiai_crm_{slug_N} (Tenant N - Isolated)
+    └── (same 21 tables, fully isolated)
 ```
 
 **Benefits:**
@@ -35,45 +35,43 @@ MariaDB Server (mariadb-crm :3307)
 
 ## 🐳 Quick Start (Docker — recommended)
 
-The workspace root uses `docker-compose-sub.yml` which runs **all** services in a shared bridge network.
+The VPS deployment uses `MaiAI-pcat/server/deploy/asterisk-livekit/docker-compose.yml` (host network mode).
 
-```powershell
-# From workspace root
-cd "d:\Learning\AI Call bot"
+```bash
+# On VPS
+cd ~/AI-Call-bot/MaiAI-pcat/server/deploy/asterisk-livekit
 
-# Start everything (MariaDB × 2, CallCenterAdmin, MaiAICRM backend + frontend)
-docker compose -f docker-compose-sub.yml up -d
+# Start CRM services
+docker compose up -d maiai-mariadb maiai-backend maiai-frontend
 
-# Or only the CRM pieces
-docker compose -f docker-compose-sub.yml up -d maiai-backend maiai-frontend
+# Rebuild after code changes
+docker compose up -d --build --force-recreate maiai-backend
 ```
 
-| Service | Container | Port |
-|---------|-----------|------|
-| MariaDB (CallCenterAdmin) | shared-mariadb | 3306 |
-| MariaDB (MaiAICRM) | maiai-mariadb | 3307 |
-| CallCenterAdmin API | callcenteradmin-app | 4000 |
-| MaiAICRM Backend | maiai-backend | 3001 |
-| MaiAICRM Frontend | maiai-frontend | 3000 |
+| Service | Container | Port | Host |
+|---------|-----------|------|------|
+| MariaDB (MaiAICRM) | maiai-mariadb | 3308 | 127.0.0.1 |
+| MaiAICRM Backend | maiai-backend | 3002 | 0.0.0.0 |
+| MaiAICRM Frontend | maiai-frontend | 3003 | 0.0.0.0 |
 
-> **Network:** All containers share `aicallbot_shared-net`, so service discovery uses container names (`maiai-backend`, `mariadb-crm`, etc.).
+> **Network:** Host network mode — all services bind directly to `127.0.0.1` on the host. Service discovery uses `127.0.0.1:port`.
 
 ### Environment Variables (MaiAICRM Backend)
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL_MASTER` | `mysql://maiai:maiai@mariadb-crm:3306/maiai_master` | Master DB connection |
-| `DATABASE_URL_TENANT` | `mysql://maiai:maiai@mariadb-crm:3306/maiai_crm_1` | Tenant DB template |
-| `PORT` | `3001` | Backend listen port |
+| Variable | VPS Default | Description |
+|----------|-------------|-------------|
+| `DATABASE_URL_MASTER` | `mysql://maiai:maiai@127.0.0.1:3308/maiai_master` | Master DB connection |
+| `DATABASE_URL_TENANT` | `mysql://maiai:maiai@127.0.0.1:3308/maiai_crm_1` | Tenant DB template (used by Prisma CLI) |
+| `PORT` | `3002` | Backend listen port |
 | `JWT_SECRET` | `maiai-jwt-secret-change-in-production` | JWT signing key |
 
 ### CallCenterAdmin → MaiAICRM Integration
 
 CallCenterAdmin provisions CRM tenants and manages admin users via:
 
-| Variable | Value |
-|----------|-------|
-| `CRM_BACKEND_URL` | `http://maiai-backend:3001` |
+| Variable | VPS Value |
+|----------|-----------|
+| `CRM_BACKEND_URL` | `http://127.0.0.1:3002` |
 | `CRM_ADMIN_EMAIL` | `admin@maiai.com` |
 | `CRM_ADMIN_PASSWORD` | `Admin@123` |
 
@@ -171,7 +169,7 @@ Extract tenantId from token
     ↓
 Look up tenant in master DB
     ↓
-Get tenant's database name (maiai_crm_{tenantId})
+Get tenant's database name from DB record (tenant.databaseName = 'maiai_crm_{slug}')
     ↓
 Create/retrieve Prisma client for tenant DB
     ↓
@@ -247,37 +245,41 @@ npm run migrate:dev-tenant
 
 ## 🗄️ Tenant Database Migration
 
-When a new tenant is created via `POST /api/admin/tenants`, the backend automatically provisions its database. This is **not** Prisma Migrate — it reads raw SQL files from a directory and executes them in order.
+When a new tenant is created via `POST /api/admin/tenants`, the backend automatically provisions its database using **Prisma Migrate** (via CLI).
 
 ### How It Works
 
 ```
 POST /api/admin/tenants  { name, slug, email, password }
     │
-    ├─ 1. INSERT INTO maiai_master.tenant (→ get tenant.id)
-    ├─ 2. UPDATE tenant SET databaseName = 'maiai_crm_{id}'
-    ├─ 3. CREATE DATABASE maiai_crm_{id}
-    ├─ 4. applyTenantMigrations(databaseName)
-    │       ├─ Scan prisma/migrations_tenant/ for folders
-    │       ├─ Sort by folder name (timestamp prefix)
-    │       ├─ For each folder: read migration.sql → execute statements
-    │       └─ Return list of applied migration names
-    └─ 5. INSERT INTO maiai_master.user (admin user for this tenant)
+    ├─ 1. INSERT INTO maiai_master.tenant
+    │      └─ databaseName = 'maiai_crm_{slug}' (slug with special chars → _)
+    ├─ 2. INSERT INTO maiai_master.user (admin user for this tenant)
+    ├─ 3. CREATE DATABASE maiai_crm_{slug} (raw SQL via Prisma client)
+    └─ 4. npx prisma migrate deploy --schema prisma/schema.tenant.prisma
+              ├─ Reads prisma/migrations_tenant/ for migration folders
+              ├─ Applies: init_crm + add_salonsettings
+              └─ Creates 21 tables in the new tenant database
 ```
 
-The `applyTenantMigrations()` function in `tenant.controller.ts` auto-discovers all migration folders — **no code changes needed** when adding new migrations.
+The `createTenantDatabase()` function in `tenant-admin.route.ts`:
+1. Creates the database via `CREATE DATABASE` (raw SQL)
+2. Runs `npx prisma migrate deploy` via `execSync` with the tenant schema config
+3. Returns success/failure status in the API response
+
+**Tenant naming convention:** `maiai_crm_{slug}` — matches the MariaDB GRANT patterns in `init-db.sql`.
 
 ### Migration Directory
 
 ```
 MaiAICRM/backend/prisma/migrations_tenant/
 ├── 20260803000100_init_crm/
-│   └── migration.sql          ← 19 core business tables
+│   └── migration.sql          ← 20 core business tables
 └── 20260814000000_add_salonsettings/
     └── migration.sql          ← adds salonsettings table
 ```
 
-Each folder must contain exactly one `migration.sql` file. Folders are sorted alphabetically (timestamp prefix ensures correct order).
+Each folder must contain exactly one `migration.sql` file. Prisma tracks applied migrations in the `_prisma_migrations` table within each tenant database.
 
 ### Response
 

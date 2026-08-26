@@ -190,4 +190,41 @@ export const CRMModel = {
     await db.guest.delete({ where: { id } });
     return { archived: false };
   },
+
+  /**
+   * Find guest by phone number (normalized).
+   * Returns serialized guest with recent services for voice agent lookup.
+   */
+  async getByPhone(db: PrismaClient, phone: string) {
+    // Normalize phone: remove +, spaces, dashes
+    const normalized = phone.replace(/[^0-9]/g, "").trim();
+    if (!normalized) return null;
+
+    const guest = await db.guest.findFirst({
+      where: {
+        phone: { contains: normalized },
+        isActive: true,
+      },
+      include: guestInclude,
+    });
+    if (!guest) return null;
+
+    const serialized = serializeGuest(guest);
+
+    // Add recent services for voice agent context
+    const recentServices = guest.appointment
+      .filter((apt: any) => apt.status !== "cancelled")
+      .slice(0, 5)
+      .flatMap((apt: any) =>
+        apt.appointmentservice.map((s: any) => s.service.name)
+      )
+      .filter((name: string, idx: number, arr: string[]) => arr.indexOf(name) === idx);
+
+    return {
+      ...serialized,
+      recentServices,
+      lastVisit: serialized.lastVisit,
+      nextAppointment: serialized.nextAppointment,
+    };
+  },
 };

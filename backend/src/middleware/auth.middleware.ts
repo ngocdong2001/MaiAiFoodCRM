@@ -7,11 +7,68 @@ import type { JwtPayload } from "../types/tenant.js";
 
 const jwtSecret = process.env.JWT_SECRET;
 
+/**
+ * Service-to-service API key for voice agent integration.
+ * Set VOICE_AGENT_API_KEY in .env to enable.
+ */
+const VOICE_AGENT_API_KEY = process.env.VOICE_AGENT_API_KEY || "";
+
+/**
+ * Resolve tenant from X-Tenant-ID header for API key auth.
+ */
+async function resolveTenantFromSlug(slug: string) {
+  const prismaMaster = getPrismaMaster();
+  const tenant = await prismaMaster.tenant.findUnique({
+    where: { slug },
+  });
+  if (!tenant || !tenant.isActive) return null;
+  return tenant;
+}
+
 export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  // ── Check API key first (service-to-service auth) ──────────────────────
+  const apiKey = req.headers["x-api-key"] as string | undefined;
+  if (apiKey && apiKey === VOICE_AGENT_API_KEY) {
+    const tenantSlug = req.headers["x-tenant-id"] as string | undefined;
+    if (!tenantSlug) {
+      return res.status(400).json({ message: "X-Tenant-ID header required for API key auth" });
+    }
+
+    const tenant = await resolveTenantFromSlug(tenantSlug);
+    if (!tenant) {
+      return res.status(401).json({ message: "Invalid tenant" });
+    }
+
+    const masterUrl = new URL(process.env.DATABASE_URL_MASTER || "mysql://maiai:maiai@localhost:3306/maiai_master");
+    const tenantDbUrl = `mysql://${masterUrl.username}:${masterUrl.password}@${masterUrl.hostname}:${masterUrl.port || 3306}/${tenant.databaseName}`;
+
+    req.tenant = {
+      id: tenant.id,
+      name: tenant.name,
+      databaseUrl: tenantDbUrl,
+    };
+
+    req.tenantClient = getPrismaTenant(tenant.id, tenantDbUrl);
+
+    // Service account context (no real user)
+    req.user = {
+      id: 0,
+      tenantId: tenant.id,
+      name: "Voice Agent",
+      email: "voice-agent@maiai.com",
+      role: "service",
+      phone: null,
+      avatarUrl: null,
+    };
+
+    return next();
+  }
+
+  // ── Standard JWT auth ──────────────────────────────────────────────────
   const authHeader = req.headers.authorization || "";
   const token = authHeader.replace("Bearer ", "").trim();
 

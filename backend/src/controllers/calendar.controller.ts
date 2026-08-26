@@ -57,12 +57,10 @@ export const CalendarController = {
     const status =
       typeof req.query.status === "string" ? req.query.status : undefined;
     if (!validDate(startDate) || !validDate(endDate))
-      return void res
-        .status(400)
-        .json({
-          success: false,
-          message: "Valid startDate and endDate are required",
-        });
+      return void res.status(400).json({
+        success: false,
+        message: "Valid startDate and endDate are required",
+      });
     if (status && !APPOINTMENT_STATUSES.includes(status as AppointmentStatus))
       return void res
         .status(400)
@@ -72,17 +70,15 @@ export const CalendarController = {
         typeof req.query.staffIds === "string"
           ? req.query.staffIds.split(",").map(Number).filter(Number.isInteger)
           : undefined;
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: await CalendarModel.getAll(getDb(req), {
-            startDate,
-            endDate,
-            staffIds,
-            status: status as AppointmentStatus | undefined,
-          }),
-        });
+      res.status(200).json({
+        success: true,
+        data: await CalendarModel.getAll(getDb(req), {
+          startDate,
+          endDate,
+          staffIds,
+          status: status as AppointmentStatus | undefined,
+        }),
+      });
     } catch (error) {
       handleError(res, error, "Failed to load appointments");
     }
@@ -105,14 +101,11 @@ export const CalendarController = {
     if (validation)
       return void res.status(400).json({ success: false, message: validation });
     try {
-      const data = await CalendarModel.create(getDb(req), input);
-      if (data && req.tenant)
-        queueEvents.publish(req.tenant.id, "appointment.created", data.id);
       res
         .status(201)
         .json({
           success: true,
-          data,
+          data: await CalendarModel.create(getDb(req), input),
           message: "Appointment created successfully",
         });
     } catch (error) {
@@ -130,14 +123,11 @@ export const CalendarController = {
     if (validation)
       return void res.status(400).json({ success: false, message: validation });
     try {
-      const data = await CalendarModel.update(getDb(req), id, input);
-      if (req.tenant)
-        queueEvents.publish(req.tenant.id, "appointment.updated", id);
       res
         .status(200)
         .json({
           success: true,
-          data,
+          data: await CalendarModel.update(getDb(req), id, input),
           message: "Appointment updated successfully",
         });
     } catch (error) {
@@ -156,17 +146,18 @@ export const CalendarController = {
         .status(400)
         .json({ success: false, message: "Invalid appointment status" });
     try {
-      const data = await CalendarModel.updateStatus(
-        getDb(req),
-        id,
-        status,
-        req.body.cancelReason,
-      );
-      if (req.tenant)
-        queueEvents.publish(req.tenant.id, "appointment.status_changed", id);
       res
         .status(200)
-        .json({ success: true, data, message: "Appointment status updated" });
+        .json({
+          success: true,
+          data: await CalendarModel.updateStatus(
+            getDb(req),
+            id,
+            status,
+            req.body.cancelReason,
+          ),
+          message: "Appointment status updated",
+        });
     } catch (error) {
       handleError(res, error, "Failed to update appointment status");
     }
@@ -179,12 +170,6 @@ export const CalendarController = {
         .json({ success: false, message: "Invalid appointment ID" });
     try {
       const data = await CalendarModel.delete(getDb(req), id);
-      if (req.tenant)
-        queueEvents.publish(
-          req.tenant.id,
-          data.cancelled ? "appointment.status_changed" : "appointment.deleted",
-          id,
-        );
       res
         .status(200)
         .json({
@@ -196,6 +181,34 @@ export const CalendarController = {
         });
     } catch (error) {
       handleError(res, error, "Failed to delete appointment");
+    }
+  },
+  async getAvailability(req: Request, res: Response): Promise<void> {
+    const date = typeof req.query.date === "string" ? req.query.date : "";
+    if (!date || !validDate(date))
+      return void res
+        .status(400)
+        .json({ success: false, message: "Valid date parameter is required" });
+    const service =
+      typeof req.query.service === "string" ? req.query.service : undefined;
+    const staffId =
+      typeof req.query.staff_id === "string"
+        ? Number.parseInt(req.query.staff_id)
+        : undefined;
+    const preferredTime =
+      typeof req.query.preferred_time === "string"
+        ? req.query.preferred_time
+        : undefined;
+    try {
+      const data = await CalendarModel.getAvailability(getDb(req), {
+        date,
+        service,
+        staffId: Number.isInteger(staffId) ? staffId : undefined,
+        preferredTime,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      handleError(res, error, "Failed to check availability");
     }
   },
 };
