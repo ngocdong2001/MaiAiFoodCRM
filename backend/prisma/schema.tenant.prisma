@@ -269,6 +269,7 @@ model staff {
   hourlyRate            Decimal?                @db.Decimal(8, 2)
   commissionRate        Decimal?                @db.Decimal(5, 2)
   joinDate              DateTime?               @db.Date
+  weeklySchedule        Json?                   // Weekly template: { monday: { active, startTime, endTime, breakStart?, breakEnd?, station? }, ... }
   createdAt             DateTime                @default(now())
   updatedAt             DateTime
   appointment           appointment[]

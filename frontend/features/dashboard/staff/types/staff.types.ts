@@ -6,6 +6,25 @@ export type StaffSpecialty = {
   description: string | null;
 };
 
+export type WeeklyScheduleDay = {
+  active: boolean;
+  startTime?: string; // HH:MM
+  endTime?: string; // HH:MM
+  breakStart?: string | null; // HH:MM
+  breakEnd?: string | null; // HH:MM
+  station?: string | null;
+};
+
+export type WeeklySchedule = {
+  monday: WeeklyScheduleDay;
+  tuesday: WeeklyScheduleDay;
+  wednesday: WeeklyScheduleDay;
+  thursday: WeeklyScheduleDay;
+  friday: WeeklyScheduleDay;
+  saturday: WeeklyScheduleDay;
+  sunday: WeeklyScheduleDay;
+};
+
 export type StaffSchedule = {
   id: number;
   date: string;
@@ -29,6 +48,7 @@ export type StaffMember = {
   hourlyRate: number | null;
   commissionRate: number | null;
   joinDate: string | null;
+  weeklySchedule: WeeklySchedule | null;
   specialties: StaffSpecialty[];
   schedules: StaffSchedule[];
 };
@@ -44,6 +64,9 @@ export type StaffFormValues = {
   commissionRate: string;
   joinDate: string;
   specialtyIds: number[];
+  // Weekly schedule section
+  weeklySchedule: WeeklySchedule | null;
+  // Legacy per-day schedule section (for overrides)
   scheduleDate: string;
   startTime: string;
   endTime: string;

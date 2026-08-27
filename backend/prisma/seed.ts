@@ -185,6 +185,61 @@ const main = async () => {
           },
         });
 
+    // Update staff with weekly schedule (new approach)
+    await prisma.staff.update({
+      where: { id: staff.id },
+      data: {
+        weeklySchedule: {
+          monday: {
+            active: seed.status !== "on_leave",
+            startTime: seed.startTime,
+            endTime: seed.endTime,
+            breakStart: seed.breakStart,
+            breakEnd: seed.breakEnd,
+            station: seed.station,
+          },
+          tuesday: {
+            active: seed.status !== "on_leave",
+            startTime: seed.startTime,
+            endTime: seed.endTime,
+            breakStart: seed.breakStart,
+            breakEnd: seed.breakEnd,
+            station: seed.station,
+          },
+          wednesday: {
+            active: seed.status !== "on_leave",
+            startTime: seed.startTime,
+            endTime: seed.endTime,
+            breakStart: seed.breakStart,
+            breakEnd: seed.breakEnd,
+            station: seed.station,
+          },
+          thursday: {
+            active: seed.status !== "on_leave",
+            startTime: seed.startTime,
+            endTime: seed.endTime,
+            breakStart: seed.breakStart,
+            breakEnd: seed.breakEnd,
+            station: seed.station,
+          },
+          friday: {
+            active: seed.status !== "on_leave",
+            startTime: seed.startTime,
+            endTime: seed.endTime,
+            breakStart: seed.breakStart,
+            breakEnd: seed.breakEnd,
+            station: seed.station,
+          },
+          saturday: {
+            active: false,
+          },
+          sunday: {
+            active: false,
+          },
+        },
+      },
+    });
+
     await prisma.staffspecialtymapping.deleteMany({
       where: { staffId: staff.id },
     });
@@ -195,35 +250,6 @@ const main = async () => {
       })),
       skipDuplicates: true,
     });
-
-    for (let dayOffset = 0; dayOffset < 7; dayOffset += 1) {
-      const date = new Date(today);
-      date.setUTCDate(today.getUTCDate() + dayOffset);
-      const isDayOff = seed.status === "on_leave" || date.getUTCDay() === 0;
-      await prisma.staffschedule.upsert({
-        where: { staffId_date: { staffId: staff.id, date } },
-        create: {
-          staffId: staff.id,
-          date,
-          startTime: seed.startTime,
-          endTime: seed.endTime,
-          breakStart: isDayOff ? null : seed.breakStart,
-          breakEnd: isDayOff ? null : seed.breakEnd,
-          isDayOff,
-          note: seed.station,
-          updatedAt: now,
-        },
-        update: {
-          startTime: seed.startTime,
-          endTime: seed.endTime,
-          breakStart: isDayOff ? null : seed.breakStart,
-          breakEnd: isDayOff ? null : seed.breakEnd,
-          isDayOff,
-          note: seed.station,
-          updatedAt: now,
-        },
-      });
-    }
   }
 
   const guestTagNames = [...new Set(guestSeeds.flatMap((guest) => guest.tags))];

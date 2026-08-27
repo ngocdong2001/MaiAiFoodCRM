@@ -1,5 +1,6 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import type { PrismaClient } from "../generated/prisma-tenant/client.js";
+import { resolveDayScheduleFromWeekly, type DaySchedule } from "./schedule.helpers.js";
 
 export const APPOINTMENT_STATUSES = [
   "pending",
@@ -92,6 +93,17 @@ const timeStringMinutes = (datetimeStr: string): number => {
   const match = datetimeStr.match(/T(\d{2}):(\d{2})/);
   if (!match) return 0;
   return Number(match[1]) * 60 + Number(match[2]);
+};
+
+// Convert a UTC datetime string to salon-local minutes-of-day.
+// Used when comparing UTC-stored appointment times against local-time break/schedule.
+const utcToLocalMinutes = (datetimeStr: string, tzOffsetMinutes: number): number => {
+  const match = datetimeStr.match(/T(\d{2}):(\d{2})/);
+  if (!match) return 0;
+  const utcMinutes = Number(match[1]) * 60 + Number(match[2]);
+  const localMinutes = utcMinutes + tzOffsetMinutes;
+  // Handle day wraparound
+  return ((localMinutes % 1440) + 1440) % 1440;
 };
 
 // Use UTC noon so date never shifts across timezone boundaries
@@ -192,7 +204,7 @@ const validateRelationsAndAvailability = async (
   const datePart = input.startTime.slice(0, 10);
   const scheduleDate = new Date(`${datePart}T00:00:00.000Z`);
 
-  const [guest, staff, services, schedule, storeHoursSetting] =
+  const [guest, staff, services, overrideSchedule, storeHoursSetting, salonTzRow] =
     await Promise.all([
       transaction.guest.findUnique({
         where: { id: input.guestId },
@@ -200,7 +212,7 @@ const validateRelationsAndAvailability = async (
       }),
       transaction.staff.findUnique({
         where: { id: input.staffId },
-        select: { status: true },
+        select: { status: true, weeklySchedule: true },
       }),
       transaction.service.findMany({
         where: { id: { in: input.serviceIds }, isActive: true },
@@ -209,6 +221,7 @@ const validateRelationsAndAvailability = async (
         where: { staffId_date: { staffId: input.staffId, date: scheduleDate } },
       }),
       transaction.setting.findUnique({ where: { key: "operating_hours" } }),
+      transaction.setting.findUnique({ where: { key: "salon_timezone" } }),
     ]);
 
   if (!guest?.isActive) throw new CalendarDomainError("Guest is unavailable");
@@ -217,8 +230,27 @@ const validateRelationsAndAvailability = async (
   if (services.length !== new Set(input.serviceIds).size)
     throw new CalendarDomainError("One or more services are invalid");
 
-  const bookingStart = timeStringMinutes(input.startTime);
-  const bookingEnd = timeStringMinutes(input.endTime);
+  // Resolve salon timezone offset for converting UTC appointment times to local.
+  // Break schedules and working hours are stored in local time, but appointments
+  // are stored in UTC. We need to convert UTC → local for accurate comparison.
+  let salonTzOffsetMinutes = 0;
+  try {
+    // salon_timezone key stores the raw timezone string, e.g. "America/Halifax"
+    const salonTz = salonTzRow?.value || "UTC";
+    // Compute UTC offset for the salon timezone on the booking date
+    const localNoon = new Date(`${datePart}T12:00:00`);
+    const tzDate = new Date(localNoon.toLocaleString("en-US", { timeZone: salonTz }));
+    salonTzOffsetMinutes = (tzDate.getTime() - localNoon.getTime()) / 60000;
+    process.stderr.write(`[BREAK-CHECK] salon_tz=${salonTz} offset=${salonTzOffsetMinutes}min salonTzRow=${!!salonTzRow}\n`);
+  } catch {
+    salonTzOffsetMinutes = 0;
+    process.stderr.write(`[BREAK-CHECK] timezone lookup FAILED, defaulting to UTC offset=0\n`);
+  }
+
+  // Convert UTC booking times to local minutes for comparison with local schedules
+  const bookingStart = utcToLocalMinutes(input.startTime, salonTzOffsetMinutes);
+  const bookingEnd = utcToLocalMinutes(input.endTime, salonTzOffsetMinutes);
+  process.stderr.write(`[BREAK-CHECK] startTime=${input.startTime} endTime=${input.endTime} → local: ${bookingStart}-${bookingEnd} min | break would be 720-780\n`);
 
   // Validate against store operating hours
   let storeHours: DayHours[] | null = null;
@@ -244,33 +276,60 @@ const validateRelationsAndAvailability = async (
       );
   }
 
-  if (schedule?.isDayOff)
+  // Resolve staff schedule: override > weekly template > error
+  let resolvedSchedule: DaySchedule | null = null;
+
+  if (overrideSchedule?.isDayOff) {
     throw new CalendarDomainError("Staff is off on the selected date", 409);
-  if (schedule) {
+  }
+
+  if (overrideSchedule) {
+    // Per-day override takes priority
+    resolvedSchedule = {
+      startTime: overrideSchedule.startTime,
+      endTime: overrideSchedule.endTime,
+      breakStart: overrideSchedule.breakStart,
+      breakEnd: overrideSchedule.breakEnd,
+      station: overrideSchedule.note,
+    };
+  } else if (staff?.weeklySchedule) {
+    // Fallback to weekly template
+    resolvedSchedule = resolveDayScheduleFromWeekly(
+      staff.weeklySchedule as any,
+      datePart,
+    );
+  }
+
+  // No schedule found means staff not available
+  if (!resolvedSchedule) {
+    throw new CalendarDomainError("Staff has no working schedule for the selected date", 409);
+  }
+
+  // Validate booking against resolved schedule
+  if (
+    bookingStart < parseTime(resolvedSchedule.startTime) ||
+    bookingEnd > parseTime(resolvedSchedule.endTime)
+  )
+    throw new CalendarDomainError(
+      "Appointment is outside staff working hours",
+      409,
+    );
+
+  if (resolvedSchedule.breakStart && resolvedSchedule.breakEnd) {
+    const breakS = parseTime(resolvedSchedule.breakStart);
+    const breakE = parseTime(resolvedSchedule.breakEnd);
+    // Only validate if break data is coherent and within the shift
     if (
-      bookingStart < parseTime(schedule.startTime) ||
-      bookingEnd > parseTime(schedule.endTime)
+      breakS < breakE &&
+      breakS >= parseTime(resolvedSchedule.startTime) &&
+      breakE <= parseTime(resolvedSchedule.endTime) &&
+      bookingStart < breakE &&
+      bookingEnd > breakS
     )
       throw new CalendarDomainError(
-        "Appointment is outside staff working hours",
+        `Appointment overlaps the staff break (${resolvedSchedule.breakStart}–${resolvedSchedule.breakEnd})`,
         409,
       );
-    if (schedule.breakStart && schedule.breakEnd) {
-      const breakS = parseTime(schedule.breakStart);
-      const breakE = parseTime(schedule.breakEnd);
-      // Only validate if break data is coherent and within the shift
-      if (
-        breakS < breakE &&
-        breakS >= parseTime(schedule.startTime) &&
-        breakE <= parseTime(schedule.endTime) &&
-        bookingStart < breakE &&
-        bookingEnd > breakS
-      )
-        throw new CalendarDomainError(
-          `Appointment overlaps the staff break (${schedule.breakStart}–${schedule.breakEnd})`,
-          409,
-        );
-    }
   }
   return services;
 };
@@ -584,10 +643,22 @@ export const CalendarModel = {
     const targetDate = new Date(`${params.date}T00:00:00.000Z`);
     const dayOfWeek = targetDate.getDay();
 
-    // Get active staff and their schedules
+    // Resolve salon timezone offset for converting local slots to UTC
+    const salonTzRow = await db.setting.findUnique({ where: { key: "salon_timezone" } });
+    let salonTzOffsetMinutes = 0;
+    try {
+      const salonTz = salonTzRow?.value || "UTC";
+      const localNoon = new Date(`${params.date}T12:00:00`);
+      const tzDate = new Date(localNoon.toLocaleString("en-US", { timeZone: salonTz }));
+      salonTzOffsetMinutes = (tzDate.getTime() - localNoon.getTime()) / 60000;
+    } catch {
+      salonTzOffsetMinutes = 0;
+    }
+
+    // Get active staff with their weeklySchedule template
     const staffList = await db.staff.findMany({
       where: { status: { notIn: ["inactive", "on_leave"] } },
-      select: { id: true, name: true, role: true },
+      select: { id: true, name: true, role: true, weeklySchedule: true },
     });
 
     const staffIds = staffList.map((s) => s.id);
@@ -599,7 +670,7 @@ export const CalendarModel = {
       ? staffIds.filter((id) => id === params.staffId)
       : staffIds;
 
-    // Get staff schedules for the day
+    // Get per-date overrides from staffschedule
     const schedules = await db.staffschedule.findMany({
       where: {
         staffId: { in: effectiveStaffIds },
@@ -607,7 +678,7 @@ export const CalendarModel = {
       },
     });
 
-    const scheduleMap = new Map(
+    const overrideMap = new Map(
       schedules.map((s) => [
         s.staffId,
         {
@@ -619,6 +690,31 @@ export const CalendarModel = {
         },
       ]),
     );
+
+    // Resolve schedule per staff: per-date override > weeklySchedule template
+    const datePart = params.date;
+    const scheduleMap = new Map<number, { startTime: string; endTime: string; isDayOff: boolean; breakStart: string | null; breakEnd: string | null }>();
+    for (const staff of staffList) {
+      if (!effectiveStaffIds.includes(staff.id)) continue;
+
+      const override = overrideMap.get(staff.id);
+      if (override) {
+        // Per-date override takes priority
+        scheduleMap.set(staff.id, override);
+      } else if (staff.weeklySchedule) {
+        // Fallback to weekly template
+        const resolved = resolveDayScheduleFromWeekly(staff.weeklySchedule as any, datePart);
+        if (resolved) {
+          scheduleMap.set(staff.id, {
+            startTime: resolved.startTime,
+            endTime: resolved.endTime,
+            isDayOff: false,
+            breakStart: resolved.breakStart ?? null,
+            breakEnd: resolved.breakEnd ?? null,
+          });
+        }
+      }
+    }
 
     // Get existing appointments for the date
     const dayStart = new Date(`${params.date}T00:00:00.000Z`);
@@ -668,7 +764,7 @@ export const CalendarModel = {
       for (let startMin = staffStart; startMin + durationMinutes <= staffEnd; startMin += 30) {
         const endMin = startMin + durationMinutes;
 
-        // Check break overlap
+        // Check break overlap (both in local time — no conversion needed)
         if (
           breakStart !== null &&
           breakEnd !== null &&
@@ -678,16 +774,17 @@ export const CalendarModel = {
           continue;
         }
 
-        // Check appointment overlap
-        const slotStart = new Date(`${params.date}T00:00:00.000Z`);
-        slotStart.setMinutes(startMin);
-        const slotEnd = new Date(`${params.date}T00:00:00.000Z`);
-        slotEnd.setMinutes(endMin);
+        // Check appointment overlap — convert local slot to UTC for comparison
+        // with UTC-stored existing appointments
+        const slotStartUtc = new Date(`${params.date}T00:00:00.000Z`);
+        slotStartUtc.setMinutes(startMin - salonTzOffsetMinutes);
+        const slotEndUtc = new Date(`${params.date}T00:00:00.000Z`);
+        slotEndUtc.setMinutes(endMin - salonTzOffsetMinutes);
 
         const hasConflict = staffAppts.some((appt) => {
           const apptStart = new Date(appt.startTime);
           const apptEnd = new Date(appt.endTime);
-          return apptStart < slotEnd && apptEnd > slotStart;
+          return apptStart < slotEndUtc && apptEnd > slotStartUtc;
         });
 
         if (!hasConflict) {

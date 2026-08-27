@@ -19,29 +19,42 @@ export type StaffListParams = {
   date: string;
 };
 
-const toPayload = (values: StaffFormValues) => ({
-  name: values.name,
-  role: values.role,
-  status: values.status,
-  phone: values.phone || null,
-  email: values.email || null,
-  avatarUrl: values.avatarUrl || null,
-  hourlyRate: values.hourlyRate ? Number(values.hourlyRate) : null,
-  commissionRate: values.commissionRate
-    ? Number(values.commissionRate)
-    : null,
-  joinDate: values.joinDate || null,
-  specialtyIds: values.specialtyIds,
-  schedule: {
-    date: values.scheduleDate,
-    startTime: values.startTime,
-    endTime: values.endTime,
-    breakStart: values.breakStart || null,
-    breakEnd: values.breakEnd || null,
-    isDayOff: values.isDayOff,
-    note: values.station || null,
-  },
-});
+const toPayload = (values: StaffFormValues) => {
+  const payload: any = {
+    name: values.name,
+    role: values.role,
+    status: values.status,
+    phone: values.phone || null,
+    email: values.email || null,
+    avatarUrl: values.avatarUrl || null,
+    hourlyRate: values.hourlyRate ? Number(values.hourlyRate) : null,
+    commissionRate: values.commissionRate
+      ? Number(values.commissionRate)
+      : null,
+    joinDate: values.joinDate || null,
+    specialtyIds: values.specialtyIds,
+  };
+
+  // Include weeklySchedule if set
+  if (values.weeklySchedule) {
+    payload.weeklySchedule = values.weeklySchedule;
+  }
+
+  // Include per-day override schedule if scheduleDate is set
+  if (values.scheduleDate) {
+    payload.schedule = {
+      date: values.scheduleDate,
+      startTime: values.startTime,
+      endTime: values.endTime,
+      breakStart: values.breakStart || null,
+      breakEnd: values.breakEnd || null,
+      isDayOff: values.isDayOff,
+      note: values.station || null,
+    };
+  }
+
+  return payload;
+};
 
 const normalizeMember = (member: Omit<StaffMember, "key">): StaffMember => ({
   ...member,

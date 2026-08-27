@@ -88,4 +88,86 @@ export const SettingsController = {
         .json({ success: false, message: "Failed to update operating hours" });
     }
   },
+
+  // ── Salon / Business profile settings ─────────────────────────
+
+  SALON_SETTING_KEYS: [
+    { key: "salon_name",      label: "Salon Name" },
+    { key: "salon_business_type", label: "Business Type" },
+    { key: "salon_email",     label: "Contact Email" },
+    { key: "salon_phone",     label: "Primary Phone" },
+    { key: "salon_address",   label: "Physical Address" },
+    { key: "salon_timezone",  label: "Salon Timezone" },
+  ] as const,
+
+  async getSalonSettings(req: Request, res: Response): Promise<void> {
+    const db = req.tenantClient!;
+    try {
+      const keys = ["salon_name", "salon_business_type", "salon_email", "salon_phone", "salon_address", "salon_timezone"];
+      const rows = await db.setting.findMany({
+        where: { key: { in: keys } },
+      });
+      const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+      const data = {
+        salonName:     map["salon_name"]      || "",
+        businessType:  map["salon_business_type"] || "",
+        email:         map["salon_email"]     || "",
+        phone:         map["salon_phone"]     || "",
+        address:       map["salon_address"]   || "",
+        timezone:      map["salon_timezone"]  || "UTC",
+      };
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error("Failed to load salon settings", error);
+      res.status(500).json({ success: false, message: "Failed to load salon settings" });
+    }
+  },
+
+  async updateSalonSettings(req: Request, res: Response): Promise<void> {
+    const db = req.tenantClient!;
+    const body = req.body as Record<string, string | undefined>;
+    const timezone = body.timezone;
+    if (!timezone || typeof timezone !== "string") {
+      return void res
+        .status(400)
+        .json({ success: false, message: "timezone is required" });
+    }
+    try {
+      const fieldMap: Record<string, string> = {
+        salon_name:          body.salonName   ?? "",
+        salon_business_type: body.businessType ?? "",
+        salon_email:         body.email       ?? "",
+        salon_phone:         body.phone       ?? "",
+        salon_address:       body.address     ?? "",
+        salon_timezone:      timezone,
+      };
+      for (const meta of SettingsController.SALON_SETTING_KEYS) {
+        const val = fieldMap[meta.key] ?? "";
+        await db.setting.upsert({
+          where: { key: meta.key },
+          update: { value: val, updatedAt: new Date() },
+          create: {
+            key: meta.key,
+            value: val,
+            group: "business",
+            dataType: "string",
+            label: meta.label,
+            updatedAt: new Date(),
+          },
+        });
+      }
+      const data = {
+        salonName:    fieldMap["salon_name"],
+        businessType: fieldMap["salon_business_type"],
+        email:        fieldMap["salon_email"],
+        phone:        fieldMap["salon_phone"],
+        address:      fieldMap["salon_address"],
+        timezone:     fieldMap["salon_timezone"],
+      };
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error("Failed to update salon settings", error);
+      res.status(500).json({ success: false, message: "Failed to update salon settings" });
+    }
+  },
 };
