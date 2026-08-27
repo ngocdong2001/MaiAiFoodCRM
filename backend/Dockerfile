@@ -22,9 +22,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/generated ./dist/generated
+COPY --from=build /app/src ./src
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/package.json ./
 COPY --from=build /app/prisma.config.ts ./
 COPY --from=build /app/prisma.config.tenant.ts ./
+COPY --from=build /app/seed.ts ./
 EXPOSE 3001
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.master.prisma --config ./prisma.config.ts || echo 'Migration skipped (tables may already exist)'; node dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.master.prisma --config ./prisma.config.ts || echo 'Master migration skipped (tables may already exist)'; npx prisma migrate deploy --schema ./prisma/schema.tenant.prisma --config ./prisma.config.tenant.ts || echo 'Tenant migration skipped (tables may already exist)'; npx tsx seed.ts || echo 'Master seed skipped'; npx tsx prisma/seed.ts || echo 'Tenant seed skipped'; node dist/server.js"]

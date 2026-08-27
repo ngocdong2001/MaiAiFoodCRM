@@ -16,6 +16,7 @@ services:
       - "${MARIADB_PORT:-3307}:3306"
     volumes:
       - maindatabasedata:/var/lib/mysql
+      - ./backend/docker-init.sql:/docker-entrypoint-initdb.d/00-init-db.sql:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -36,6 +37,7 @@ services:
     environment:
       DATABASE_URL: mysql://maiai:maiai@mariadb:3306/maiai_crm
       DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@mariadb:3306/maiai_master}"
+      DATABASE_URL_TENANT: "${DATABASE_URL_TENANT:-mysql://maiai:maiai@mariadb:3306/maiai_crm_1}"
       PORT: "3002"
       NODE_ENV: production
       JWT_SECRET: "${JWT_SECRET:-maiai-jwt-secret-change-in-production}"
@@ -50,13 +52,13 @@ services:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}"
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
     container_name: maiai-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     networks:
@@ -64,7 +66,6 @@ services:
 
 volumes:
   maindatabasedata:
-    external: true
 
 networks:
   maiai-net:
