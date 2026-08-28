@@ -6,6 +6,8 @@ import WeeklySchedule, {
 } from "@/shared/components/molecules/WeeklySchedule";
 
 import { useCalendarData } from "../../context/CalendarDataContext";
+import type { CalendarAppointment } from "../../types/calendar.types";
+import { BookingFormContent } from "../BookingFormDialog";
 import BookingStatusControl from "./BookingStatusControl";
 import WeeklyAppointmentBoard from "./WeeklyAppointmentBoard";
 
@@ -28,7 +30,9 @@ const StaffDailyScheduleSection = () => {
     cursorDate,
     setCursorDate,
   } = useCalendarData();
-  const [viewMode, setViewMode] = useState<WeeklyScheduleViewMode>("day");
+  const [viewMode, setViewMode] = useState<WeeklyScheduleViewMode>("week");
+  const [editingAppointment, setEditingAppointment] =
+    useState<CalendarAppointment | null>(null);
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith("vi") ? "vi-VN" : "en-US";
 
@@ -78,8 +82,16 @@ const StaffDailyScheduleSection = () => {
         resourceKey: event.resourceKey!,
         startHour: event.startHour,
         endHour: event.endHour,
-        label: `${event.title} · ${event.detail.timeRange}`,
+        label: event.title,
         sublabel: event.subtitle,
+        workItems: [
+          {
+            id: event.key,
+            title: `${event.title} – ${event.subtitle}`,
+            timeRange: event.detail.timeRange,
+            detail: event.detail.status,
+          },
+        ],
         extra: (
           <BookingStatusControl
             appointmentId={Number(event.key)}
@@ -106,6 +118,18 @@ const StaffDailyScheduleSection = () => {
     );
   }, [slots]);
 
+  const editDialog = editingAppointment ? (
+    <BookingFormContent
+      open={Boolean(editingAppointment)}
+      onOpenChange={(open) => {
+        if (!open) setEditingAppointment(null);
+      }}
+      initialDate={new Date(editingAppointment.appointment!.startTime)}
+      onCreated={setCursorDate}
+      appointment={editingAppointment.appointment!}
+    />
+  ) : null;
+
   if (viewMode === "week") {
     const weekStart = getWeekStart(cursorDate);
     const weekEnd = new Date(weekStart);
@@ -117,54 +141,61 @@ const StaffDailyScheduleSection = () => {
     });
 
     return (
-      <WeeklyAppointmentBoard
-        rangeLabel={rangeLabel}
-        weekStart={weekStart}
-        events={weekEvents}
-        onDayView={() => setViewMode("day")}
-        onPrevious={() =>
-          setCursorDate((current) => {
-            const next = new Date(current);
-            next.setDate(current.getDate() - 7);
-            return next;
-          })
-        }
-        onNext={() =>
-          setCursorDate((current) => {
-            const next = new Date(current);
-            next.setDate(current.getDate() + 7);
-            return next;
-          })
-        }
-      />
+      <>
+        <WeeklyAppointmentBoard
+          rangeLabel={rangeLabel}
+          weekStart={weekStart}
+          events={weekEvents}
+          onSelectAppointment={setEditingAppointment}
+          onDayView={() => setViewMode("day")}
+          onPrevious={() =>
+            setCursorDate((current) => {
+              const next = new Date(current);
+              next.setDate(current.getDate() - 7);
+              return next;
+            })
+          }
+          onNext={() =>
+            setCursorDate((current) => {
+              const next = new Date(current);
+              next.setDate(current.getDate() + 7);
+              return next;
+            })
+          }
+        />
+        {editDialog}
+      </>
     );
   }
 
   return (
-    <WeeklySchedule
-      title={t("dashboard.calendar.dailyTitle")}
-      rangeLabel={rangeLabel}
-      hours={hours}
-      resources={resources}
-      slots={slots}
-      activeViewMode={viewMode}
-      viewModes={["day", "week"]}
-      onViewModeChange={setViewMode}
-      onPrevRange={() => {
-        setCursorDate((prev) => {
-          const next = new Date(prev);
-          next.setDate(prev.getDate() - (viewMode === "day" ? 1 : 7));
-          return next;
-        });
-      }}
-      onNextRange={() => {
-        setCursorDate((prev) => {
-          const next = new Date(prev);
-          next.setDate(prev.getDate() + (viewMode === "day" ? 1 : 7));
-          return next;
-        });
-      }}
-    />
+    <>
+      <WeeklySchedule
+        title={t("dashboard.calendar.dailyTitle")}
+        rangeLabel={rangeLabel}
+        hours={hours}
+        resources={resources}
+        slots={slots}
+        activeViewMode={viewMode}
+        viewModes={["day", "week"]}
+        onViewModeChange={setViewMode}
+        onPrevRange={() => {
+          setCursorDate((prev) => {
+            const next = new Date(prev);
+            next.setDate(prev.getDate() - (viewMode === "day" ? 1 : 7));
+            return next;
+          });
+        }}
+        onNextRange={() => {
+          setCursorDate((prev) => {
+            const next = new Date(prev);
+            next.setDate(prev.getDate() + (viewMode === "day" ? 1 : 7));
+            return next;
+          });
+        }}
+      />
+      {editDialog}
+    </>
   );
 };
 

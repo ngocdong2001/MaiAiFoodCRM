@@ -9,8 +9,8 @@ import { BookingFormContent } from "@/features/dashboard/calendar/components/Boo
 const WelcomeSection = () => {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
-  const firstName =
-    user?.name?.split(" ")[0] ?? t("dashboard.overview.welcome.fallbackName");
+  const displayName =
+    user?.name?.trim() || t("dashboard.overview.welcome.fallbackName");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [openAsWalkIn, setOpenAsWalkIn] = useState(false);
 
@@ -23,7 +23,7 @@ const WelcomeSection = () => {
     <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-[#171A21] sm:text-3xl">
-          {t("dashboard.overview.welcome.title", { name: firstName })}
+          {t("dashboard.overview.welcome.title", { name: displayName })}
         </h1>
         <p className="mt-1 text-sm text-[#8D95A5] sm:text-base">
           {t("dashboard.overview.welcome.subtitle")}

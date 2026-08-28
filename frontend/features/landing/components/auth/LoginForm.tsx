@@ -20,6 +20,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
+import { Spinner } from "@/shared/components/ui/spinner";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -120,9 +121,14 @@ const LoginForm = () => {
             className="h-11 w-full rounded-lg bg-slate-900 text-white hover:bg-slate-800"
             disabled={loginMutation.isPending}
           >
-            {loginMutation.isPending
-              ? t("auth.login.signingIn")
-              : t("auth.login.submit")}
+            {loginMutation.isPending ? (
+              <span className="inline-flex items-center gap-2">
+                <Spinner className="size-4" />
+                {t("auth.login.signingIn")}
+              </span>
+            ) : (
+              t("auth.login.submit")
+            )}
           </Button>
         </form>
       </div>

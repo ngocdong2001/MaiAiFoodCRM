@@ -338,13 +338,13 @@ const WeeklySchedule = ({
             <div
               className="grid"
               style={{
-                gridTemplateColumns: `repeat(${hours.length}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${hours.length - 1}, minmax(0, 1fr))`,
               }}
             >
-              {hours.map((hour) => (
+              {hours.slice(0, -1).map((hour) => (
                 <div
                   key={hour}
-                  className="border-l border-[#DEE1E7]/40 py-4 text-center text-xs font-medium text-[#8D95A5]"
+                  className="border-l border-[#DEE1E7]/40 px-2 py-4 text-left text-xs font-medium text-[#8D95A5]"
                 >
                   {formatHour(hour)}
                 </div>
@@ -389,10 +389,10 @@ const WeeklySchedule = ({
                   <div
                     className="pointer-events-none absolute inset-0 grid"
                     style={{
-                      gridTemplateColumns: `repeat(${hours.length}, minmax(0, 1fr))`,
+                      gridTemplateColumns: `repeat(${hours.length - 1}, minmax(0, 1fr))`,
                     }}
                   >
-                    {hours.map((hour) => (
+                    {hours.slice(0, -1).map((hour) => (
                       <div
                         key={hour}
                         className="border-l border-[#DEE1E7]/40"
@@ -406,36 +406,38 @@ const WeeklySchedule = ({
                     const primary =
                       slot.label ??
                       `${formatHour(slot.startHour)} - ${formatHour(slot.endHour)}`;
-                    const combinedText = slot.sublabel
-                      ? `${primary} • ${slot.sublabel}`
-                      : primary;
 
                     return (
                       <Popover
                         key={`${slot.resourceKey}-${slot.startHour}-${slot.endHour}-${slot.label ?? "slot"}`}
                       >
                         <PopoverTrigger
-                          className="absolute z-10 mx-1.5 flex min-w-0 cursor-pointer items-center overflow-hidden rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                          className="absolute z-10 mx-1.5 flex min-w-0 cursor-pointer flex-col justify-center overflow-hidden rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                           style={{
                             left: `${Math.max(0, ((slot.startHour - startHour) / totalHours) * 100)}%`,
                             right: `${Math.max(0, ((endHour - slot.endHour) / totalHours) * 100)}%`,
                             top: 8 + slot.lane * 58,
-                            height: 42,
+                            height: 46,
                             backgroundColor: `${accent}1A`,
                             borderColor: `${accent}55`,
                             color: text,
                           }}
                         >
                           <span
-                            className="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold"
+                            className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold"
                             style={{ color: text }}
                           >
                             <span
                               className="h-1.5 w-1.5 shrink-0 rounded-full"
                               style={{ backgroundColor: accent }}
                             />
-                            <span className="truncate">{combinedText}</span>
+                            <span className="truncate">{primary}</span>
                           </span>
+                          {slot.sublabel ? (
+                            <span className="mt-0.5 truncate text-[10px] font-normal opacity-80">
+                              {slot.sublabel}
+                            </span>
+                          ) : null}
                         </PopoverTrigger>
                         <PopoverContent
                           align="start"

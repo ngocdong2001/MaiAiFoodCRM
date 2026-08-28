@@ -1,6 +1,7 @@
 "use client";
 import { useTranslation } from "react-i18next";
 
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import { NULL_TEXT_KEY } from "@/shared/lib/constants";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
@@ -21,9 +22,10 @@ const LiveQueueSection = () => {
       </p>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">
-          {t("dashboard.overview.queue.loading")}
-        </p>
+        <LoadingState
+          className="mt-4"
+          label={t("dashboard.overview.queue.loading")}
+        />
       ) : queue.length === 0 ? (
         <p className="mt-4 text-sm text-[#8D95A5]">
           {t("dashboard.overview.queue.empty")}

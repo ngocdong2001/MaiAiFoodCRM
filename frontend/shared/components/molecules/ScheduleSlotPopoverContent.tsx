@@ -15,30 +15,10 @@ type ScheduleSlotPopoverContentProps = {
 };
 
 const ScheduleSlotPopoverContent = ({
-  staffName,
-  staffRole,
-  periodLabel,
-  slotType = "work",
-  note,
   workItems = [],
 }: ScheduleSlotPopoverContentProps) => {
   return (
     <div className="space-y-3">
-      <div>
-        <p className="text-sm font-semibold text-[#171A21]">{staffName}</p>
-        <p className="text-xs text-[#8D95A5]">{staffRole ?? "Staff"}</p>
-      </div>
-
-      <div className="rounded-md border border-[#E6E9EF] bg-[#F9FAFB] px-3 py-2">
-        <p className="text-xs font-semibold text-[#171A21]">{periodLabel}</p>
-        <p className="text-[11px] text-[#8D95A5]">
-          {slotType === "break" ? "Break period" : "Working period"}
-        </p>
-        {note ? (
-          <p className="mt-1 text-[11px] text-[#8D95A5]">{note}</p>
-        ) : null}
-      </div>
-
       <div>
         <p className="text-xs font-semibold text-[#171A21]">Assigned work</p>
         {workItems.length === 0 ? (

@@ -75,46 +75,49 @@ export const CalendarDataProvider = ({ children }: { children: ReactNode }) => {
       (appointments.data ?? [])
         .filter((appointment) => appointment.status !== "cancelled")
         .map((appointment) => {
-        const startTime = new Date(appointment.startTime);
-        const endTime = new Date(appointment.endTime);
-        return {
-          key: String(appointment.id),
-          title: appointment.guest.name,
-          subtitle: appointment.services
-            .map((service) => service.name)
-            .join(", "),
-          resourceKey: String(appointment.staffId),
-          year: startTime.getFullYear(),
-          month: startTime.getMonth(),
-          day: startTime.getDate(),
-          startHour: decimalHour(startTime),
-          endHour: decimalHour(endTime),
-          tone: tone(appointment.status),
-          detail: {
-            status: appointment.status,
-            guest: appointment.guest.name,
-            membership:
-              appointment.guest.loyaltyPoints >= 1000 ? "VIP Member" : "Guest",
-            visit: `${appointment.guest.totalVisits + 1}th Visit`,
-            service: appointment.services
+          const startTime = new Date(appointment.startTime);
+          const endTime = new Date(appointment.endTime);
+          return {
+            key: String(appointment.id),
+            title: appointment.guest.name,
+            subtitle: appointment.services
               .map((service) => service.name)
               .join(", "),
-            stylist: appointment.staff.name,
-            duration: `${Math.round(((endTime.getTime() - startTime.getTime()) / 3_600_000) * 10) / 10} hrs`,
-            timeRange: `${startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${endTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
-            station: appointment.station ?? "Unassigned",
-            stationArea: appointment.staff.role,
-            clientNotes:
-              appointment.notes ?? appointment.guest.notes ?? "No notes",
-            aiSuggestion: {
-              icon: Sparkles,
-              title: "Service recommendation",
-              description:
-                "Recommendations are generated from the guest service history.",
+            resourceKey: String(appointment.staffId),
+            year: startTime.getFullYear(),
+            month: startTime.getMonth(),
+            day: startTime.getDate(),
+            startHour: decimalHour(startTime),
+            endHour: decimalHour(endTime),
+            tone: tone(appointment.status),
+            detail: {
+              status: appointment.status,
+              guest: appointment.guest.name,
+              membership:
+                appointment.guest.loyaltyPoints >= 1000
+                  ? "VIP Member"
+                  : "Guest",
+              visit: `${appointment.guest.totalVisits + 1}th Visit`,
+              service: appointment.services
+                .map((service) => service.name)
+                .join(", "),
+              stylist: appointment.staff.name,
+              duration: `${Math.round(((endTime.getTime() - startTime.getTime()) / 3_600_000) * 10) / 10} hrs`,
+              timeRange: `${startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${endTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+              station: appointment.station ?? "Unassigned",
+              stationArea: appointment.staff.role,
+              clientNotes:
+                appointment.notes ?? appointment.guest.notes ?? "No notes",
+              aiSuggestion: {
+                icon: Sparkles,
+                title: "Service recommendation",
+                description:
+                  "Recommendations are generated from the guest service history.",
+              },
             },
-          },
-        } satisfies CalendarAppointment;
-      }),
+            appointment,
+          } satisfies CalendarAppointment;
+        }),
     [appointments.data],
   );
 

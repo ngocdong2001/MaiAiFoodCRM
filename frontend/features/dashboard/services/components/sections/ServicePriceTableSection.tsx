@@ -1,10 +1,18 @@
 "use client";
 
 import { Clock, DollarSign, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FocusEvent,
+  type KeyboardEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 
 import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import SelectField from "@/shared/components/molecules/SelectField";
 import { Button } from "@/shared/components/ui/button";
 
@@ -24,11 +32,8 @@ type ServicePriceTableSectionProps = {
   onChangeRow: (key: string, patch: Partial<ServiceDraftRow>) => void;
   onAddRow: () => void;
   onRemoveRow: (key: string) => void;
-  onSave: () => void;
   onReset: () => void;
 };
-
-const currency = new Intl.NumberFormat("vi-VN");
 
 const cellInput =
   "w-full bg-transparent text-sm text-[#171A21] outline-none placeholder:text-[#B4BAC5] focus:rounded-md focus:bg-[#F5F7FA] focus:px-2 focus:py-1";
@@ -44,7 +49,6 @@ const ServicePriceTableSection = ({
   onChangeRow,
   onAddRow,
   onRemoveRow,
-  onSave,
   onReset,
 }: ServicePriceTableSectionProps) => {
   const { t } = useTranslation();
@@ -56,11 +60,6 @@ const ServicePriceTableSection = ({
       })),
     [categories],
   );
-  const totalValue = rows.reduce(
-    (sum, row) => sum + (Number(row.price) || 0),
-    0,
-  );
-  const averageValue = rows.length ? Math.round(totalValue / rows.length) : 0;
 
   const [deleteConfirmKey, setDeleteConfirmKey] = useState<string | null>(null);
   const deleteTarget = useMemo(
@@ -165,11 +164,8 @@ const ServicePriceTableSection = ({
           <tbody>
             {isLoading ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="px-6 py-10 text-center text-sm text-[#8D95A5]"
-                >
-                  {t("dashboard.services.table.loading")}
+                <td colSpan={6} className="px-6 py-10">
+                  <LoadingState label={t("dashboard.services.table.loading")} />
                 </td>
               </tr>
             ) : null}
@@ -196,7 +192,9 @@ const ServicePriceTableSection = ({
 
                 <td className="px-4 py-3">
                   <input
-                    ref={index === visibleRows.length - 1 ? lastRowRef : undefined}
+                    ref={
+                      index === visibleRows.length - 1 ? lastRowRef : undefined
+                    }
                     value={row.name}
                     placeholder={t("dashboard.services.table.namePlaceholder")}
                     onChange={(event) =>
@@ -298,28 +296,7 @@ const ServicePriceTableSection = ({
         </table>
       </div>
 
-      <footer className="flex flex-col gap-4 border-t border-[#EDEFF3] px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-8">
-          <div>
-            <p className="text-xs text-[#8D95A5]">
-              {t("dashboard.services.table.totalValue")}
-            </p>
-            <p className="text-xl font-bold text-[#E5397F]">
-              {currency.format(totalValue)}{" "}
-              {t("dashboard.services.table.currency")}
-            </p>
-          </div>
-          <div className="border-l border-[#EDEFF3] pl-8">
-            <p className="text-xs text-[#8D95A5]">
-              {t("dashboard.services.table.averageValue")}
-            </p>
-            <p className="text-xl font-bold text-[#171A21]">
-              {currency.format(averageValue)}{" "}
-              {t("dashboard.services.table.currency")}
-            </p>
-          </div>
-        </div>
-
+      <footer className="flex justify-end border-t border-[#EDEFF3] px-6 py-5">
         <div className="flex items-center gap-3">
           <Button
             type="button"

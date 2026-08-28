@@ -309,13 +309,29 @@
         "message": "Message",
         "accept": "Accept",
         "emptyTitle": "Queue is looking good!",
-        "emptyDescription": "New requests will appear here instantly."
+        "emptyDescription": "New requests will appear here instantly.",
+        "loading": "Loading…",
+        "empty": "No active appointments today.",
+        "col": {
+          "guest": "Guest",
+          "service": "Service",
+          "notes": "Notes / Special Requests",
+          "status": "Status"
+        },
+        "status": {
+          "waiting": "Pending",
+          "ready": "Ready",
+          "completed": "Completed",
+          "cancelled": "Cancelled",
+          "error": "Failed to update status. Please try again."
+        }
       },
       "statusControl": {
         "label": "Status",
         "waiting": "Pending",
         "ready": "Ready",
         "completed": "Completed",
+        "cancelled": "Cancelled",
         "updating": "Updating...",
         "error": "Failed to update status. Please try again.",
         "confirmTitle": "Confirm status change",
@@ -326,6 +342,8 @@
       "booking": {
         "title": "New booking",
         "description": "Create an appointment using live guest, staff, and service availability.",
+        "editTitle": "Edit booking",
+        "editDescription": "Update the guest, staff, services, or appointment time.",
         "guest": "Guest",
         "selectGuest": "Select guest",
         "staff": "Staff member",
@@ -347,6 +365,14 @@
         "cancel": "Cancel",
         "create": "Create booking",
         "creating": "Creating...",
+        "update": "Update booking",
+        "updating": "Updating...",
+        "reschedule": "Reschedule",
+        "creatingGuest": "Creating guest...",
+        "walkInName": "Walk-in guest name",
+        "walkInPhone": "Phone number (optional)",
+        "chooseExisting": "Choose existing",
+        "addWalkIn": "+ Walk-in",
         "errors": {
           "required": "Guest, staff, and at least one service are required.",
           "invalidDate": "Choose a valid booking date and time.",
@@ -424,6 +450,12 @@
         "viewFullQueue": "View Full Queue",
         "loading": "Loading…",
         "empty": "No active appointments today.",
+        "col": {
+          "guest": "Guest",
+          "service": "Service",
+          "notes": "Notes / Special Requests",
+          "status": "Status"
+        },
         "status": {
           "now": "Now",
           "soon": "Soon",
@@ -432,6 +464,7 @@
           "waiting": "Pending",
           "ready": "Ready",
           "completed": "Completed",
+          "cancelled": "Cancelled",
           "error": "Failed to update status. Please try again."
         },
         "items": {
@@ -533,12 +566,14 @@
       "totalGuests": "Total Guests: {{count}}",
       "vip": "VIP: {{count}}",
       "atRisk": "At Risk: {{count}}",
-      "emptyState": "No guest matched your filter. Try changing search or segment."
+      "emptyState": "No guest matched your filter. Try changing search or segment.",
+      "loading": "Loading guests…"
     },
     "reports": {
       "title": "Reports & Exports",
       "filters": "Filters",
-      "exportData": "Export Data"
+      "exportData": "Export Data",
+      "loading": "Loading reports…"
     },
     "revenue": {
       "title": "Daily Revenue Summary",

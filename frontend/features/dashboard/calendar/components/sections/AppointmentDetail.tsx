@@ -3,14 +3,20 @@
 import { Clock, MapPin, Scissors, Star, X } from "lucide-react";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
-import type { AppointmentDetailData } from "@/features/dashboard/calendar/types/calendar.types";
+import type { CalendarAppointment } from "@/features/dashboard/calendar/types/calendar.types";
 
 type AppointmentDetailProps = {
-  detail: AppointmentDetailData;
+  appointment: CalendarAppointment;
   onClose: () => void;
+  onReschedule: (appointment: CalendarAppointment) => void;
 };
 
-const AppointmentDetail = ({ detail, onClose }: AppointmentDetailProps) => {
+const AppointmentDetail = ({
+  appointment,
+  onClose,
+  onReschedule,
+}: AppointmentDetailProps) => {
+  const { detail } = appointment;
   const AiIcon = detail.aiSuggestion.icon;
 
   return (
@@ -116,6 +122,7 @@ const AppointmentDetail = ({ detail, onClose }: AppointmentDetailProps) => {
           <div className="mt-4 flex items-center gap-3 border-t border-[#EEF0F3] p-5">
             <button
               type="button"
+              onClick={() => onReschedule(appointment)}
               className="flex-1 rounded-[10px] border border-[#DEE1E7] bg-white px-4 py-2.5 text-sm font-medium text-[#171A21] transition-colors hover:bg-[#F9FAFB]"
             >
               Reschedule

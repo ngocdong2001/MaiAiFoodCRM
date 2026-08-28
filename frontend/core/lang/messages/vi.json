@@ -309,13 +309,29 @@
         "message": "Nhắn tin",
         "accept": "Tiếp nhận",
         "emptyTitle": "Hàng chờ đang ổn!",
-        "emptyDescription": "Yêu cầu mới sẽ xuất hiện ngay tại đây."
+        "emptyDescription": "Yêu cầu mới sẽ xuất hiện ngay tại đây.",
+        "loading": "Đang tải…",
+        "empty": "Không có lịch hẹn nào hôm nay.",
+        "col": {
+          "guest": "Tên Khách Hàng",
+          "service": "Loại Dịch Vụ/Hẹn",
+          "notes": "Ghi chú/Yêu cầu đặc biệt",
+          "status": "Trạng thái"
+        },
+        "status": {
+          "waiting": "Đang chờ",
+          "ready": "Sẵn sàng",
+          "completed": "Hoàn thành",
+          "cancelled": "Đã hủy",
+          "error": "Cập nhật trạng thái thất bại. Vui lòng thử lại."
+        }
       },
       "statusControl": {
         "label": "Trạng thái",
         "waiting": "Đang chờ",
         "ready": "Sẵn sàng",
         "completed": "Hoàn thành",
+        "cancelled": "Đã hủy",
         "updating": "Đang cập nhật...",
         "error": "Cập nhật trạng thái thất bại. Vui lòng thử lại.",
         "confirmTitle": "Xác nhận đổi trạng thái",
@@ -326,6 +342,8 @@
       "booking": {
         "title": "Tạo lịch hẹn",
         "description": "Tạo lịch từ dữ liệu khách hàng, nhân viên và dịch vụ hiện có.",
+        "editTitle": "Sửa lịch hẹn",
+        "editDescription": "Cập nhật khách hàng, nhân viên, dịch vụ hoặc thời gian hẹn.",
         "guest": "Khách hàng",
         "selectGuest": "Chọn khách hàng",
         "staff": "Nhân viên",
@@ -347,6 +365,14 @@
         "cancel": "Hủy",
         "create": "Tạo lịch hẹn",
         "creating": "Đang tạo...",
+        "update": "Cập nhật lịch hẹn",
+        "updating": "Đang cập nhật...",
+        "reschedule": "Đổi lịch",
+        "creatingGuest": "Đang tạo khách...",
+        "walkInName": "Tên khách vãng lai",
+        "walkInPhone": "Số điện thoại (tuỳ chọn)",
+        "chooseExisting": "Chọn có sẵn",
+        "addWalkIn": "+ Vãng lai",
         "errors": {
           "required": "Vui lòng chọn khách hàng, nhân viên và ít nhất một dịch vụ.",
           "invalidDate": "Vui lòng chọn ngày và giờ hợp lệ.",
@@ -417,6 +443,7 @@
           "waiting": "Đang chờ",
           "ready": "Sẵn sàng",
           "completed": "Hoàn thành",
+          "cancelled": "Đã hủy",
           "error": "Cập nhật trạng thái thất bại. Vui lòng thử lại."
         }
       },
@@ -482,12 +509,14 @@
       "totalGuests": "Tổng khách: {{count}}",
       "vip": "VIP: {{count}}",
       "atRisk": "Cần chăm sóc lại: {{count}}",
-      "emptyState": "Không có khách phù hợp bộ lọc. Hãy thử đổi từ khóa hoặc phân khúc."
+      "emptyState": "Không có khách phù hợp bộ lọc. Hãy thử đổi từ khóa hoặc phân khúc.",
+      "loading": "Đang tải khách…"
     },
     "reports": {
       "title": "Báo cáo & Xuất dữ liệu",
       "filters": "Bộ lọc",
-      "exportData": "Xuất dữ liệu"
+      "exportData": "Xuất dữ liệu",
+      "loading": "Đang tải báo cáo…"
     },
     "revenue": {
       "title": "Tổng kết doanh thu trong ngày",

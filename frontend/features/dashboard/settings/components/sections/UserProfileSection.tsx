@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useAuthStore } from "@/core/store/authStore";
+import { useAuthStore, type AuthUser } from "@/core/store/authStore";
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -14,6 +14,14 @@ import { useUpdateProfile } from "../../hooks/useUpdateProfile";
 const UserProfileSection = () => {
   const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
+
+  if (!user) return <p className="text-sm text-[#8D95A5]">{t("dashboard.settings.profile.loading")}</p>;
+
+  return <UserProfileForm key={user.id} user={user} />;
+};
+
+const UserProfileForm = ({ user }: { user: AuthUser }) => {
+  const { t } = useTranslation();
   const updateProfile = useUpdateProfile();
   const [values, setValues] = useState(() => ({ name: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", avatarUrl: user?.avatarUrl ?? "" }));
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -29,8 +37,6 @@ const UserProfileSection = () => {
       },
     });
   };
-
-  if (!user) return <p className="text-sm text-[#8D95A5]">{t("dashboard.settings.profile.loading")}</p>;
 
   return (
     <section className="max-w-3xl rounded-xl border border-[#DEE1E7] bg-white p-6 shadow-[0px_1px_2px_0px_#0000000a]">

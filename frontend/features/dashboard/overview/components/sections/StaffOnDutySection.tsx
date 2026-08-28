@@ -2,6 +2,7 @@
 import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import { cn } from "@/shared/lib/utils";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
@@ -40,9 +41,10 @@ const StaffOnDutySection = () => {
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">
-          {t("dashboard.overview.staffOnDuty.loading")}
-        </p>
+        <LoadingState
+          className="mt-4"
+          label={t("dashboard.overview.staffOnDuty.loading")}
+        />
       ) : staff.length === 0 ? (
         <p className="mt-4 text-sm text-[#8D95A5]">
           {t("dashboard.overview.staffOnDuty.empty")}

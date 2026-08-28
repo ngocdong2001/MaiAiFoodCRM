@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
 const relativeTime = (
@@ -43,9 +44,10 @@ const RecentGuestsSection = () => {
       </p>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">
-          {t("dashboard.overview.recentGuests.loading")}
-        </p>
+        <LoadingState
+          className="mt-4"
+          label={t("dashboard.overview.recentGuests.loading")}
+        />
       ) : guests.length === 0 ? (
         <p className="mt-4 text-sm text-[#8D95A5]">
           {t("dashboard.overview.recentGuests.empty")}

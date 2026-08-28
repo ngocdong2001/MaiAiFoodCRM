@@ -262,7 +262,6 @@ const ServicesPage = () => {
           onChangeRow={changeRow}
           onAddRow={addRow}
           onRemoveRow={removeRow}
-          onSave={save}
           onReset={() => setPendingReset(true)}
         />
       )}

@@ -3,15 +3,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  defaultOperatingHours,
-  integrationItems,
-  settingsNavItems,
-} from "../data/data";
+import { defaultOperatingHours, settingsNavItems } from "../data/data";
 import type { SettingsTab } from "../types/settings.types";
 import BusinessProfileSection from "../components/sections/BusinessProfileSection";
 import CommunicationsSection from "../components/sections/CommunicationsSection";
-import IntegrationsSection from "../components/sections/IntegrationsSection";
 import OperatingHoursSection from "../components/sections/OperatingHoursSection";
 import SecuritySection from "../components/sections/SecuritySection";
 import SettingsNavSection from "../components/sections/SettingsNavSection";
@@ -41,9 +36,6 @@ const SettingsPage = () => {
         {activeTab === "business-profile" && <BusinessProfileSection />}
         {activeTab === "operating-hours" && (
           <OperatingHoursSection initialHours={defaultOperatingHours} />
-        )}
-        {activeTab === "integrations" && (
-          <IntegrationsSection items={integrationItems} />
         )}
         {activeTab === "communications" && <CommunicationsSection />}
         {activeTab === "security" && <SecuritySection />}

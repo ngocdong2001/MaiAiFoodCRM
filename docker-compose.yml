@@ -13,6 +13,8 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --max-connections=200
+    ports:
+      - "3308:3308"
     volumes:
       - maindatabasedata:/var/lib/mysql
       - ./backend/docker-init.sql:/docker-entrypoint-initdb.d/00-init-db.sql:ro
@@ -22,7 +24,8 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-    network_mode: host
+    networks:
+      - maiai-net
 
   backend:
     build:
@@ -33,9 +36,9 @@ services:
       maiai-mariadb:
         condition: service_healthy
     environment:
-      DATABASE_URL: "${DATABASE_URL:-mysql://maiai:maiai@127.0.0.1:3308/maiai_crm}"
-      DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@127.0.0.1:3308/maiai_master}"
-      DATABASE_URL_TENANT: "${DATABASE_URL_TENANT:-mysql://maiai:maiai@127.0.0.1:3308/maiai_crm_1}"
+      DATABASE_URL: "${DATABASE_URL:-mysql://maiai:maiai@maiai-mariadb:3308/maiai_crm}"
+      DATABASE_URL_MASTER: "${DATABASE_URL_MASTER:-mysql://maiai:maiai@maiai-mariadb:3308/maiai_master}"
+      DATABASE_URL_TENANT: "${DATABASE_URL_TENANT:-mysql://maiai:maiai@maiai-mariadb:3308/maiai_crm_1}"
       PORT: "3002"
       NODE_ENV: production
       JWT_SECRET: "${JWT_SECRET:-maiai-jwt-secret-change-in-production}"
@@ -43,34 +46,32 @@ services:
       ADMIN_API_KEY: "${ADMIN_API_KEY:-maiai-admin-key-2026}"
       GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.maiai-backend.rule=Host(`${TRAEFIK_MAIAI_BACKEND_HOST:-crmapi.maiai.tech}`)"
-      - "traefik.http.routers.maiai-backend.entrypoints=websecure"
-      - "traefik.http.routers.maiai-backend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.maiai-backend.loadbalancer.server.port=3002"
-    network_mode: host
+    ports:
+      - "3002:3002"
+    networks:
+      - maiai-net
 
   frontend:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-crmapi.maiai.tech}/api}"
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
     container_name: maiai-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
       PORT: "3006"
-      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-https://${TRAEFIK_MAIAI_BACKEND_HOST:-crmapi.maiai.tech}/api}"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}"
       HOSTNAME: "0.0.0.0"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.maiai-frontend.rule=Host(`${TRAEFIK_MAIAI_FRONTEND_HOST:-crm.maiai.tech}`)"
-      - "traefik.http.routers.maiai-frontend.entrypoints=websecure"
-      - "traefik.http.routers.maiai-frontend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.maiai-frontend.loadbalancer.server.port=3006"
-    network_mode: host
+    ports:
+      - "3006:3006"
+    networks:
+      - maiai-net
 
 volumes:
   maindatabasedata:
+
+networks:
+  maiai-net:
+    driver: bridge

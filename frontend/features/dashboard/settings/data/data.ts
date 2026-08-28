@@ -8,7 +8,6 @@ export const settingsNavItems: SettingsNavItem[] = [
   { key: "user-profile", label: "profile", icon: "user" },
   { key: "business-profile", label: "businessProfile", icon: "building" },
   { key: "operating-hours", label: "operatingHours", icon: "clock" },
-  { key: "integrations", label: "integrations", icon: "calendar-days" },
   { key: "communications", label: "communications", icon: "phone-call" },
   { key: "security", label: "security", icon: "shield-check" },
 ];

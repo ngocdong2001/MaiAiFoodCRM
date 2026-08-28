@@ -19,25 +19,30 @@ import SelectField from "@/shared/components/molecules/SelectField";
 import { cn } from "@/shared/lib/utils";
 import { useUpdateAppointmentStatus } from "@/features/dashboard/calendar/hooks/useCalendar";
 
-// The Overview live-queue only exposes the 3-state booking flow; other backend
-// statuses (cancelled, no_show, in_progress) are managed from the calendar and
-// render as a plain read-only label here.
-type BookingUiStatus = "pending" | "confirmed" | "completed";
+// The Overview live-queue exposes the booking status flow. Other backend
+// statuses (no_show, in_progress) are managed from the calendar and render as
+// a plain read-only label here.
+type BookingUiStatus = "pending" | "confirmed" | "completed" | "cancelled";
 
 const STATUS_OPTIONS: { value: BookingUiStatus; badgeClass: string }[] = [
   { value: "pending", badgeClass: "bg-[#F97316] text-white" },
   { value: "confirmed", badgeClass: "bg-primary text-white" },
   { value: "completed", badgeClass: "bg-[#10B981] text-white" },
+  { value: "cancelled", badgeClass: "bg-[#EF4444] text-white" },
 ];
 
 const labelKey: Record<BookingUiStatus, string> = {
   pending: "dashboard.overview.queue.status.waiting",
   confirmed: "dashboard.overview.queue.status.ready",
   completed: "dashboard.overview.queue.status.completed",
+  cancelled: "dashboard.overview.queue.status.cancelled",
 };
 
 const isUiStatus = (value: string): value is BookingUiStatus =>
-  value === "pending" || value === "confirmed" || value === "completed";
+  value === "pending" ||
+  value === "confirmed" ||
+  value === "completed" ||
+  value === "cancelled";
 
 type QueueStatusCellProps = {
   appointmentId: number;

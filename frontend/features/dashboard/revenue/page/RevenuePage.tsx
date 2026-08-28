@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import {
   Select,
   SelectContent,
@@ -24,6 +24,7 @@ import {
 
 import { StaffRevenueAccordionItem } from "@/shared/components/revenue/StaffRevenueAccordionItem";
 import { NULL_TEXT_KEY } from "@/shared/lib/constants";
+import { useStaffList } from "@/features/dashboard/staff/hooks/useStaff";
 
 import {
   revenueService,
@@ -35,27 +36,39 @@ type RevenueFilterDraft = {
   startDate: string;
   endDate: string;
   staffId: string;
-  paymentMethod: string;
 };
 
-const EMPTY_FILTER_DRAFT: RevenueFilterDraft = {
-  startDate: "",
-  endDate: "",
-  staffId: "",
-  paymentMethod: "",
+const toDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const createTodayFilterDraft = (): RevenueFilterDraft => {
+  const today = toDateKey(new Date());
+  return {
+    startDate: today,
+    endDate: today,
+    staffId: "",
+  };
 };
 
 const RevenuePage = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [summary, setSummary] = useState<RevenueSummaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [draftFilters, setDraftFilters] =
-    useState<RevenueFilterDraft>(EMPTY_FILTER_DRAFT);
-  const [appliedFilters, setAppliedFilters] =
-    useState<RevenueFilterDraft>(EMPTY_FILTER_DRAFT);
+  const [draftFilters, setDraftFilters] = useState<RevenueFilterDraft>(() =>
+    createTodayFilterDraft(),
+  );
+  const [appliedFilters, setAppliedFilters] = useState<RevenueFilterDraft>(() =>
+    createTodayFilterDraft(),
+  );
   const [staffSearch, setStaffSearch] = useState("");
+  const staffFilterQuery = useStaffList({
+    date: draftFilters.startDate || toDateKey(new Date()),
+  });
 
   const buildSummaryParams = (
     draft: RevenueFilterDraft,
@@ -68,7 +81,6 @@ const RevenuePage = () => {
       startDate: draft.startDate || undefined,
       endDate: draft.endDate || undefined,
       staffId: Number.isFinite(staffId) ? staffId : undefined,
-      paymentMethod: draft.paymentMethod || undefined,
     };
   };
 
@@ -86,21 +98,23 @@ const RevenuePage = () => {
   };
 
   useEffect(() => {
-    void loadSummary();
+    queueMicrotask(() => {
+      void loadSummary(buildSummaryParams(appliedFilters));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleApplyFilters = async () => {
     const nextApplied = { ...draftFilters };
     setAppliedFilters(nextApplied);
-    setIsFilterOpen(false);
     await loadSummary(buildSummaryParams(nextApplied));
   };
 
   const handleResetFilters = async () => {
-    setDraftFilters(EMPTY_FILTER_DRAFT);
-    setAppliedFilters(EMPTY_FILTER_DRAFT);
-    setIsFilterOpen(false);
-    await loadSummary();
+    const todayFilters = createTodayFilterDraft();
+    setDraftFilters(todayFilters);
+    setAppliedFilters(todayFilters);
+    await loadSummary(buildSummaryParams(todayFilters));
   };
 
   const handleExportExcel = async () => {
@@ -151,34 +165,30 @@ const RevenuePage = () => {
   }, [summary]);
 
   const summaryDateLabel = useMemo(() => {
+    const formatDate = (value: string) =>
+      new Date(`${value}T00:00:00`).toLocaleDateString("vi-VN");
+
+    if (appliedFilters.startDate && appliedFilters.endDate) {
+      if (appliedFilters.startDate === appliedFilters.endDate) {
+        return formatDate(appliedFilters.startDate);
+      }
+      return `${formatDate(appliedFilters.startDate)} - ${formatDate(appliedFilters.endDate)}`;
+    }
+
+    if (appliedFilters.startDate) return formatDate(appliedFilters.startDate);
+    if (appliedFilters.endDate) return formatDate(appliedFilters.endDate);
+
     if (!summary?.summaryDate) return t("dashboard.shared.sampleDate");
-    const locale = i18n.language === "vi" ? "vi-VN" : "en-US";
-    return new Date(summary.summaryDate).toLocaleDateString(locale, {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }, [summary, t, i18n.language]);
+    return new Date(summary.summaryDate).toLocaleDateString("vi-VN");
+  }, [appliedFilters.endDate, appliedFilters.startDate, summary, t]);
 
   const selectedStaffLabel = useMemo(() => {
     if (!draftFilters.staffId) return t("dashboard.revenue.filters.allStaff");
-    const match = (summary?.staffRevenueRows ?? []).find(
+    const match = (staffFilterQuery.data ?? []).find(
       (r) => r.key === draftFilters.staffId,
     );
-    return match?.staffName ?? draftFilters.staffId;
-  }, [draftFilters.staffId, summary, t]);
-
-  const selectedPaymentMethodLabel = useMemo(() => {
-    if (!draftFilters.paymentMethod)
-      return t("dashboard.revenue.filters.allMethods");
-    return t(
-      `dashboard.revenue.paymentMethodLabels.${draftFilters.paymentMethod}`,
-      {
-        defaultValue: draftFilters.paymentMethod,
-      },
-    );
-  }, [draftFilters.paymentMethod, t]);
+    return match?.name ?? draftFilters.staffId;
+  }, [draftFilters.staffId, staffFilterQuery.data, t]);
 
   const filteredStaffRows = useMemo(() => {
     const rows = summary?.staffRevenueRows ?? [];
@@ -220,12 +230,6 @@ const RevenuePage = () => {
     return best;
   }, [summary, t]);
 
-  const avgRevenue = useMemo(() => {
-    const rows = summary?.staffRevenueRows ?? [];
-    if (rows.length === 0) return 0;
-    return rows.reduce((acc, r) => acc + r.totalRevenue, 0) / rows.length;
-  }, [summary]);
-
   return (
     <div className="flex min-h-full flex-col gap-6 px-8 py-8">
       {/* Header Banner */}
@@ -235,7 +239,7 @@ const RevenuePage = () => {
           <h1 className="text-[32px] font-bold leading-10 tracking-tight text-[#1A1A1A]">
             {t("dashboard.revenue.title", {
               defaultValue: "Tổng kết doanh thu trong ngày",
-            })}
+            })} {summaryDateLabel}
           </h1>
           <p className="mt-1 text-sm text-[#9DA1A7]">
             {t("dashboard.revenue.subtitle", {
@@ -272,17 +276,6 @@ const RevenuePage = () => {
             <button
               type="button"
               onClick={() => {
-                setDraftFilters(appliedFilters);
-                setIsFilterOpen(!isFilterOpen);
-              }}
-              className="flex h-10 items-center gap-2 rounded-[10px] border border-[#DEE1E7] bg-white px-4 text-sm font-medium text-[#1A1A1A] shadow-[0px_2px_4px_0px_#00000012] hover:bg-[#F9FAFB]"
-            >
-              <SlidersHorizontal className="h-4 w-4 text-[#9DA1A7]" />
-              {t("dashboard.revenue.reportFilters")}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
                 void handleExportExcel();
               }}
               disabled={!summary || isLoading}
@@ -296,8 +289,12 @@ const RevenuePage = () => {
       </div>
 
       {/* Filter panel */}
-      {isFilterOpen && (
-        <div className="grid grid-cols-1 gap-3 rounded-xl border border-[#DFE1E4] bg-white p-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="rounded-xl border border-[#DFE1E4] bg-white p-4 shadow-[0px_2px_4px_0px_#0000000d]">
+        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#1D1F23]">
+          <SlidersHorizontal className="h-4 w-4 text-[#9DA1A7]" />
+          {t("dashboard.revenue.reportFilters")}
+        </div>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end">
           <div className="flex flex-col gap-2">
             <label className="text-sm text-[#1D1F23]">
               {t("dashboard.revenue.filters.startDate")}
@@ -344,45 +341,15 @@ const RevenuePage = () => {
                 <SelectItem value="all">
                   {t("dashboard.revenue.filters.allStaff")}
                 </SelectItem>
-                {(summary?.staffRevenueRows ?? []).map((row) => (
-                  <SelectItem key={row.key} value={row.key}>
-                    {row.staffName}
+                {(staffFilterQuery.data ?? []).map((staff) => (
+                  <SelectItem key={staff.key} value={staff.key}>
+                    {staff.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-[#1D1F23]">
-              {t("dashboard.revenue.filters.paymentMethod")}
-            </label>
-            <Select
-              value={draftFilters.paymentMethod || "all"}
-              onValueChange={(v) =>
-                setDraftFilters((p) => ({
-                  ...p,
-                  paymentMethod: v == null || v === "all" ? "" : v,
-                }))
-              }
-            >
-              <SelectTrigger className="h-9 rounded-[8px] border-[#DEE1E7] text-sm">
-                <SelectValue>{selectedPaymentMethodLabel}</SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  {t("dashboard.revenue.filters.allMethods")}
-                </SelectItem>
-                {(summary?.paymentMethods ?? []).map((item) => (
-                  <SelectItem key={item.key} value={item.key}>
-                    {t(`dashboard.revenue.paymentMethodLabels.${item.key}`, {
-                      defaultValue: item.label,
-                    })}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex gap-2 md:col-span-2 xl:col-span-4">
+          <div className="flex gap-2 md:col-span-2 xl:col-span-1">
             <button
               type="button"
               onClick={() => {
@@ -403,7 +370,7 @@ const RevenuePage = () => {
             </button>
           </div>
         </div>
-      )}
+      </section>
 
       {errorMessage && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -411,9 +378,10 @@ const RevenuePage = () => {
         </div>
       )}
       {isLoading && (
-        <div className="rounded-xl border border-[#DFE1E4] bg-white px-4 py-3 text-sm text-[#9DA1A7]">
-          {t("dashboard.revenue.loading")}
-        </div>
+        <LoadingState
+          className="rounded-xl border border-[#DFE1E4] bg-white"
+          label={t("dashboard.revenue.loading")}
+        />
       )}
 
       {/* Four Stat Cards */}
@@ -574,7 +542,7 @@ const RevenuePage = () => {
         </div>
 
         <div>
-          {filteredStaffRows.map((row, index) => (
+          {filteredStaffRows.map((row) => (
             <StaffRevenueAccordionItem
               key={row.key}
               row={row}
@@ -587,44 +555,6 @@ const RevenuePage = () => {
         </div>
       </div>
 
-      {/* Bottom widgets */}
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_443px]">
-        {/* Payment methods summary */}
-        <div className="rounded-[12px] bg-white p-6 shadow-[0px_2px_4px_0px_#00000012]">
-          <h2 className="text-base font-semibold text-[#1A1A1A]">
-            {t("dashboard.revenue.paymentMethods")}
-          </h2>
-          <p className="mt-1 text-xs text-[#9DA1A7]">
-            {t("dashboard.revenue.paymentDistribution")}
-          </p>
-          <div className="mt-5 space-y-3">
-            {(summary?.paymentMethods ?? []).map((item) => (
-              <div key={item.key} className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm text-[#1A1A1A]">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  {t(`dashboard.revenue.paymentMethodLabels.${item.key}`, {
-                    defaultValue: item.label,
-                  })}
-                </span>
-                <span className="text-sm font-semibold text-[#1A1A1A]">
-                  {formatCurrency(item.amount)}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 border-t border-[#F3F4F6] pt-4 flex items-center justify-between">
-            <span className="text-sm text-[#1A1A1A]">
-              {t("dashboard.revenue.total")}
-            </span>
-            <span className="text-sm font-bold text-[#f04cac]">
-              {formatCurrency(totalRevenue)}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -19,20 +19,27 @@ import { cn } from "@/shared/lib/utils";
 
 import { useUpdateAppointmentStatus } from "../../hooks/useCalendar";
 
-// The UI only exposes 3 booking states; other backend statuses (cancelled, no_show,
-// in_progress) are managed elsewhere and are left untouched if encountered here.
-export type BookingUiStatus = "pending" | "confirmed" | "completed";
+// The UI exposes the booking status flow (pending/confirmed/completed/cancelled);
+// other backend statuses (no_show, in_progress) are managed elsewhere and are
+// left untouched if encountered here.
+export type BookingUiStatus =
+  | "pending"
+  | "confirmed"
+  | "completed"
+  | "cancelled";
 
 const STATUS_OPTIONS: { value: BookingUiStatus; badgeClass: string }[] = [
   { value: "pending", badgeClass: "bg-[#F59E0B] text-white" },
   { value: "confirmed", badgeClass: "bg-primary text-white" },
   { value: "completed", badgeClass: "bg-[#10B981] text-white" },
+  { value: "cancelled", badgeClass: "bg-[#EF4444] text-white" },
 ];
 
 const labelKey: Record<BookingUiStatus, string> = {
   pending: "dashboard.calendar.statusControl.waiting",
   confirmed: "dashboard.calendar.statusControl.ready",
   completed: "dashboard.calendar.statusControl.completed",
+  cancelled: "dashboard.calendar.statusControl.cancelled",
 };
 
 type BookingStatusControlProps = {
@@ -52,10 +59,13 @@ const BookingStatusControl = ({
   );
 
   const isUiStatus = (value: string): value is BookingUiStatus =>
-    value === "pending" || value === "confirmed" || value === "completed";
+    value === "pending" ||
+    value === "confirmed" ||
+    value === "completed" ||
+    value === "cancelled";
 
   if (!isUiStatus(status)) {
-    // Statuses outside the 3-state flow (cancelled, no_show, in_progress) render read-only.
+    // Statuses outside the booking flow (no_show, in_progress) render read-only.
     return null;
   }
 

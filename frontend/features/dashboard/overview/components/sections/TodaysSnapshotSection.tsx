@@ -1,6 +1,7 @@
 "use client";
 import { useTranslation } from "react-i18next";
 
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import { cn } from "@/shared/lib/utils";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
 
@@ -19,9 +20,10 @@ const TodaysSnapshotSection = () => {
       </p>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-[#8D95A5]">
-          {t("dashboard.overview.snapshot.loading")}
-        </p>
+        <LoadingState
+          className="mt-4"
+          label={t("dashboard.overview.snapshot.loading")}
+        />
       ) : snapshot.length === 0 ? (
         <p className="mt-4 text-sm text-[#8D95A5]">
           {t("dashboard.overview.snapshot.empty")}

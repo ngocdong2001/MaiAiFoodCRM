@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Banknote,
-  CreditCard,
-  Smartphone,
-  Star,
-  Tag,
-  Wallet,
-} from "lucide-react";
+import { Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -26,22 +19,6 @@ import {
   type StaffRevenueDetailResponse,
   type StaffRevenueRow,
 } from "@/features/dashboard/revenue/services/revenue.service";
-
-const PAYMENT_ICON: Record<string, React.ReactNode> = {
-  cash: <Banknote className="h-3.5 w-3.5" />,
-  card: <CreditCard className="h-3.5 w-3.5" />,
-  transfer: <Wallet className="h-3.5 w-3.5" />,
-  ewallet: <Smartphone className="h-3.5 w-3.5" />,
-  loyalty_points: <Star className="h-3.5 w-3.5" />,
-};
-
-const PAYMENT_COLOR: Record<string, string> = {
-  cash: "bg-pink-100 text-pink-700",
-  card: "bg-yellow-100 text-yellow-700",
-  transfer: "bg-teal-100 text-teal-700",
-  ewallet: "bg-blue-100 text-blue-700",
-  loyalty_points: "bg-purple-100 text-purple-700",
-};
 
 const fmt = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -161,23 +138,6 @@ function JobDetailDialog({ job, onClose }: JobDialogProps) {
             </div>
           </div>
 
-          {/* Payment method */}
-          <div className="flex items-center justify-between rounded-[10px] bg-[#F6F7F9] px-4 py-3">
-            <span className="text-xs text-[#9DA1A7]">
-              {t("dashboard.revenue.staffDetail.paymentMethod", {
-                defaultValue: "Payment Method",
-              })}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${PAYMENT_COLOR[job.paymentMethod] ?? "bg-gray-100 text-gray-700"}`}
-            >
-              {PAYMENT_ICON[job.paymentMethod]}
-              {t(`dashboard.revenue.paymentMethodLabels.${job.paymentMethod}`, {
-                defaultValue: job.paymentMethod,
-              })}
-            </span>
-          </div>
-
           {job.receiptNumber && (
             <p className="text-xs text-[#B0B5BF]">
               {t("dashboard.revenue.staffDetail.receipt", {
@@ -221,7 +181,7 @@ export function StaffRevenueAccordionItem({
   };
 
   useEffect(() => {
-    fetchDetail();
+    queueMicrotask(fetchDetail);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row.key, dateRange?.startDate, dateRange?.endDate]);
 
@@ -303,9 +263,6 @@ export function StaffRevenueAccordionItem({
                   <th className="px-4 py-1 text-left text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
                     {t("dashboard.revenue.staffDetail.guest")}
                   </th>
-                  <th className="px-4 py-1 text-left text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
-                    {t("dashboard.revenue.staffTable.colServices")}
-                  </th>
                   <th className="px-4 py-1 text-right text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
                     {t("dashboard.revenue.table.totalRevenue")}
                   </th>
@@ -320,19 +277,6 @@ export function StaffRevenueAccordionItem({
                   >
                     <td className="px-4 text-sm font-medium text-[#1D1F23]">
                       {job.guestName}
-                    </td>
-                    <td className="px-4">
-                      <div className="flex flex-wrap gap-1">
-                        {job.services.length > 0 ? (
-                          job.services.map((s) => (
-                            <span key={s.serviceId} className="text-sm text-[#1D1F23]">
-                              {s.serviceName}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-sm text-[#9DA1A7]">—</span>
-                        )}
-                      </div>
                     </td>
                     <td className="px-4 text-right text-sm font-bold text-[#1D1F23]">
                       {fmt(job.finalAmount)}

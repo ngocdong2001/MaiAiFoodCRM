@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 
 import PageHeader from "@/shared/components/molecules/PageHeader";
+import LoadingState from "@/shared/components/molecules/LoadingState";
 
 import { savedTemplates, recentActivityItems } from "../data/data";
 import { useReportsSummary } from "../hooks/useReports";
@@ -47,10 +48,7 @@ const ReportsPage = () => {
     }));
   }, [summary]);
 
-  const revenueData = useMemo(
-    () => summary?.monthlyRevenue ?? [],
-    [summary],
-  );
+  const revenueData = useMemo(() => summary?.monthlyRevenue ?? [], [summary]);
 
   const serviceBreakdown: BookingServiceDataPoint[] = useMemo(() => {
     if (!summary) return [];
@@ -93,9 +91,10 @@ const ReportsPage = () => {
       />
 
       {isLoading ? (
-        <div className="rounded-xl border border-[#DFE1E4] bg-white px-4 py-3 text-sm text-[#9DA1A7]">
-          Loading reports…
-        </div>
+        <LoadingState
+          className="rounded-xl border border-[#DFE1E4] bg-white"
+          label={t("dashboard.reports.loading")}
+        />
       ) : (
         <>
           <ReportStatsSection metrics={statMetrics} />

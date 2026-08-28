@@ -1,18 +1,11 @@
 "use client";
 
-import {
-  Banknote,
-  CreditCard,
-  Smartphone,
-  Star,
-  Tag,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
+import { Tag, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import LoadingState from "@/shared/components/molecules/LoadingState";
 import { Badge } from "@/shared/components/ui/badge";
 import {
   Dialog,
@@ -25,22 +18,6 @@ import {
   revenueService,
   type StaffRevenueDetailResponse,
 } from "../services/revenue.service";
-
-const PAYMENT_METHOD_ICON: Record<string, React.ReactNode> = {
-  cash: <Banknote className="h-3.5 w-3.5" />,
-  card: <CreditCard className="h-3.5 w-3.5" />,
-  transfer: <Wallet className="h-3.5 w-3.5" />,
-  ewallet: <Smartphone className="h-3.5 w-3.5" />,
-  loyalty_points: <Star className="h-3.5 w-3.5" />,
-};
-
-const PAYMENT_METHOD_COLOR: Record<string, string> = {
-  cash: "bg-pink-100 text-pink-700",
-  card: "bg-yellow-100 text-yellow-700",
-  transfer: "bg-teal-100 text-teal-700",
-  ewallet: "bg-blue-100 text-blue-700",
-  loyalty_points: "bg-purple-100 text-purple-700",
-};
 
 interface Props {
   staffKey: string | null;
@@ -66,21 +43,23 @@ const StaffRevenueDetailDialog = ({
     if (!staffKey) return;
 
     let cancelled = false;
-    setIsLoading(true);
-    setError(null);
-    setDetail(null);
+    queueMicrotask(() => {
+      setIsLoading(true);
+      setError(null);
+      setDetail(null);
 
-    revenueService
-      .getStaffDetail(staffKey, dateRange)
-      .then((data) => {
-        if (!cancelled) setDetail(data);
-      })
-      .catch(() => {
-        if (!cancelled) setError(t("dashboard.revenue.errors.loadSummary"));
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
+      revenueService
+        .getStaffDetail(staffKey, dateRange)
+        .then((data) => {
+          if (!cancelled) setDetail(data);
+        })
+        .catch(() => {
+          if (!cancelled) setError(t("dashboard.revenue.errors.loadSummary"));
+        })
+        .finally(() => {
+          if (!cancelled) setIsLoading(false);
+        });
+    });
 
     return () => {
       cancelled = true;
@@ -117,10 +96,7 @@ const StaffRevenueDetailDialog = ({
                 className="h-14 w-14 rounded-full object-cover"
               />
             ) : (
-              <InitialsAvatar
-                name={staffName}
-                className="h-14 w-14 text-lg"
-              />
+              <InitialsAvatar name={staffName} className="h-14 w-14 text-lg" />
             )}
             <div>
               <DialogTitle className="text-xl font-bold text-[#171A21]">
@@ -176,13 +152,9 @@ const StaffRevenueDetailDialog = ({
             </h3>
 
             {isLoading && (
-              <p className="text-sm text-[#8D95A5]">
-                {t("dashboard.revenue.loading")}
-              </p>
+              <LoadingState compact label={t("dashboard.revenue.loading")} />
             )}
-            {error && (
-              <p className="text-sm text-red-600">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-600">{error}</p>}
 
             {detail && detail.jobs.length === 0 && (
               <p className="text-sm text-[#8D95A5]">
@@ -223,13 +195,6 @@ const StaffRevenueDetailDialog = ({
                       </div>
                     </div>
 
-                    {/* Payment method badge */}
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${PAYMENT_METHOD_COLOR[job.paymentMethod] ?? "bg-gray-100 text-gray-700"}`}
-                    >
-                      {PAYMENT_METHOD_ICON[job.paymentMethod]}
-                      {job.paymentMethod}
-                    </span>
                   </div>
 
                   {/* Services performed */}

@@ -22,8 +22,13 @@ import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { Textarea } from "@/shared/components/ui/textarea";
 
 import { useCalendarData } from "../context/CalendarDataContext";
-import { useCalendarOptions, useCreateAppointment } from "../hooks/useCalendar";
+import {
+  useCalendarOptions,
+  useCreateAppointment,
+  useUpdateAppointment,
+} from "../hooks/useCalendar";
 import { calendarService } from "../services/calendar.service";
+import type { ApiAppointment } from "../types/calendar.types";
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 type Values = {
@@ -57,6 +62,33 @@ const errorKey = (error: unknown) => {
   return "unknown";
 };
 
+const createInitialValues = (initialDate: Date): Values => ({
+  guestId: "",
+  staffId: "",
+  date: initialDate.toISOString().slice(0, 10),
+  startTime: "09:00",
+  serviceIds: [],
+  status: "confirmed",
+  priority: "normal",
+  notes: "",
+});
+
+const createValuesFromAppointment = (appointment: ApiAppointment): Values => {
+  const startTime = new Date(appointment.startTime);
+  const pad2 = (value: number) => String(value).padStart(2, "0");
+
+  return {
+    guestId: String(appointment.guestId),
+    staffId: String(appointment.staffId),
+    date: `${startTime.getFullYear()}-${pad2(startTime.getMonth() + 1)}-${pad2(startTime.getDate())}`,
+    startTime: `${pad2(startTime.getHours())}:${pad2(startTime.getMinutes())}`,
+    serviceIds: appointment.services.map((service) => service.id),
+    status: appointment.status,
+    priority: appointment.priority,
+    notes: appointment.notes ?? "",
+  };
+};
+
 const BookingFormDialog = ({ open, onOpenChange }: Props) => {
   const { cursorDate, setCursorDate } = useCalendarData();
   if (!open) return null;
@@ -77,33 +109,50 @@ export const BookingFormContent = ({
   initialDate,
   onCreated,
   defaultWalkIn = false,
+  appointment,
 }: Props & {
   initialDate: Date;
   onCreated: (date: Date) => void;
   defaultWalkIn?: boolean;
+  appointment?: ApiAppointment;
 }) => {
   const options = useCalendarOptions();
   const create = useCreateAppointment();
+  const updateAppointment = useUpdateAppointment();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const isEditing = Boolean(appointment);
   const [error, setError] = useState<string | null>(null);
-  const [isWalkIn, setIsWalkIn] = useState(defaultWalkIn);
+  const [isWalkIn, setIsWalkIn] = useState(defaultWalkIn && !appointment);
   const [walkInName, setWalkInName] = useState("");
   const [walkInPhone, setWalkInPhone] = useState("");
   const [isCreatingGuest, setIsCreatingGuest] = useState(false);
-  const [values, setValues] = useState<Values>({
-    guestId: "",
-    staffId: "",
-    date: initialDate.toISOString().slice(0, 10),
-    startTime: "09:00",
-    serviceIds: [],
-    status: "confirmed",
-    priority: "normal",
-    notes: "",
-  });
+  const [values, setValues] = useState<Values>(() =>
+    appointment
+      ? createValuesFromAppointment(appointment)
+      : createInitialValues(initialDate),
+  );
+
   const update = <Key extends keyof Values>(key: Key, value: Values[Key]) => {
     setValues((current) => ({ ...current, [key]: value }));
     setError(null);
+  };
+
+  const resetForm = () => {
+    setValues(
+      appointment
+        ? createValuesFromAppointment(appointment)
+        : createInitialValues(initialDate),
+    );
+    setIsWalkIn(defaultWalkIn && !appointment);
+    setWalkInName("");
+    setWalkInPhone("");
+    setError(null);
+  };
+
+  const requestClose = () => {
+    resetForm();
+    onOpenChange(false);
   };
   const selectedServices = (options.data?.services ?? []).filter((service) =>
     values.serviceIds.includes(service.id),
@@ -116,6 +165,28 @@ export const BookingFormContent = ({
     (total, service) => total + service.price,
     0,
   );
+
+  // Group services by category so the list reads as labelled subgroups.
+  const groupedServices = (options.data?.services ?? []).reduce<
+    Array<{
+      category: string;
+      services: Array<{
+        id: number;
+        name: string;
+        price: number;
+        durationMinutes: number;
+      }>;
+    }>
+  >((groups, service) => {
+    const label = service.category ?? "";
+    const existing = groups.find((group) => group.category === label);
+    if (existing) {
+      existing.services.push(service);
+    } else {
+      groups.push({ category: label, services: [service] });
+    }
+    return groups;
+  }, []);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -158,38 +229,68 @@ export const BookingFormContent = ({
     const pad2 = (n: number) => String(n).padStart(2, "0");
     const fmtLocal = (d: Date) =>
       `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:00`;
-    create.mutate(
-      {
-        guestId: Number(resolvedGuestId),
-        staffId: Number(values.staffId),
-        startTime: fmtLocal(startDate),
-        endTime: fmtLocal(endDate),
-        serviceIds: values.serviceIds,
-        status: values.status,
-        priority: values.priority,
-        source: isWalkIn ? "walk_in" : "dashboard",
-        notes: values.notes.trim() || undefined,
-      },
-      {
-        onSuccess: () => {
-          onCreated(startDate);
-          onOpenChange(false);
-        },
-        onError: (mutationError) =>
-          setError(
-            t(`dashboard.calendar.booking.errors.${errorKey(mutationError)}`),
-          ),
-      },
-    );
+    const input = {
+      guestId: Number(resolvedGuestId),
+      staffId: Number(values.staffId),
+      startTime: fmtLocal(startDate),
+      endTime: fmtLocal(endDate),
+      serviceIds: values.serviceIds,
+      status: values.status,
+      priority: values.priority,
+      source: isWalkIn ? "walk_in" : (appointment?.source ?? "dashboard"),
+      notes: values.notes.trim() || undefined,
+    };
+    const onSuccess = () => {
+      onCreated(startDate);
+      onOpenChange(false);
+    };
+    const onError = (mutationError: unknown) =>
+      setError(
+        t(`dashboard.calendar.booking.errors.${errorKey(mutationError)}`),
+      );
+
+    if (appointment) {
+      updateAppointment.mutate(
+        { id: appointment.id, input },
+        { onSuccess, onError },
+      );
+      return;
+    }
+
+    create.mutate(input, {
+      onSuccess,
+      onError,
+    });
   };
 
+  const isSaving = create.isPending || updateAppointment.isPending;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          requestClose();
+        } else {
+          onOpenChange(true);
+        }
+      }}
+    >
       <DialogContent className="flex h-[min(92vh,50rem)] max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         <DialogHeader className="shrink-0 border-b border-[#E7EAF0] px-6 py-5">
-          <DialogTitle>{t("dashboard.calendar.booking.title")}</DialogTitle>
+          <DialogTitle>
+            {t(
+              isEditing
+                ? "dashboard.calendar.booking.editTitle"
+                : "dashboard.calendar.booking.title",
+            )}
+          </DialogTitle>
           <DialogDescription>
-            {t("dashboard.calendar.booking.description")}
+            {t(
+              isEditing
+                ? "dashboard.calendar.booking.editDescription"
+                : "dashboard.calendar.booking.description",
+            )}
           </DialogDescription>
         </DialogHeader>
         {error && (
@@ -210,7 +311,7 @@ export const BookingFormContent = ({
                   <div className="space-y-1.5">
                     <div className="flex gap-1.5">
                       <Input
-                        placeholder="Tên khách vãng lai"
+                        placeholder={t("dashboard.calendar.booking.walkInName")}
                         value={walkInName}
                         onChange={(e) => {
                           setWalkInName(e.target.value);
@@ -226,13 +327,14 @@ export const BookingFormContent = ({
                           setWalkInName("");
                           setWalkInPhone("");
                         }}
+                        disabled={isEditing}
                         className="h-9 rounded-md border border-[#DEE1E7] px-2.5 text-xs text-[#8D95A5] hover:bg-[#F3F4F7]"
                       >
-                        Chọn có sẵn
+                        {t("dashboard.calendar.booking.chooseExisting")}
                       </button>
                     </div>
                     <Input
-                      placeholder="Số điện thoại (tuỳ chọn)"
+                      placeholder={t("dashboard.calendar.booking.walkInPhone")}
                       value={walkInPhone}
                       onChange={(e) => setWalkInPhone(e.target.value)}
                       className="h-9"
@@ -257,16 +359,18 @@ export const BookingFormContent = ({
                         className="h-9"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsWalkIn(true);
-                        update("guestId", "");
-                      }}
-                      className="h-9 rounded-md border border-[#DEE1E7] bg-[#F9FAFB] px-2.5 text-xs font-medium text-[#8D95A5] hover:bg-[#F3F4F7] hover:text-[#171A21]"
-                    >
-                      + Vãng lai
-                    </button>
+                    {!isEditing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsWalkIn(true);
+                          update("guestId", "");
+                        }}
+                        className="h-9 rounded-md border border-[#DEE1E7] bg-[#F9FAFB] px-2.5 text-xs font-medium text-[#8D95A5] hover:bg-[#F3F4F7] hover:text-[#171A21]"
+                      >
+                        {t("dashboard.calendar.booking.addWalkIn")}
+                      </button>
+                    )}
                   </div>
                 )}
               </Field>
@@ -342,45 +446,60 @@ export const BookingFormContent = ({
                 {t("dashboard.calendar.booking.services")}{" "}
                 <span className="text-destructive">*</span>
               </legend>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {options.data?.services.map((service) => {
-                  const checked = values.serviceIds.includes(service.id);
-                  return (
-                    <label
-                      key={service.id}
-                      className={
-                        checked
-                          ? "cursor-pointer rounded-lg border border-primary bg-primary/5 p-3"
-                          : "cursor-pointer rounded-lg border border-[#DEE1E7] p-3 hover:bg-[#F9FAFB]"
-                      }
-                    >
-                      <input
-                        type="checkbox"
-                        className="sr-only"
-                        checked={checked}
-                        onChange={() =>
-                          update(
-                            "serviceIds",
-                            checked
-                              ? values.serviceIds.filter(
-                                  (id) => id !== service.id,
+              <div className="space-y-4">
+                {groupedServices.map((group) => (
+                  <div key={group.category || "__uncategorised"}>
+                    {group.category ? (
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#8D95A5]">
+                        {group.category}
+                      </p>
+                    ) : null}
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {group.services.map((service) => {
+                        const checked = values.serviceIds.includes(service.id);
+                        return (
+                          <label
+                            key={service.id}
+                            className={
+                              checked
+                                ? "relative cursor-pointer rounded-lg border border-primary bg-primary/5 p-3"
+                                : "relative cursor-pointer rounded-lg border border-[#DEE1E7] p-3 hover:bg-[#F9FAFB]"
+                            }
+                          >
+                            <input
+                              type="checkbox"
+                              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                              checked={checked}
+                              aria-label={`${service.name} ${t(
+                                "dashboard.calendar.booking.minutes",
+                                { count: service.durationMinutes },
+                              )} · $${service.price.toFixed(2)}`}
+                              onChange={() =>
+                                update(
+                                  "serviceIds",
+                                  checked
+                                    ? values.serviceIds.filter(
+                                        (id) => id !== service.id,
+                                      )
+                                    : [...values.serviceIds, service.id],
                                 )
-                              : [...values.serviceIds, service.id],
-                          )
-                        }
-                      />
-                      <span className="block text-sm font-semibold text-[#171A21]">
-                        {service.name}
-                      </span>
-                      <span className="mt-1 block text-xs text-[#8D95A5]">
-                        {t("dashboard.calendar.booking.minutes", {
-                          count: service.durationMinutes,
-                        })}{" "}
-                        · ${service.price.toFixed(2)}
-                      </span>
-                    </label>
-                  );
-                })}
+                              }
+                            />
+                            <span className="pointer-events-none block text-sm font-semibold text-[#171A21]">
+                              {service.name}
+                            </span>
+                            <span className="pointer-events-none mt-1 block text-xs text-[#8D95A5]">
+                              {t("dashboard.calendar.booking.minutes", {
+                                count: service.durationMinutes,
+                              })}{" "}
+                              · ${service.price.toFixed(2)}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
               {selectedServices.length > 0 && (
                 <p className="mt-2 text-sm font-medium text-[#4B5563]">
@@ -408,23 +527,27 @@ export const BookingFormContent = ({
           </form>
         </ScrollArea>
         <DialogFooter className="shrink-0 border-t border-[#E7EAF0] px-6 py-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button type="button" variant="outline" onClick={requestClose}>
             {t("dashboard.calendar.booking.cancel")}
           </Button>
           <Button
             type="submit"
             form="booking-form"
-            disabled={create.isPending || options.isPending || isCreatingGuest}
+            disabled={isSaving || options.isPending || isCreatingGuest}
           >
             {isCreatingGuest
-              ? "Đang tạo khách..."
-              : create.isPending
-                ? t("dashboard.calendar.booking.creating")
-                : t("dashboard.calendar.booking.create")}
+              ? t("dashboard.calendar.booking.creatingGuest")
+              : isSaving
+                ? t(
+                    isEditing
+                      ? "dashboard.calendar.booking.updating"
+                      : "dashboard.calendar.booking.creating",
+                  )
+                : t(
+                    isEditing
+                      ? "dashboard.calendar.booking.update"
+                      : "dashboard.calendar.booking.create",
+                  )}
           </Button>
         </DialogFooter>
       </DialogContent>

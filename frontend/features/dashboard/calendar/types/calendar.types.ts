@@ -46,6 +46,7 @@ export type QueueRequest = {
 
 export type CalendarAppointment = SchedulerEvent & {
   detail: AppointmentDetailData;
+  appointment?: ApiAppointment;
 };
 
 export type CalendarData = {
@@ -72,7 +73,13 @@ export type CalendarOption = {
 export type CalendarOptions = {
   guests: Array<CalendarOption & { phone: string | null }>;
   staff: Array<CalendarOption & { role: string }>;
-  services: Array<CalendarOption & { price: number; durationMinutes: number }>;
+  services: Array<
+    CalendarOption & {
+      price: number;
+      durationMinutes: number;
+      category: string | null;
+    }
+  >;
   operatingHours: Array<{
     day: string;
     open: boolean;
@@ -89,6 +96,7 @@ export type ApiAppointment = {
   endTime: string;
   status: string;
   priority: string;
+  source: string | null;
   notes: string | null;
   station: string | null;
   guest: CalendarOption & {
