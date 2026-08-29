@@ -60,6 +60,8 @@ export const ModelName = {
   guesttag: 'guesttag',
   guesttagmapping: 'guesttagmapping',
   payment: 'payment',
+  revenuerecord: 'revenuerecord',
+  revenuerecorddetail: 'revenuerecorddetail',
   paymentdetail: 'paymentdetail',
   refund: 'refund',
   service: 'service',
@@ -231,6 +233,45 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const RevenuerecordScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  appointmentId: 'appointmentId',
+  guestId: 'guestId',
+  guestName: 'guestName',
+  guestPhone: 'guestPhone',
+  guestAvatarUrl: 'guestAvatarUrl',
+  staffId: 'staffId',
+  staffName: 'staffName',
+  staffRole: 'staffRole',
+  staffAvatarUrl: 'staffAvatarUrl',
+  amount: 'amount',
+  discountAmount: 'discountAmount',
+  tipAmount: 'tipAmount',
+  finalAmount: 'finalAmount',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  receiptNumber: 'receiptNumber',
+  paidAt: 'paidAt',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RevenuerecordScalarFieldEnum = (typeof RevenuerecordScalarFieldEnum)[keyof typeof RevenuerecordScalarFieldEnum]
+
+
+export const RevenuerecorddetailScalarFieldEnum = {
+  id: 'id',
+  revenueRecordId: 'revenueRecordId',
+  serviceId: 'serviceId',
+  serviceName: 'serviceName',
+  categoryName: 'categoryName',
+  price: 'price',
+  quantity: 'quantity'
+} as const
+
+export type RevenuerecorddetailScalarFieldEnum = (typeof RevenuerecorddetailScalarFieldEnum)[keyof typeof RevenuerecorddetailScalarFieldEnum]
 
 
 export const PaymentdetailScalarFieldEnum = {
@@ -480,6 +521,29 @@ export const paymentOrderByRelevanceFieldEnum = {
 } as const
 
 export type paymentOrderByRelevanceFieldEnum = (typeof paymentOrderByRelevanceFieldEnum)[keyof typeof paymentOrderByRelevanceFieldEnum]
+
+
+export const revenuerecordOrderByRelevanceFieldEnum = {
+  guestName: 'guestName',
+  guestPhone: 'guestPhone',
+  guestAvatarUrl: 'guestAvatarUrl',
+  staffName: 'staffName',
+  staffRole: 'staffRole',
+  staffAvatarUrl: 'staffAvatarUrl',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  receiptNumber: 'receiptNumber'
+} as const
+
+export type revenuerecordOrderByRelevanceFieldEnum = (typeof revenuerecordOrderByRelevanceFieldEnum)[keyof typeof revenuerecordOrderByRelevanceFieldEnum]
+
+
+export const revenuerecorddetailOrderByRelevanceFieldEnum = {
+  serviceName: 'serviceName',
+  categoryName: 'categoryName'
+} as const
+
+export type revenuerecorddetailOrderByRelevanceFieldEnum = (typeof revenuerecorddetailOrderByRelevanceFieldEnum)[keyof typeof revenuerecorddetailOrderByRelevanceFieldEnum]
 
 
 export const refundOrderByRelevanceFieldEnum = {

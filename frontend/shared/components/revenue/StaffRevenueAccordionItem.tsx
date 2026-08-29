@@ -158,10 +158,7 @@ interface Props {
   dateRange?: { startDate?: string; endDate?: string };
 }
 
-export function StaffRevenueAccordionItem({
-  row,
-  dateRange,
-}: Props) {
+export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
   const { t } = useTranslation();
   const [detail, setDetail] = useState<StaffRevenueDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -198,19 +195,24 @@ export function StaffRevenueAccordionItem({
               className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-[#f04cac]/10"
             />
           ) : (
-            <InitialsAvatar name={row.staffName} className="h-10 w-10 shrink-0" />
+            <InitialsAvatar
+              name={row.staffName}
+              className="h-10 w-10 shrink-0"
+            />
           )}
           <div className="min-w-0 text-left">
-            <p className="truncate text-sm font-semibold text-[#1A1A1A]">{row.staffName}</p>
-            <p className="text-xs text-[#9DA1A7]">
-              ID: #{row.key}
+            <p className="truncate text-sm font-semibold text-[#1A1A1A]">
+              {row.staffName}
             </p>
+            <p className="text-xs text-[#9DA1A7]">ID: #{row.key}</p>
           </div>
         </div>
 
         {/* Số hóa đơn */}
         <div className="flex w-35 shrink-0 items-center justify-center px-4 py-4">
-          <span className="text-sm font-bold text-[#1D1F23]">{row.services}</span>
+          <span className="text-sm font-bold text-[#1D1F23]">
+            {row.services}
+          </span>
           <span className="ml-1 text-xs text-[#9DA1A7]">
             {t("dashboard.revenue.staffTable.colOrders")}
           </span>
@@ -218,19 +220,9 @@ export function StaffRevenueAccordionItem({
 
         {/* Tổng doanh thu */}
         <div className="flex w-40 shrink-0 items-center px-4 py-4">
-          <span className="text-sm font-bold text-[#f04cac]">{fmt(row.totalRevenue)}</span>
-        </div>
-
-        {/* Dịch vụ thực hiện */}
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 px-4 py-4">
-          {(row.recentServiceNames ?? []).slice(0, 2).map((name) => (
-            <span
-              key={name}
-              className="shrink-0 rounded-full bg-[#EAECEE]/80 px-2.5 py-1 text-[11px] text-[#1D1F23]"
-            >
-              {name}
-            </span>
-          ))}
+          <span className="text-sm font-bold text-[#f04cac]">
+            {fmt(row.totalRevenue)}
+          </span>
         </div>
 
         {/* Menu */}
@@ -290,7 +282,10 @@ export function StaffRevenueAccordionItem({
       </div>
 
       {selectedJob && (
-        <JobDetailDialog job={selectedJob} onClose={() => setSelectedJob(null)} />
+        <JobDetailDialog
+          job={selectedJob}
+          onClose={() => setSelectedJob(null)}
+        />
       )}
     </>
   );

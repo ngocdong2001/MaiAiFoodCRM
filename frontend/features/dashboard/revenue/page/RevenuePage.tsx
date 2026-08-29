@@ -239,7 +239,8 @@ const RevenuePage = () => {
           <h1 className="text-[32px] font-bold leading-10 tracking-tight text-[#1A1A1A]">
             {t("dashboard.revenue.title", {
               defaultValue: "Tổng kết doanh thu trong ngày",
-            })} {summaryDateLabel}
+            })}{" "}
+            {summaryDateLabel}
           </h1>
           <p className="mt-1 text-sm text-[#9DA1A7]">
             {t("dashboard.revenue.subtitle", {
@@ -535,9 +536,6 @@ const RevenuePage = () => {
           <div className="w-40 shrink-0 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
             {t("dashboard.revenue.staffTable.colRevenue")}
           </div>
-          <div className="flex-1 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-            {t("dashboard.revenue.staffTable.colServices")}
-          </div>
           <div className="w-10 shrink-0" />
         </div>
 
@@ -554,7 +552,6 @@ const RevenuePage = () => {
           ))}
         </div>
       </div>
-
     </div>
   );
 };

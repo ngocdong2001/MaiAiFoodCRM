@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import EmptyState from "@/shared/components/molecules/EmptyState";
@@ -34,12 +35,13 @@ const CRMGuestsListSection = ({
   segments,
   onSegmentChange,
 }: CRMGuestsListSectionProps) => {
+  const { t } = useTranslation();
   return (
     <section className="p-4 sm:p-5 xl:border-r xl:border-[#EEF1F5]">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-[#171A21]">Guests</h2>
+        <h2 className="text-base font-semibold text-[#171A21]">{t("dashboard.crm.list.title")}</h2>
         <span className="text-xs font-medium text-[#8D95A5]">
-          {guests.length} guests
+          {t("dashboard.crm.list.guestsCount", { count: guests.length })}
         </span>
       </div>
 
@@ -47,7 +49,7 @@ const CRMGuestsListSection = ({
         <input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Search by name, phone, or tags..."
+          placeholder={t("dashboard.crm.list.searchPlaceholder")}
           className="w-full border-none bg-transparent text-xs text-[#374357] outline-none placeholder:text-[#A4ADBC]"
         />
       </label>
@@ -67,7 +69,7 @@ const CRMGuestsListSection = ({
                   : "border-[#E7EBF2] bg-white text-[#8D95A5] hover:bg-[#F8FAFC]",
               )}
             >
-              {item === "All" ? "All Guests" : item}
+              {item === "All" ? t("dashboard.crm.list.allGuests") : t(`dashboard.crm.segments.${item}`)}
             </button>
           );
         })}
@@ -106,7 +108,7 @@ const CRMGuestsListSection = ({
                             segmentTone[guest.segment],
                           )}
                         >
-                          {guest.segment}
+                          {t(`dashboard.crm.segments.${guest.segment}`)}
                         </span>
                         <span className="max-w-24 truncate rounded-full bg-[#F3F5F9] px-1.5 py-0.5 text-[10px] text-[#707B90]">
                           {guest.roleTag}
@@ -132,7 +134,7 @@ const CRMGuestsListSection = ({
         <EmptyState
           variant="dashed"
           className="mt-4"
-          message="No guests found with current search/filter."
+          message={t("dashboard.crm.list.noResults")}
         />
       )}
     </section>

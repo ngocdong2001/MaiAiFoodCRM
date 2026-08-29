@@ -8,7 +8,7 @@ import vi from "./messages/vi.json";
 export const SUPPORTED_LANGUAGES = ["en", "vi"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-export const DEFAULT_LANGUAGE: SupportedLanguage = "vi";
+export const DEFAULT_LANGUAGE: SupportedLanguage = "en";
 
 export const LANGUAGE_STORAGE_KEY = "maiai-language";
 

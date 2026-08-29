@@ -567,7 +567,74 @@
       "vip": "VIP: {{count}}",
       "atRisk": "At Risk: {{count}}",
       "emptyState": "No guest matched your filter. Try changing search or segment.",
-      "loading": "Loading guests…"
+      "loading": "Loading guests…",
+      "loadError": "Could not load guests from the database.",
+      "retry": "Try again",
+      "deleteDialog": {
+        "title": "Delete guest?",
+        "description": "{{name}} will be removed. Guests with booking history are archived to preserve records.",
+        "appointmentsTitle": "Guest appointments ({{count}})",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "pending": "Deleting..."
+      },
+      "profile": {
+        "noPhone": "No phone",
+        "noEmail": "No email",
+        "editGuest": "Edit guest",
+        "deleteGuest": "Delete guest",
+        "totalSpend": "Total Spend",
+        "totalVisits": "Total Visits",
+        "noShows": "No-Shows",
+        "clientSince": "Client Since",
+        "ownerNotes": "Owner Notes",
+        "editNotes": "Edit Notes",
+        "noNotes": "No notes yet.",
+        "bookingHistory": "Booking History",
+        "notAvailable": "Not available",
+        "preferences": "Preferences",
+        "loyalty": "Loyalty",
+        "loyaltyPoints": "points available",
+        "details": "Details",
+        "birthday": "Birthday",
+        "nextAppointment": "Next appointment"
+      },
+      "form": {
+        "editGuest": "Edit guest",
+        "addGuest": "Add guest",
+        "description": "Manage contact details, loyalty, tags, and owner notes.",
+        "fullName": "Full name",
+        "phone": "Phone",
+        "email": "Email",
+        "birthday": "Birthday",
+        "gender": "Gender",
+        "loyaltyPoints": "Loyalty points",
+        "avatarUrl": "Avatar URL",
+        "guestTags": "Guest tags",
+        "ownerNotes": "Owner notes",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveGuest": "Save guest"
+      },
+      "notes": {
+        "title": "Edit owner notes",
+        "description": "The saved note is added to the guest note history.",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveNotes": "Save notes"
+      },
+      "list": {
+        "title": "Guests",
+        "guestsCount": "{{count}} guests",
+        "searchPlaceholder": "Search by name, phone, or tags...",
+        "allGuests": "All Guests",
+        "noResults": "No guests found with current search/filter."
+      },
+      "segments": {
+        "VIP": "VIP",
+        "Loyal": "Loyal",
+        "At Risk": "At Risk"
+      }
     },
     "reports": {
       "title": "Reports & Exports",
@@ -744,7 +811,7 @@
         "namePlaceholder": "Service name",
         "selectCategory": "Select category...",
         "minutes": "min",
-        "currency": "đ",
+        "currency": "$",
         "newRowLabel": "new row",
         "deleteRow": "Delete {{name}}",
         "addRowHint": "Click here to add a new service...",

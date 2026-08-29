@@ -1,6 +1,6 @@
 "use client";
 
-import { UserPlus } from "lucide-react";
+import { CalendarClock, UserPlus } from "lucide-react";
 import { useDeferredValue, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -133,8 +133,8 @@ const CRMPage = () => {
       ) : guestsQuery.isError ? (
         <QueryErrorState
           className="m-5"
-          message="Could not load guests from the database."
-          retryLabel="Try again"
+          message={t("dashboard.crm.loadError")}
+          retryLabel={t("dashboard.crm.retry")}
           onRetry={() => guestsQuery.refetch()}
         />
       ) : (
@@ -184,11 +184,45 @@ const CRMPage = () => {
       />
       <ConfirmDialog
         open={Boolean(deletingGuest)}
-        title="Delete guest?"
-        description={`${deletingGuest?.name ?? ""} will be removed. Guests with booking history are archived to preserve records.`}
-        cancelLabel="Cancel"
-        confirmLabel="Delete"
-        pendingLabel="Deleting..."
+        title={t("dashboard.crm.deleteDialog.title")}
+        description={t("dashboard.crm.deleteDialog.description", {
+          name: deletingGuest?.name ?? "",
+        })}
+        extraContent={
+          deletingGuest && deletingGuest.activities.length > 0 ? (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5">
+              <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <CalendarClock className="h-3.5 w-3.5" />
+                {t("dashboard.crm.deleteDialog.appointmentsTitle", {
+                  count: deletingGuest.activities.length,
+                })}
+              </div>
+              <ul className="max-h-40 space-y-1.5 overflow-y-auto">
+                {deletingGuest.activities.map((activity) => (
+                  <li
+                    key={activity.id}
+                    className="rounded-md bg-white px-2 py-1.5 text-xs text-[#3A4354] ring-1 ring-primary/10"
+                  >
+                    <p className="font-medium text-[#171A21]">
+                      {activity.title}
+                    </p>
+                    <p className="text-[#8D95A5]">
+                      {new Date(activity.date).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}{" "}
+                      • {activity.technician} • {activity.status}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : undefined
+        }
+        cancelLabel={t("dashboard.crm.deleteDialog.cancel")}
+        confirmLabel={t("dashboard.crm.deleteDialog.confirm")}
+        pendingLabel={t("dashboard.crm.deleteDialog.pending")}
         pending={deleteGuest.isPending}
         destructive
         onOpenChange={(open) => !open && setDeletingGuest(null)}

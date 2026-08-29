@@ -2,6 +2,108 @@ import "dotenv/config";
 
 import { prisma } from "../src/lib/prisma";
 
+// Idempotently ensures PaymentDetail rows exist for a payment (mirrors the
+// production logic in calendar.model.ts's ensurePaymentForCompletedAppointment).
+const ensurePaymentDetails = async (
+  paymentId: number,
+  services: { serviceId: number; price: number; quantity?: number }[],
+) => {
+  const existingDetails = await prisma.paymentdetail.findMany({
+    where: { paymentId },
+    select: { serviceId: true },
+  });
+  const existingIds = new Set(existingDetails.map((d) => d.serviceId));
+  const missing = services.filter((s) => !existingIds.has(s.serviceId));
+  if (missing.length > 0) {
+    await prisma.paymentdetail.createMany({
+      data: missing.map((s) => ({
+        paymentId,
+        serviceId: s.serviceId,
+        price: s.price,
+        quantity: s.quantity ?? 1,
+      })),
+      skipDuplicates: true,
+    });
+  }
+};
+
+// Idempotently creates the immutable RevenueRecord (+ details) snapshot for a
+// seeded payment, mirroring the production ensureRevenueSnapshot logic.
+const ensureRevenueSnapshot = async (params: {
+  paymentId: number;
+  appointmentId: number;
+  guestId: number;
+  staffId: number | null;
+  amount: number;
+  discountAmount: number;
+  tipAmount: number;
+  finalAmount: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  receiptNumber: string | null;
+  paidAt: Date;
+  services: { serviceId: number; price: number; quantity?: number }[];
+}) => {
+  const existing = await prisma.revenuerecord.findUnique({
+    where: { paymentId: params.paymentId },
+    select: { id: true },
+  });
+  if (existing) return;
+
+  const [guest, staff, serviceRows] = await Promise.all([
+    prisma.guest.findUnique({
+      where: { id: params.guestId },
+      select: { name: true, phone: true, avatarUrl: true },
+    }),
+    params.staffId
+      ? prisma.staff.findUnique({
+          where: { id: params.staffId },
+          select: { name: true, role: true, avatarUrl: true },
+        })
+      : Promise.resolve(null),
+    prisma.service.findMany({
+      where: { id: { in: params.services.map((s) => s.serviceId) } },
+      select: { id: true, name: true, servicecategory: { select: { name: true } } },
+    }),
+  ]);
+  const serviceMap = new Map(serviceRows.map((row) => [row.id, row]));
+
+  await prisma.revenuerecord.create({
+    data: {
+      paymentId: params.paymentId,
+      appointmentId: params.appointmentId,
+      guestId: params.guestId,
+      guestName: guest?.name ?? "Walk-in Guest",
+      guestPhone: guest?.phone ?? null,
+      guestAvatarUrl: guest?.avatarUrl ?? null,
+      staffId: params.staffId,
+      staffName: staff?.name ?? null,
+      staffRole: staff?.role ?? null,
+      staffAvatarUrl: staff?.avatarUrl ?? null,
+      amount: params.amount,
+      discountAmount: params.discountAmount,
+      tipAmount: params.tipAmount,
+      finalAmount: params.finalAmount,
+      paymentMethod: params.paymentMethod,
+      paymentStatus: params.paymentStatus,
+      receiptNumber: params.receiptNumber,
+      paidAt: params.paidAt,
+      revenuerecorddetail: {
+        create: params.services.map((s) => {
+          const service = serviceMap.get(s.serviceId);
+          return {
+            serviceId: s.serviceId,
+            serviceName: service?.name ?? "Unknown Service",
+            categoryName: service?.servicecategory?.name ?? null,
+            price: s.price,
+            quantity: s.quantity ?? 1,
+          };
+        }),
+      },
+    },
+  });
+};
+
 const avatars = [
   "https://cdn.visily.ai/text2design/images/01837de52a9f0882c2fd1a7e437aec953140b7cf33c98f0c921e6728037101b5.webp",
   "https://cdn.visily.ai/text2design/images/1ad9ee6c66620f82a971daf6fdded160b9767b6787b2b3b1104edd9bf4b80df9.webp",
@@ -636,7 +738,6 @@ const main = async () => {
 
   let appointmentCount = 0;
   let paymentCount = 0;
-  let receiptCounter = 1;
 
   for (const seed of appointmentSeeds) {
     const guestId = guestByName[seed.guestName];
@@ -697,12 +798,13 @@ const main = async () => {
       const existing = await prisma.payment.findUnique({
         where: { appointmentId: appointment.id },
       });
-      if (!existing) {
-        const tip =
-          seed.paymentMethod === "cash"
-            ? 0
-            : Math.round(serviceData.price * 0.1);
-        await prisma.payment.create({
+      const tip =
+        seed.paymentMethod === "cash"
+          ? 0
+          : Math.round(serviceData.price * 0.1);
+      const payment =
+        existing ??
+        (await prisma.payment.create({
           data: {
             appointmentId: appointment.id,
             guestId,
@@ -714,11 +816,135 @@ const main = async () => {
             paymentMethod: seed.paymentMethod,
             paymentStatus: "paid",
             paidAt: endTime,
-            receiptNumber: `RCP-${String(receiptCounter++).padStart(5, "0")}`,
+            // Deterministic per-seed key avoids collisions when re-running the
+            // seed on a day where relative "today" offsets no longer match
+            // previously-seeded rows (so a "new" appointment insert can occur).
+            receiptNumber: `RCP-${seed.key}`,
           },
-        });
-        paymentCount++;
-      }
+        }));
+      if (!existing) paymentCount++;
+
+      const serviceLines = [{ serviceId, price: serviceData.price, quantity: 1 }];
+      await ensurePaymentDetails(payment.id, serviceLines);
+      await ensureRevenueSnapshot({
+        paymentId: payment.id,
+        appointmentId: appointment.id,
+        guestId,
+        staffId,
+        amount: Number(payment.amount),
+        discountAmount: Number(payment.discountAmount),
+        tipAmount: Number(payment.tipAmount),
+        finalAmount: Number(payment.finalAmount),
+        paymentMethod: payment.paymentMethod,
+        paymentStatus: payment.paymentStatus,
+        receiptNumber: payment.receiptNumber,
+        paidAt: payment.paidAt,
+        services: serviceLines,
+      });
+    }
+  }
+
+  // ── Multi-service completed transaction (tests revenue_record_details) ───
+  {
+    const guestId = guestByName["Mia Johnson"];
+    const staffId = staffByName["David Kim"];
+    const svc1 = services.get("Gel Manicure");
+    const svc2 = services.get("Nail Art Design");
+    if (guestId && staffId && svc1 && svc2) {
+      const startTime = new Date(today);
+      startTime.setUTCDate(today.getUTCDate() - 3);
+      startTime.setUTCHours(14, 0, 0, 0);
+      const endTime = new Date(startTime.getTime() + 90 * 60 * 1000);
+
+      const existingAppt = await prisma.appointment.findFirst({
+        where: { guestId, staffId, startTime },
+      });
+      const appointment =
+        existingAppt ??
+        (await prisma.appointment.create({
+          data: {
+            guestId,
+            staffId,
+            startTime,
+            endTime,
+            status: "completed",
+            source: "walk_in",
+            notes: "appt-multi-service",
+            updatedAt: now,
+          },
+        }));
+      appointmentCount++;
+
+      const svc1Data = serviceSeeds.find((s) => s.name === "Gel Manicure")!;
+      const svc2Data = serviceSeeds.find((s) => s.name === "Nail Art Design")!;
+      await prisma.appointmentservice.upsert({
+        where: { appointmentId_serviceId: { appointmentId: appointment.id, serviceId: svc1 } },
+        create: {
+          appointmentId: appointment.id,
+          serviceId: svc1,
+          staffId,
+          priceAtBooking: svc1Data.price,
+          durationAtBooking: svc1Data.durationMinutes,
+          status: "completed",
+        },
+        update: { status: "completed" },
+      });
+      await prisma.appointmentservice.upsert({
+        where: { appointmentId_serviceId: { appointmentId: appointment.id, serviceId: svc2 } },
+        create: {
+          appointmentId: appointment.id,
+          serviceId: svc2,
+          staffId,
+          priceAtBooking: svc2Data.price,
+          durationAtBooking: svc2Data.durationMinutes,
+          status: "completed",
+        },
+        update: { status: "completed" },
+      });
+
+      const totalAmount = svc1Data.price + svc2Data.price;
+      const existingPayment = await prisma.payment.findUnique({
+        where: { appointmentId: appointment.id },
+      });
+      const payment =
+        existingPayment ??
+        (await prisma.payment.create({
+          data: {
+            appointmentId: appointment.id,
+            guestId,
+            staffId,
+            amount: totalAmount,
+            discountAmount: 0,
+            tipAmount: 0,
+            finalAmount: totalAmount,
+            paymentMethod: "credit_card",
+            paymentStatus: "paid",
+            paidAt: endTime,
+            receiptNumber: "RCP-MULTI-001",
+          },
+        }));
+      if (!existingPayment) paymentCount++;
+
+      const multiServiceLines = [
+        { serviceId: svc1, price: svc1Data.price, quantity: 1 },
+        { serviceId: svc2, price: svc2Data.price, quantity: 1 },
+      ];
+      await ensurePaymentDetails(payment.id, multiServiceLines);
+      await ensureRevenueSnapshot({
+        paymentId: payment.id,
+        appointmentId: appointment.id,
+        guestId,
+        staffId,
+        amount: Number(payment.amount),
+        discountAmount: Number(payment.discountAmount),
+        tipAmount: Number(payment.tipAmount),
+        finalAmount: Number(payment.finalAmount),
+        paymentMethod: payment.paymentMethod,
+        paymentStatus: payment.paymentStatus,
+        receiptNumber: payment.receiptNumber,
+        paidAt: payment.paidAt,
+        services: multiServiceLines,
+      });
     }
   }
 
@@ -784,8 +1010,9 @@ const main = async () => {
 
       const paidAt = new Date(endT);
       const pExisting = await prisma.payment.findUnique({ where: { appointmentId: appt.id } });
-      if (!pExisting) {
-        await prisma.payment.create({
+      const payment =
+        pExisting ??
+        (await prisma.payment.create({
           data: {
             appointmentId: appt.id,
             guestId: gId,
@@ -797,11 +1024,29 @@ const main = async () => {
             paymentMethod: i % 2 === 0 ? "credit_card" : "cash",
             paymentStatus: "paid",
             paidAt,
-            receiptNumber: `RCP-H${String(receiptCounter++).padStart(5, "0")}`,
+            // Deterministic key (monthOffset + index) avoids collisions on reruns.
+            receiptNumber: `RCP-H-${hist.monthOffset}-${i}`,
           },
-        });
-        paymentCount++;
-      }
+        }));
+      if (!pExisting) paymentCount++;
+
+      const histServiceLines = [{ serviceId: svcId, price: hist.basePrice, quantity: 1 }];
+      await ensurePaymentDetails(payment.id, histServiceLines);
+      await ensureRevenueSnapshot({
+        paymentId: payment.id,
+        appointmentId: appt.id,
+        guestId: gId,
+        staffId: stId,
+        amount: Number(payment.amount),
+        discountAmount: Number(payment.discountAmount),
+        tipAmount: Number(payment.tipAmount),
+        finalAmount: Number(payment.finalAmount),
+        paymentMethod: payment.paymentMethod,
+        paymentStatus: payment.paymentStatus,
+        receiptNumber: payment.receiptNumber,
+        paidAt: payment.paidAt,
+        services: histServiceLines,
+      });
       appointmentCount++;
     }
   }

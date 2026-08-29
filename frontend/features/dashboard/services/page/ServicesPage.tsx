@@ -105,7 +105,9 @@ const ServicesPage = () => {
   );
   // Blank draft rows (no name yet) don't count as a real change, so they never
   // trigger autosave/refetch while the user is still filling them in.
-  const meaningfulRows = rows.filter((row) => row.id !== null || row.name.trim());
+  const meaningfulRows = rows.filter(
+    (row) => row.id !== null || row.name.trim(),
+  );
   const meaningfulSignature = signature(meaningfulRows);
   const isDirty = meaningfulSignature !== baseline || removedIds.length > 0;
 

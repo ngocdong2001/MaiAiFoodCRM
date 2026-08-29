@@ -194,7 +194,6 @@ const StaffRevenueDetailDialog = ({
                         </p>
                       </div>
                     </div>
-
                   </div>
 
                   {/* Services performed */}

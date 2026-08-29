@@ -177,11 +177,60 @@ model payment {
   staff          staff?      @relation(fields: [staffId], references: [id], map: "Payment_staffId_fkey")
   refund         refund[]
   paymentdetail  paymentdetail[]
+  revenuerecord  revenuerecord?
 
   @@index([guestId], map: "Payment_guestId_idx")
   @@index([paidAt], map: "Payment_paidAt_idx")
   @@index([paymentMethod], map: "Payment_paymentMethod_idx")
   @@index([staffId], map: "Payment_staffId_fkey")
+}
+
+// Immutable snapshot of a completed payment, created once when the related
+// appointment/payment transitions to "completed". Independent of later
+// changes to guest/staff/service records — used exclusively by the Revenue feature.
+model revenuerecord {
+  id             Int                   @id @default(autoincrement())
+  paymentId      Int                   @unique(map: "RevenueRecord_paymentId_key")
+  appointmentId  Int
+  guestId        Int
+  guestName      String                @db.VarChar(255)
+  guestPhone     String?               @db.VarChar(20)
+  guestAvatarUrl String?               @db.VarChar(500)
+  staffId        Int?
+  staffName      String?               @db.VarChar(255)
+  staffRole      String?               @db.VarChar(30)
+  staffAvatarUrl String?               @db.VarChar(500)
+  amount         Decimal               @db.Decimal(12, 2)
+  discountAmount Decimal               @db.Decimal(10, 2)
+  tipAmount      Decimal               @db.Decimal(10, 2)
+  finalAmount    Decimal               @db.Decimal(12, 2)
+  paymentMethod  String                @db.VarChar(20)
+  paymentStatus  String                @db.VarChar(20)
+  receiptNumber  String?               @db.VarChar(50)
+  paidAt         DateTime
+  recordedAt     DateTime              @default(now())
+  payment        payment               @relation(fields: [paymentId], references: [id], onDelete: Cascade, map: "RevenueRecord_paymentId_fkey")
+  revenuerecorddetail revenuerecorddetail[]
+
+  @@index([paidAt], map: "RevenueRecord_paidAt_idx")
+  @@index([staffId], map: "RevenueRecord_staffId_idx")
+  @@index([guestId], map: "RevenueRecord_guestId_idx")
+}
+
+// One row per service snapshotted for a revenue record (mirrors paymentdetail at completion time).
+model revenuerecorddetail {
+  id              Int           @id @default(autoincrement())
+  revenueRecordId Int
+  serviceId       Int
+  serviceName     String        @db.VarChar(255)
+  categoryName    String?       @db.VarChar(100)
+  price           Decimal       @db.Decimal(10, 2)
+  quantity        Int           @default(1)
+  revenuerecord   revenuerecord @relation(fields: [revenueRecordId], references: [id], onDelete: Cascade, map: "RevenueRecordDetail_revenueRecordId_fkey")
+
+  @@unique([revenueRecordId, serviceId], map: "RevenueRecordDetail_revenueRecordId_serviceId_key")
+  @@index([revenueRecordId], map: "RevenueRecordDetail_revenueRecordId_idx")
+  @@index([serviceId], map: "RevenueRecordDetail_serviceId_idx")
 }
 
 // One row per service within a Payment (Payment = one Booking checkout, PaymentDetail = one Service line item)

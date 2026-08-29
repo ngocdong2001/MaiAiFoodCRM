@@ -18,6 +18,7 @@ type ConfirmDialogProps = {
   open: boolean;
   title: string;
   description?: ReactNode;
+  extraContent?: ReactNode;
   confirmLabel: string;
   cancelLabel: string;
   pendingLabel?: string;
@@ -31,6 +32,7 @@ const ConfirmDialog = ({
   open,
   title,
   description,
+  extraContent,
   confirmLabel,
   cancelLabel,
   pendingLabel,
@@ -48,6 +50,7 @@ const ConfirmDialog = ({
             <AlertDialogDescription>{description}</AlertDialogDescription>
           ) : null}
         </AlertDialogHeader>
+        {extraContent}
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction

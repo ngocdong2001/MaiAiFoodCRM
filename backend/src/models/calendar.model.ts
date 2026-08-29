@@ -194,6 +194,101 @@ const ensurePaymentForCompletedAppointment = async (
       skipDuplicates: true,
     });
   }
+
+  await ensureRevenueSnapshot(transaction, payment, services);
+};
+
+// Idempotently creates the immutable RevenueRecord (+ details) snapshot for a
+// completed payment. Safe to call repeatedly: `paymentId` is unique, so a
+// duplicate "completed" transition never produces a second revenue record.
+const ensureRevenueSnapshot = async (
+  transaction: Prisma.TransactionClient,
+  payment: {
+    id: number;
+    appointmentId: number;
+    guestId: number;
+    staffId: number | null;
+    amount: Prisma.Decimal | number;
+    discountAmount: Prisma.Decimal | number;
+    tipAmount: Prisma.Decimal | number;
+    finalAmount: Prisma.Decimal | number;
+    paymentMethod: string;
+    paymentStatus: string;
+    receiptNumber: string | null;
+    paidAt: Date;
+  },
+  services: { serviceId: number; priceAtBooking: Prisma.Decimal | number }[],
+) => {
+  const alreadySnapshotted = await transaction.revenuerecord.findUnique({
+    where: { paymentId: payment.id },
+    select: { id: true },
+  });
+  if (alreadySnapshotted) return;
+
+  const [guest, staff, serviceRows] = await Promise.all([
+    transaction.guest.findUnique({
+      where: { id: payment.guestId },
+      select: { name: true, phone: true, avatarUrl: true },
+    }),
+    payment.staffId
+      ? transaction.staff.findUnique({
+          where: { id: payment.staffId },
+          select: { name: true, role: true, avatarUrl: true },
+        })
+      : Promise.resolve(null),
+    transaction.service.findMany({
+      where: { id: { in: services.map((item) => item.serviceId) } },
+      select: { id: true, name: true, servicecategory: { select: { name: true } } },
+    }),
+  ]);
+
+  const serviceMap = new Map(serviceRows.map((row) => [row.id, row]));
+
+  try {
+    await transaction.revenuerecord.create({
+      data: {
+        paymentId: payment.id,
+        appointmentId: payment.appointmentId,
+        guestId: payment.guestId,
+        guestName: guest?.name ?? "Walk-in Guest",
+        guestPhone: guest?.phone ?? null,
+        guestAvatarUrl: guest?.avatarUrl ?? null,
+        staffId: payment.staffId,
+        staffName: staff?.name ?? null,
+        staffRole: staff?.role ?? null,
+        staffAvatarUrl: staff?.avatarUrl ?? null,
+        amount: payment.amount,
+        discountAmount: payment.discountAmount,
+        tipAmount: payment.tipAmount,
+        finalAmount: payment.finalAmount,
+        paymentMethod: payment.paymentMethod,
+        paymentStatus: payment.paymentStatus,
+        receiptNumber: payment.receiptNumber,
+        paidAt: payment.paidAt,
+        revenuerecorddetail: {
+          create: services.map((item) => {
+            const service = serviceMap.get(item.serviceId);
+            return {
+              serviceId: item.serviceId,
+              serviceName: service?.name ?? "Unknown Service",
+              categoryName: service?.servicecategory?.name ?? null,
+              price: item.priceAtBooking,
+              quantity: 1,
+            };
+          }),
+        },
+      },
+    });
+  } catch (error) {
+    // Concurrent completion request already created the snapshot — safe to ignore.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return;
+    }
+    throw error;
+  }
 };
 
 const validateRelationsAndAvailability = async (

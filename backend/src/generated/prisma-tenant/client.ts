@@ -85,6 +85,16 @@ export type guesttagmapping = Prisma.guesttagmappingModel
  */
 export type payment = Prisma.paymentModel
 /**
+ * Model revenuerecord
+ * 
+ */
+export type revenuerecord = Prisma.revenuerecordModel
+/**
+ * Model revenuerecorddetail
+ * 
+ */
+export type revenuerecorddetail = Prisma.revenuerecorddetailModel
+/**
  * Model paymentdetail
  * 
  */

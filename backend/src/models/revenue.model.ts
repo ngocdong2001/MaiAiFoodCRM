@@ -158,7 +158,7 @@ export const RevenueModel = {
     const parsedStart = parseDateInput(filters.startDate);
     const parsedEnd = parseDateInput(filters.endDate);
 
-    const payments = await db.payment.findMany({
+    const records = await db.revenuerecord.findMany({
       where: {
         staffId,
         ...(parsedStart || parsedEnd
@@ -171,42 +171,35 @@ export const RevenueModel = {
           : {}),
       },
       orderBy: { paidAt: "desc" },
-      include: {
-        appointment: {
-          include: {
-            guest: true,
-            appointmentservice: { include: { service: true } },
-          },
-        },
-      },
+      include: { revenuerecorddetail: true },
     });
 
     let totalRevenue = 0;
     let totalTips = 0;
 
-    const jobs: StaffRevenueDetailJob[] = payments.map((p) => {
-      const finalAmt = decimalToNumber(p.finalAmount);
-      const tipAmt = decimalToNumber(p.tipAmount);
+    const jobs: StaffRevenueDetailJob[] = records.map((r) => {
+      const finalAmt = decimalToNumber(r.finalAmount);
+      const tipAmt = decimalToNumber(r.tipAmount);
       totalRevenue += finalAmt;
       totalTips += tipAmt;
 
       return {
-        paymentId: p.id,
-        appointmentId: p.appointmentId,
-        paidAt: p.paidAt.toISOString(),
-        guestName: p.appointment?.guest?.name ?? "Walk-in Guest",
-        guestAvatarUrl: p.appointment?.guest?.avatarUrl ?? null,
-        services: (p.appointment?.appointmentservice ?? []).map((as) => ({
-          serviceId: as.serviceId,
-          serviceName: as.service.name,
-          price: decimalToNumber(as.priceAtBooking),
+        paymentId: r.paymentId,
+        appointmentId: r.appointmentId,
+        paidAt: r.paidAt.toISOString(),
+        guestName: r.guestName,
+        guestAvatarUrl: r.guestAvatarUrl ?? null,
+        services: r.revenuerecorddetail.map((detail) => ({
+          serviceId: detail.serviceId,
+          serviceName: detail.serviceName,
+          price: decimalToNumber(detail.price),
         })),
-        amount: decimalToNumber(p.amount),
-        discountAmount: decimalToNumber(p.discountAmount),
+        amount: decimalToNumber(r.amount),
+        discountAmount: decimalToNumber(r.discountAmount),
         tipAmount: tipAmt,
         finalAmount: finalAmt,
-        paymentMethod: p.paymentMethod,
-        receiptNumber: p.receiptNumber ?? null,
+        paymentMethod: r.paymentMethod,
+        receiptNumber: r.receiptNumber ?? null,
       };
     });
 
@@ -226,20 +219,20 @@ export const RevenueModel = {
     db: PrismaClient,
     filters: RevenueSummaryFilters = {},
   ): Promise<RevenueSummaryResponse> {
-    const filterWhere: Prisma.paymentWhereInput = {
+    const filterWhere: Prisma.revenuerecordWhereInput = {
       ...(filters.staffId ? { staffId: filters.staffId } : {}),
       ...(filters.paymentMethod
         ? { paymentMethod: filters.paymentMethod }
         : {}),
     };
 
-    const latestPayment = await db.payment.findFirst({
+    const latestRecord = await db.revenuerecord.findFirst({
       where: filterWhere,
       orderBy: { paidAt: "desc" },
       select: { paidAt: true },
     });
 
-    if (!latestPayment) {
+    if (!latestRecord) {
       return {
         summaryDate: new Date().toISOString(),
         metrics: [
@@ -285,13 +278,13 @@ export const RevenueModel = {
       ? startOfDay(parsedStartDate)
       : parsedEndDate
         ? startOfDay(parsedEndDate)
-        : dayRange(latestPayment.paidAt).start;
+        : dayRange(latestRecord.paidAt).start;
 
     const currentEnd = parsedEndDate
       ? endOfDay(parsedEndDate)
       : parsedStartDate
         ? endOfDay(parsedStartDate)
-        : dayRange(latestPayment.paidAt).end;
+        : dayRange(latestRecord.paidAt).end;
 
     const currentRange =
       currentStart.getTime() <= currentEnd.getTime()
@@ -304,7 +297,7 @@ export const RevenueModel = {
     const previousStart = new Date(previousEnd.getTime() - periodDurationMs);
     const previousRange = { start: previousStart, end: previousEnd };
 
-    const currentWhere: Prisma.paymentWhereInput = {
+    const currentWhere: Prisma.revenuerecordWhereInput = {
       ...filterWhere,
       paidAt: {
         gte: currentRange.start,
@@ -312,7 +305,7 @@ export const RevenueModel = {
       },
     };
 
-    const previousWhere: Prisma.paymentWhereInput = {
+    const previousWhere: Prisma.revenuerecordWhereInput = {
       ...filterWhere,
       paidAt: {
         gte: previousRange.start,
@@ -320,9 +313,9 @@ export const RevenueModel = {
       },
     };
 
-    const [currentAggregate, previousAggregate, currentPayments] =
+    const [currentAggregate, previousAggregate, currentRecords] =
       await Promise.all([
-        db.payment.aggregate({
+        db.revenuerecord.aggregate({
           where: currentWhere,
           _sum: {
             finalAmount: true,
@@ -333,7 +326,7 @@ export const RevenueModel = {
             id: true,
           },
         }),
-        db.payment.aggregate({
+        db.revenuerecord.aggregate({
           where: previousWhere,
           _sum: {
             finalAmount: true,
@@ -344,19 +337,13 @@ export const RevenueModel = {
             id: true,
           },
         }),
-        db.payment.findMany({
+        db.revenuerecord.findMany({
           where: currentWhere,
           orderBy: {
             paidAt: "desc",
           },
           include: {
-            staff: true,
-            appointment: {
-              include: {
-                guest: true,
-                appointmentservice: { include: { service: true } },
-              },
-            },
+            revenuerecorddetail: true,
           },
         }),
       ]);
@@ -417,32 +404,32 @@ export const RevenueModel = {
 
     const staffServiceNamesMap = new Map<number, Set<string>>();
 
-    currentPayments.forEach((payment) => {
-      if (payment.staffId && payment.staff) {
-        const existing = staffMap.get(payment.staffId) ?? {
-          key: String(payment.staffId),
-          staffName: payment.staff.name,
+    currentRecords.forEach((record) => {
+      if (record.staffId) {
+        const existing = staffMap.get(record.staffId) ?? {
+          key: String(record.staffId),
+          staffName: record.staffName ?? "Unknown Staff",
           services: 0,
           tips: 0,
           totalRevenue: 0,
-          avatarUrl: payment.staff.avatarUrl ?? null,
+          avatarUrl: record.staffAvatarUrl ?? null,
           recentServiceNames: [],
         };
 
         existing.services += 1;
-        existing.tips += decimalToNumber(payment.tipAmount);
-        existing.totalRevenue += decimalToNumber(payment.finalAmount);
-        staffMap.set(payment.staffId, existing);
+        existing.tips += decimalToNumber(record.tipAmount);
+        existing.totalRevenue += decimalToNumber(record.finalAmount);
+        staffMap.set(record.staffId, existing);
 
         const serviceNames =
-          staffServiceNamesMap.get(payment.staffId) ?? new Set<string>();
-        (payment.appointment?.appointmentservice ?? []).forEach((as) => {
-          serviceNames.add(as.service.name);
+          staffServiceNamesMap.get(record.staffId) ?? new Set<string>();
+        record.revenuerecorddetail.forEach((detail) => {
+          serviceNames.add(detail.serviceName);
         });
-        staffServiceNamesMap.set(payment.staffId, serviceNames);
+        staffServiceNamesMap.set(record.staffId, serviceNames);
       }
 
-      const methodKey = payment.paymentMethod;
+      const methodKey = record.paymentMethod;
       const methodLabel =
         settingMap.get(`${PAYMENT_LABEL_PREFIX}${methodKey}`) ??
         buildReadableMethodLabel(methodKey);
@@ -456,7 +443,7 @@ export const RevenueModel = {
         color: methodColor,
       };
 
-      methodExisting.amount += decimalToNumber(payment.finalAmount);
+      methodExisting.amount += decimalToNumber(record.finalAmount);
       paymentMethodMap.set(methodKey, methodExisting);
     });
 
@@ -475,29 +462,29 @@ export const RevenueModel = {
       (a, b) => b.amount - a.amount,
     );
 
-    const recentRevenueActivities: RevenueActivity[] = currentPayments
+    const recentRevenueActivities: RevenueActivity[] = currentRecords
       .slice(0, 6)
-      .map((payment) => {
+      .map((record) => {
         const methodLabel =
-          settingMap.get(`${PAYMENT_LABEL_PREFIX}${payment.paymentMethod}`) ??
-          buildReadableMethodLabel(payment.paymentMethod);
+          settingMap.get(`${PAYMENT_LABEL_PREFIX}${record.paymentMethod}`) ??
+          buildReadableMethodLabel(record.paymentMethod);
         const paymentViaPrefix =
           settingMap.get(PAYMENT_VIA_PREFIX_KEY) ?? DEFAULT_PAYMENT_VIA_PREFIX;
         const walkInGuestLabel =
           settingMap.get(WALK_IN_GUEST_KEY) ?? DEFAULT_WALK_IN_GUEST_LABEL;
-        const isWalkIn = !payment.appointment?.guest?.name;
+        const isWalkIn = !record.guestName;
 
-        const serviceTags = (payment.appointment?.appointmentservice ?? []).map(
-          (as) => as.service.name,
+        const serviceTags = record.revenuerecorddetail.map(
+          (detail) => detail.serviceName,
         );
 
         return {
-          key: `${payment.id}`,
-          title: payment.appointment?.guest?.name ?? walkInGuestLabel,
+          key: `${record.paymentId}`,
+          title: record.guestName || walkInGuestLabel,
           subtitle: `${paymentViaPrefix} ${methodLabel}`,
-          paymentMethod: payment.paymentMethod,
-          amount: decimalToNumber(payment.finalAmount),
-          time: payment.paidAt.toISOString(),
+          paymentMethod: record.paymentMethod,
+          amount: decimalToNumber(record.finalAmount),
+          time: record.paidAt.toISOString(),
           isWalkIn,
           serviceTags,
           serviceCount: serviceTags.length,

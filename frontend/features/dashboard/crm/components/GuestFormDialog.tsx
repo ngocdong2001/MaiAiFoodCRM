@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/shared/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
@@ -38,6 +39,7 @@ const GuestFormDialog = (props: Props) => {
 };
 
 const GuestFormContent = ({ open, guest, tags, submitting, error, onOpenChange, onSubmit }: Props) => {
+  const { t } = useTranslation();
   const [values, setValues] = useState(() => initialValues(guest));
   const update = <Key extends keyof GuestFormValues>(key: Key, value: GuestFormValues[Key]) => setValues((current) => ({ ...current, [key]: value }));
   const submit = (event: FormEvent) => { event.preventDefault(); onSubmit(values); };
@@ -46,21 +48,21 @@ const GuestFormContent = ({ open, guest, tags, submitting, error, onOpenChange, 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{guest ? "Edit guest" : "Add guest"}</DialogTitle>
-          <DialogDescription>Manage contact details, loyalty, tags, and owner notes.</DialogDescription>
+          <DialogTitle>{guest ? t("dashboard.crm.form.editGuest") : t("dashboard.crm.form.addGuest")}</DialogTitle>
+          <DialogDescription>{t("dashboard.crm.form.description")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Full name"><Input value={values.name} onChange={(event) => update("name", event.target.value)} required /></Field>
-            <Field label="Phone"><Input value={values.phone} onChange={(event) => update("phone", event.target.value)} /></Field>
-            <Field label="Email"><Input type="email" value={values.email} onChange={(event) => update("email", event.target.value)} /></Field>
-            <Field label="Birthday"><Input type="date" value={values.dateOfBirth} onChange={(event) => update("dateOfBirth", event.target.value)} /></Field>
-            <Field label="Gender"><Input value={values.gender} onChange={(event) => update("gender", event.target.value)} /></Field>
-            <Field label="Loyalty points"><Input type="number" min="0" value={values.loyaltyPoints} onChange={(event) => update("loyaltyPoints", event.target.value)} /></Field>
-            <div className="sm:col-span-2"><Field label="Avatar URL"><Input type="url" value={values.avatarUrl} onChange={(event) => update("avatarUrl", event.target.value)} /></Field></div>
+            <Field label={t("dashboard.crm.form.fullName")}><Input value={values.name} onChange={(event) => update("name", event.target.value)} required /></Field>
+            <Field label={t("dashboard.crm.form.phone")}><Input value={values.phone} onChange={(event) => update("phone", event.target.value)} /></Field>
+            <Field label={t("dashboard.crm.form.email")}><Input type="email" value={values.email} onChange={(event) => update("email", event.target.value)} /></Field>
+            <Field label={t("dashboard.crm.form.birthday")}><Input type="date" value={values.dateOfBirth} onChange={(event) => update("dateOfBirth", event.target.value)} /></Field>
+            <Field label={t("dashboard.crm.form.gender")}><Input value={values.gender} onChange={(event) => update("gender", event.target.value)} /></Field>
+            <Field label={t("dashboard.crm.form.loyaltyPoints")}><Input type="number" min="0" value={values.loyaltyPoints} onChange={(event) => update("loyaltyPoints", event.target.value)} /></Field>
+            <div className="sm:col-span-2"><Field label={t("dashboard.crm.form.avatarUrl")}><Input type="url" value={values.avatarUrl} onChange={(event) => update("avatarUrl", event.target.value)} /></Field></div>
           </div>
           <fieldset>
-            <legend className="mb-2 text-sm font-medium">Guest tags</legend>
+            <legend className="mb-2 text-sm font-medium">{t("dashboard.crm.form.guestTags")}</legend>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => {
                 const checked = values.tagIds.includes(tag.id);
@@ -68,9 +70,9 @@ const GuestFormContent = ({ open, guest, tags, submitting, error, onOpenChange, 
               })}
             </div>
           </fieldset>
-          <Field label="Owner notes"><Textarea value={values.notes} onChange={(event) => update("notes", event.target.value)} rows={4} /></Field>
+          <Field label={t("dashboard.crm.form.ownerNotes")}><Textarea value={values.notes} onChange={(event) => update("notes", event.target.value)} rows={4} /></Field>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <DialogFooter className="mx-0 mb-0 px-0 pb-0"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save guest"}</Button></DialogFooter>
+          <DialogFooter className="mx-0 mb-0 px-0 pb-0"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("dashboard.crm.form.cancel")}</Button><Button type="submit" disabled={submitting}>{submitting ? t("dashboard.crm.form.saving") : t("dashboard.crm.form.saveGuest")}</Button></DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
