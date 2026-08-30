@@ -249,6 +249,59 @@ model paymentdetail {
   @@index([serviceId], map: "PaymentDetail_serviceId_idx")
 }
 
+// ─── Call Analysis — per-tenant call history with latency breakdown ────────
+// Stores detailed call analysis data following the Call Analysis Playbook
+// (latency breakdown, cache performance, per-turn timing, etc.)
+model callanalysis {
+  id              Int      @id @default(autoincrement())
+  callId          String?  @unique
+  roomName        String?  @db.VarChar(200)
+  callerNumber    String?  @db.VarChar(32)
+  calledNumber    String?  @db.VarChar(32)
+  direction       String   @default("inbound") @db.VarChar(10)
+  status          String   @default("completed") @db.VarChar(20)
+  startedAt       DateTime?
+  endedAt         DateTime?
+  duration        Int      @default(0)
+
+  // Agent config
+  sttModel        String?  @db.VarChar(100)
+  llmModel        String?  @db.VarChar(100)
+  ttsModel        String?  @db.VarChar(100)
+  cacheEnabled    Boolean  @default(false)
+  eotThreshold    Decimal? @db.Decimal(5, 3)
+  tenantSlug      String?  @db.VarChar(100)
+
+  // Latency summary
+  turnCount       Int      @default(0)
+  avgLatencyMs    Decimal? @db.Decimal(10, 2)
+  minLatencyMs    Decimal? @db.Decimal(10, 2)
+  maxLatencyMs    Decimal? @db.Decimal(10, 2)
+  firstAudioMs    Int?
+
+  // Cache performance
+  cacheHits       Int      @default(0)
+  cacheMisses     Int      @default(0)
+  cacheBypasses   Int      @default(0)
+
+  // Audio stats
+  audioSentBytes  Int      @default(0)
+  audioRecvBytes  Int      @default(0)
+  functionCalls   Int      @default(0)
+
+  // Per-turn data (JSON array of turn objects)
+  turnsData       Json?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([callId], map: "CallAnalysis_callId_idx")
+  @@index([roomName], map: "CallAnalysis_roomName_idx")
+  @@index([callerNumber], map: "CallAnalysis_callerNumber_idx")
+  @@index([startedAt], map: "CallAnalysis_startedAt_idx")
+  @@index([createdAt], map: "CallAnalysis_createdAt_idx")
+}
+
 model refund {
   id         Int      @id @default(autoincrement())
   paymentId  Int
