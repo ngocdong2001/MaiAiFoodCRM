@@ -48,6 +48,12 @@ services:
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
     ports:
       - "3002:3002"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maiai-backend.rule=Host(`crmapi.maiai.tech`)"
+      - "traefik.http.routers.maiai-backend.entrypoints=websecure"
+      - "traefik.http.routers.maiai-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.maiai-backend.loadbalancer.server.port=3002"
     networks:
       - maiai-net
 
@@ -66,6 +72,12 @@ services:
       HOSTNAME: "0.0.0.0"
     ports:
       - "3006:3006"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maiai-frontend.rule=Host(`crm.maiai.tech`)"
+      - "traefik.http.routers.maiai-frontend.entrypoints=websecure"
+      - "traefik.http.routers.maiai-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.maiai-frontend.loadbalancer.server.port=3006"
     networks:
       - maiai-net
 
