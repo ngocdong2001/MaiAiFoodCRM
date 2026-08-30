@@ -359,6 +359,7 @@ const validateRelationsAndAvailability = async (
   if (storeHours) {
     const dayName = dayNameFromDateStr(datePart);
     const dayConfig = storeHours.find((d) => d.day === dayName);
+    process.stderr.write(`[STORE-HOURS] datePart=${datePart} dayName=${dayName} storeHours=${JSON.stringify(storeHours)} dayConfig=${JSON.stringify(dayConfig)}\n`);
     if (!dayConfig || !dayConfig.open)
       throw new CalendarDomainError("Store is closed on the selected day", 409);
     if (
