@@ -18,10 +18,23 @@ function requireAdminKey(req: Request, res: Response, next: Function) {
 }
 
 // ─── Helper: resolve tenant DB URL from tenant ID ───────────────────────────
-function getTenantDbUrl(tenantId: number): string {
+async function getTenantDbUrl(tenantId: number): Promise<string> {
   const base = process.env.DATABASE_URL_TENANT || process.env.DATABASE_URL || "";
-  // Replace the database name in the URL with the tenant-specific database
-  // e.g. mysql://user:pass@host:3308/maiai_crm_1 → maiai_crm_{tenantId}
+  // Look up the actual databaseName from the master tenant table
+  try {
+    const { getPrismaMaster } = await import("../lib/prisma-master");
+    const prismaMaster = getPrismaMaster();
+    const tenant = await prismaMaster.tenant.findUnique({
+      where: { id: tenantId },
+      select: { databaseName: true },
+    });
+    if (tenant?.databaseName) {
+      return base.replace(/\/[^\/]+$/, `/${tenant.databaseName}`);
+    }
+  } catch (err) {
+    console.error("[CallAnalysis] Failed to lookup tenant databaseName:", err);
+  }
+  // Fallback: construct from tenantId (legacy format)
   return base.replace(/\/[^\/]+$/, `/maiai_crm_${tenantId}`);
 }
 
@@ -36,7 +49,7 @@ router.post("/", requireAdminKey, async (req: Request, res: Response) => {
       return;
     }
 
-    const dbUrl = getTenantDbUrl(tenantId);
+    const dbUrl = await getTenantDbUrl(tenantId);
     const prisma = getPrismaTenant(tenantId, dbUrl);
 
     const data = req.body;
@@ -99,7 +112,7 @@ router.get("/:tenantId", requireAdminKey, async (req: Request, res: Response) =>
     const pageSize = Math.min(100, Math.max(1, Number(req.query.pageSize) || 20));
     const status = req.query.status as string | undefined;
 
-    const dbUrl = getTenantDbUrl(tenantId);
+    const dbUrl = await getTenantDbUrl(tenantId);
     const prisma = getPrismaTenant(tenantId, dbUrl);
 
     const where: Record<string, unknown> = {};
@@ -140,7 +153,7 @@ router.get("/:tenantId/stats", requireAdminKey, async (req: Request, res: Respon
       return;
     }
 
-    const dbUrl = getTenantDbUrl(tenantId);
+    const dbUrl = await getTenantDbUrl(tenantId);
     const prisma = getPrismaTenant(tenantId, dbUrl);
 
     const [total, completed, failed, missed] = await Promise.all([
@@ -192,7 +205,7 @@ router.get("/:tenantId/:analysisId", requireAdminKey, async (req: Request, res: 
       return;
     }
 
-    const dbUrl = getTenantDbUrl(tenantId);
+    const dbUrl = await getTenantDbUrl(tenantId);
     const prisma = getPrismaTenant(tenantId, dbUrl);
 
     const analysis = await prisma.callanalysis.findUnique({
