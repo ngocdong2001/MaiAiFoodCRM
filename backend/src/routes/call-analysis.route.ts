@@ -87,6 +87,7 @@ router.post("/", requireAdminKey, async (req: Request, res: Response) => {
         functionCalls: data.functionCalls || 0,
 
         turnsData: data.turnsData || undefined,
+        transcript: data.transcript || undefined,
       },
     });
 
