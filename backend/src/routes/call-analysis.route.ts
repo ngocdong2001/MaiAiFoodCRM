@@ -86,6 +86,13 @@ router.post("/", requireAdminKey, async (req: Request, res: Response) => {
         audioRecvBytes: data.audioRecvBytes || 0,
         functionCalls: data.functionCalls || 0,
 
+        // Error tracking fields
+        errorMessage: data.errorMessage || null,
+        errorCode: data.errorCode || null,
+        errorDetails: data.errorDetails || null,
+        deepgramError: data.deepgramError || null,
+        ttsError: data.ttsError || null,
+
         turnsData: data.turnsData || undefined,
         transcript: data.transcript || undefined,
       },

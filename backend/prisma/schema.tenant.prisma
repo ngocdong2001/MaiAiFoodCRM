@@ -289,6 +289,13 @@ model callanalysis {
   audioRecvBytes  Int      @default(0)
   functionCalls   Int      @default(0)
 
+  // Error tracking
+  errorMessage    String?  @db.Text
+  errorCode       String?  @db.VarChar(100)
+  errorDetails    String?  @db.Text
+  deepgramError   String?  @db.Text
+  ttsError        String?  @db.Text
+
   // Per-turn data (JSON array of turn objects)
   turnsData       Json?
   // Full conversation transcript (JSON array of {role, speaker, text, ts})

@@ -42,10 +42,11 @@ const decimalHour = (date: Date) => date.getHours() + date.getMinutes() / 60;
 export const CalendarDataProvider = ({ children }: { children: ReactNode }) => {
   const [cursorDate, setCursorDate] = useState(() => new Date());
   const [selectedStaffIds, setSelectedStaffIds] = useState<number[]>([]);
-  const start = new Date(cursorDate.getFullYear(), cursorDate.getMonth(), 1);
+  // Fetch appointments for ±1 month around cursorDate to cover weekly navigation
+  const start = new Date(cursorDate.getFullYear(), cursorDate.getMonth() - 1, 1);
   const end = new Date(
     cursorDate.getFullYear(),
-    cursorDate.getMonth() + 1,
+    cursorDate.getMonth() + 2,
     0,
     23,
     59,
