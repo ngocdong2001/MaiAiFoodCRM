@@ -550,43 +550,43 @@ export const BookingFormContent = ({
             )}
           </form>
         </ScrollArea>
-        <DialogFooter className="shrink-0 border-t border-[#E7EAF0] px-6 py-4">
+        <DialogFooter className="shrink-0 border-t border-[#E7EAF0] flex items-center gap-3 px-6 py-4">
           {isEditing && (
-            <div className="mr-auto">
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={deleteAppointment.isPending || isSaving}
-              >
-                {deleteAppointment.isPending
-                  ? t("dashboard.calendar.booking.deleting")
-                  : t("dashboard.calendar.booking.delete")}
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteAppointment.isPending || isSaving}
+            >
+              {deleteAppointment.isPending
+                ? t("dashboard.calendar.booking.deleting")
+                : t("dashboard.calendar.booking.delete")}
+            </Button>
           )}
-          <Button type="button" variant="outline" onClick={requestClose}>
-            {t("dashboard.calendar.booking.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form="booking-form"
-            disabled={isSaving || options.isPending || isCreatingGuest}
-          >
-            {isCreatingGuest
-              ? t("dashboard.calendar.booking.creatingGuest")
-              : isSaving
-                ? t(
-                    isEditing
-                      ? "dashboard.calendar.booking.updating"
-                      : "dashboard.calendar.booking.creating",
-                  )
-                : t(
-                    isEditing
-                      ? "dashboard.calendar.booking.update"
-                      : "dashboard.calendar.booking.create",
-                  )}
-          </Button>
+          <div className="ml-auto flex gap-3">
+            <Button type="button" variant="outline" onClick={requestClose}>
+              {t("dashboard.calendar.booking.cancel")}
+            </Button>
+            <Button
+              type="submit"
+              form="booking-form"
+              disabled={isSaving || options.isPending || isCreatingGuest}
+            >
+              {isCreatingGuest
+                ? t("dashboard.calendar.booking.creatingGuest")
+                : isSaving
+                  ? t(
+                      isEditing
+                        ? "dashboard.calendar.booking.updating"
+                        : "dashboard.calendar.booking.creating",
+                    )
+                  : t(
+                      isEditing
+                        ? "dashboard.calendar.booking.update"
+                        : "dashboard.calendar.booking.create",
+                    )}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
