@@ -367,6 +367,9 @@
         "creating": "Creating...",
         "update": "Update booking",
         "updating": "Updating...",
+        "delete": "Delete booking",
+        "deleting": "Deleting...",
+        "deleteConfirmation": "Are you sure you want to delete this appointment? This action cannot be undone.",
         "reschedule": "Reschedule",
         "creatingGuest": "Creating guest...",
         "walkInName": "Walk-in guest name",
@@ -384,7 +387,8 @@
           "storeClosed": "The store is closed on the selected day.",
           "outsideStoreHours": "The booking time is outside the store's operating hours. Please choose another time.",
           "walkInNameRequired": "Please enter the walk-in guest's name.",
-          "createGuestFailed": "Could not create the guest profile. Please try again."
+          "createGuestFailed": "Could not create the guest profile. Please try again.",
+          "deleteFailed": "Failed to delete the appointment. Please try again."
         }
       }
     },

@@ -26,6 +26,7 @@ import {
   useCalendarOptions,
   useCreateAppointment,
   useUpdateAppointment,
+  useDeleteAppointment,
 } from "../hooks/useCalendar";
 import { calendarService } from "../services/calendar.service";
 import type { ApiAppointment } from "../types/calendar.types";
@@ -119,6 +120,7 @@ export const BookingFormContent = ({
   const options = useCalendarOptions();
   const create = useCreateAppointment();
   const updateAppointment = useUpdateAppointment();
+  const deleteAppointment = useDeleteAppointment();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const isEditing = Boolean(appointment);
@@ -187,6 +189,28 @@ export const BookingFormContent = ({
     }
     return groups;
   }, []);
+
+  const handleDelete = () => {
+    if (!appointment) return;
+    
+    const confirmDelete = window.confirm(
+      t("dashboard.calendar.booking.deleteConfirmation")
+    );
+    if (!confirmDelete) return;
+
+    setError(null);
+    deleteAppointment.mutate(
+      { id: appointment.id },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+        },
+        onError: () => {
+          setError(t("dashboard.calendar.booking.errors.deleteFailed"));
+        },
+      },
+    );
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -527,6 +551,20 @@ export const BookingFormContent = ({
           </form>
         </ScrollArea>
         <DialogFooter className="shrink-0 border-t border-[#E7EAF0] px-6 py-4">
+          {isEditing && (
+            <div className="mr-auto">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={deleteAppointment.isPending || isSaving}
+              >
+                {deleteAppointment.isPending
+                  ? t("dashboard.calendar.booking.deleting")
+                  : t("dashboard.calendar.booking.delete")}
+              </Button>
+            </div>
+          )}
           <Button type="button" variant="outline" onClick={requestClose}>
             {t("dashboard.calendar.booking.cancel")}
           </Button>

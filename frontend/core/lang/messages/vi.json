@@ -367,6 +367,9 @@
         "creating": "Đang tạo...",
         "update": "Cập nhật lịch hẹn",
         "updating": "Đang cập nhật...",
+        "delete": "Xóa lịch hẹn",
+        "deleting": "Đang xóa...",
+        "deleteConfirmation": "Bạn có chắc chắn muốn xóa lịch hẹn này? Hành động này không thể hoàn tác.",
         "reschedule": "Đổi lịch",
         "creatingGuest": "Đang tạo khách...",
         "walkInName": "Tên khách vãng lai",
@@ -384,7 +387,8 @@
           "storeClosed": "Cửa hàng đóng cửa vào ngày đã chọn.",
           "outsideStoreHours": "Khung giờ đặt lịch nằm ngoài giờ hoạt động của cửa hàng. Vui lòng chọn khung giờ khác.",
           "walkInNameRequired": "Vui lòng nhập tên khách vãng lai.",
-          "createGuestFailed": "Không thể tạo hồ sơ khách. Vui lòng thử lại."
+          "createGuestFailed": "Không thể tạo hồ sơ khách. Vui lòng thử lại.",
+          "deleteFailed": "Không thể xóa lịch hẹn. Vui lòng thử lại."
         }
       }
     },
