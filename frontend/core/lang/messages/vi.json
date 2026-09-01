@@ -437,6 +437,7 @@
           "guest": "Tên Khách Hàng",
           "service": "Loại Dịch Vụ/Hẹn",
           "notes": "Ghi chú/Yêu cầu đặc biệt",
+          "appointmentTime": "Giờ hẹn",
           "status": "Trạng thái"
         },
         "status": {

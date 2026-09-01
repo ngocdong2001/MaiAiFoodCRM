@@ -454,6 +454,7 @@
           "guest": "Guest",
           "service": "Service",
           "notes": "Notes / Special Requests",
+          "appointmentTime": "Appointment Time",
           "status": "Status"
         },
         "status": {
