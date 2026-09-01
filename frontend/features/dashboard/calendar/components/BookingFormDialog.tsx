@@ -200,7 +200,7 @@ export const BookingFormContent = ({
 
     setError(null);
     deleteAppointment.mutate(
-      { id: appointment.id },
+      appointment.id,
       {
         onSuccess: () => {
           onOpenChange(false);
