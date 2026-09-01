@@ -2,6 +2,10 @@ import type { Request, Response } from "express";
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import { queueEvents } from "../lib/queue-events.js";
 import {
+  sendAppointmentConfirmation,
+  type AppointmentSmsData,
+} from "../lib/twilio.js";
+import {
   APPOINTMENT_STATUSES,
   CalendarDomainError,
   CalendarModel,
@@ -101,13 +105,29 @@ export const CalendarController = {
     if (validation)
       return void res.status(400).json({ success: false, message: validation });
     try {
+      const appointment = await CalendarModel.create(getDb(req), input);
+
       res
         .status(201)
         .json({
           success: true,
-          data: await CalendarModel.create(getDb(req), input),
+          data: appointment,
           message: "Appointment created successfully",
         });
+
+      // ── Send confirmation SMS to guest (non-blocking) ──────────────
+      if (appointment) {
+        const smsData: AppointmentSmsData = {
+          guestName: appointment.guest?.name ?? "Valued Customer",
+          guestPhone: appointment.guest?.phone ?? null,
+          services: (appointment.services ?? []).map((s: any) => s.name),
+          startTime: appointment.startTime,
+          endTime: appointment.endTime,
+        };
+        sendAppointmentConfirmation(smsData).catch((err) =>
+          console.error("[Calendar] SMS confirmation failed:", err),
+        );
+      }
     } catch (error) {
       handleError(res, error, "Failed to create appointment");
     }

@@ -65,7 +65,7 @@ const FormDialog = ({
       onSubmit={onSubmit}
       className={cn(
         "space-y-5",
-        scrollable && "min-h-0 flex-1 overflow-y-auto px-5 py-4",
+        scrollable && "min-h-0 overflow-y-auto px-5 py-4",
       )}
     >
       {error ? (
@@ -84,7 +84,7 @@ const FormDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          scrollable && "max-h-[90vh] overflow-hidden p-0",
+          scrollable && "max-h-[90vh] grid-rows-[auto_1fr_auto] overflow-hidden p-0",
           contentClassName,
         )}
       >
@@ -102,7 +102,7 @@ const FormDialog = ({
         ) : (
           <div
             className={cn(
-              scrollable && "min-h-0 flex-1 overflow-y-auto px-5 py-4",
+              scrollable && "min-h-0 overflow-y-auto px-5 py-4",
             )}
           >
             {children}
