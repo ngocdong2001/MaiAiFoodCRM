@@ -9,6 +9,7 @@ type StatCardProps = {
   /** `stacked` puts the icon top-right above the value, `inline` puts it left of the text. */
   layout?: "stacked" | "inline";
   iconWrapperClassName?: string;
+  iconBgColor?: string;
   hint?: ReactNode;
   hintClassName?: string;
   action?: ReactNode;
@@ -21,6 +22,7 @@ const StatCard = ({
   icon,
   layout = "stacked",
   iconWrapperClassName,
+  iconBgColor,
   hint,
   hintClassName,
   action,
@@ -38,6 +40,7 @@ const StatCard = ({
           <span
             className={cn(
               "flex h-10 w-10 items-center justify-center rounded-lg",
+              iconBgColor,
               iconWrapperClassName,
             )}
           >
@@ -61,16 +64,16 @@ const StatCard = ({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]",
+        "flex flex-col rounded-[12px] bg-white p-5 shadow-[0px_2px_4px_0px_#00000012]",
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-[#8D95A5]">{label}</p>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <p className="text-sm font-medium text-[#9DA1A7]">{label}</p>
         {icon ? (
           <span
             className={cn(
-              "flex items-center justify-center",
+              "flex h-5 w-5 flex-shrink-0 items-center justify-center",
               iconWrapperClassName,
             )}
           >
@@ -78,11 +81,11 @@ const StatCard = ({
           </span>
         ) : null}
       </div>
-      <p className="mt-3 text-2xl font-bold tracking-tight text-[#171A21]">
+      <p className="text-3xl font-bold tracking-tight text-[#1D1F23]">
         {value}
       </p>
       {hint ? (
-        <div className={cn("mt-1 text-xs font-medium", hintClassName)}>
+        <div className={cn("mt-2 text-xs text-[#9DA1A7]", hintClassName)}>
           {hint}
         </div>
       ) : null}

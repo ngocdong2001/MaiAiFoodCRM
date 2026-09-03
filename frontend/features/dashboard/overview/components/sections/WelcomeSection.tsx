@@ -19,6 +19,15 @@ const WelcomeSection = () => {
     setBookingOpen(true);
   };
 
+  // Format date in Vietnamese style: "ngày 24 tháng 9 năm 2023"
+  const today = new Date();
+  const dateStr = new Intl.DateTimeFormat("vi-VN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(today);
+  const subtitle = t("dashboard.overview.welcome.subtitle", { date: dateStr });
+
   return (
     <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -26,7 +35,7 @@ const WelcomeSection = () => {
           {t("dashboard.overview.welcome.title", { name: displayName })}
         </h1>
         <p className="mt-1 text-sm text-[#8D95A5] sm:text-base">
-          {t("dashboard.overview.welcome.subtitle")}
+          {subtitle}
         </p>
       </div>
 

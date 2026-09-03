@@ -29,7 +29,7 @@ const StatsSection = () => {
           }),
       hintTone: "positive" as const,
       icon: CalendarDays,
-      iconColor: "text-primary",
+      iconColor: "text-[#EC4899]",
     },
     {
       key: "seat-utilization",
@@ -42,7 +42,7 @@ const StatsSection = () => {
           }),
       hintTone: "positive" as const,
       icon: Gauge,
-      iconColor: "text-[#171A21]",
+      iconColor: "text-[#A78BFA]",
     },
     {
       key: "waitlist",
@@ -53,7 +53,7 @@ const StatsSection = () => {
       hint: t("dashboard.overview.stats.waitlist.hint"),
       hintTone: "muted" as const,
       icon: Users,
-      iconColor: "text-[#A17DE8]",
+      iconColor: "text-[#A78BFA]",
     },
     {
       key: "guest-activity",
@@ -64,7 +64,7 @@ const StatsSection = () => {
       hint: t("dashboard.overview.stats.guest-activity.hint"),
       hintTone: "muted" as const,
       icon: Clock,
-      iconColor: "text-[#171A21]",
+      iconColor: "text-[#374151]",
     },
   ];
 
@@ -77,10 +77,10 @@ const StatsSection = () => {
             key={card.key}
             label={card.label}
             value={card.value}
-            icon={<Icon className={cn("h-4 w-4", card.iconColor)} />}
+            icon={<Icon className={cn("h-5 w-5", card.iconColor)} />}
             hint={card.hint}
             hintClassName={
-              card.hintTone === "positive" ? "text-[#2FA35C]" : "text-[#8D95A5]"
+              card.hintTone === "positive" ? "text-[#059669]" : "text-[#9DA1A7]"
             }
           />
         );
