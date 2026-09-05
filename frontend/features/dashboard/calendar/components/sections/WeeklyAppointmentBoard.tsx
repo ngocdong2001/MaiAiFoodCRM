@@ -108,8 +108,8 @@ const WeeklyAppointmentBoard = ({
                   <p
                     className={
                       isToday
-                        ? "mx-auto mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white"
-                        : "mt-1 text-lg font-semibold text-[#171A21]"
+                        ? "mx-auto mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white"
+                        : "mx-auto mt-1 flex h-8 w-8 items-center justify-center text-lg font-semibold text-[#171A21]"
                     }
                   >
                     {date.getDate()}

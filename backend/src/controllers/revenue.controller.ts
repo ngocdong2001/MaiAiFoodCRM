@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 
+import { queueEvents } from "../lib/queue-events.js";
 import { RevenueModel } from "../models/revenue.model";
 
 const getDb = (req: Request) => req.tenantClient!;
@@ -19,9 +20,7 @@ export const RevenueController = {
             ? req.query.startDate
             : undefined,
         endDate:
-          typeof req.query.endDate === "string"
-            ? req.query.endDate
-            : undefined,
+          typeof req.query.endDate === "string" ? req.query.endDate : undefined,
       });
 
       if (!data) {
@@ -67,6 +66,83 @@ export const RevenueController = {
       res.status(500).json({
         success: false,
         message: "Failed to load revenue summary",
+      });
+    }
+  },
+
+  async updateCancelReason(req: Request, res: Response): Promise<void> {
+    try {
+      const recordId = Number.parseInt(req.params.recordId, 10);
+      if (!Number.isFinite(recordId)) {
+        res.status(400).json({ success: false, message: "Invalid recordId" });
+        return;
+      }
+      const { cancelReason } = req.body;
+      if (
+        !cancelReason ||
+        typeof cancelReason !== "string" ||
+        !cancelReason.trim()
+      ) {
+        res
+          .status(400)
+          .json({ success: false, message: "cancelReason is required" });
+        return;
+      }
+
+      const data = await RevenueModel.updateCancelReason(
+        getDb(req),
+        recordId,
+        cancelReason.trim(),
+      );
+      if (!data) {
+        res
+          .status(404)
+          .json({
+            success: false,
+            message: "Revenue record not found or not cancelled",
+          });
+        return;
+      }
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error("RevenueController.updateCancelReason error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to update cancel reason",
+      });
+    }
+  },
+
+  async restoreBooking(req: Request, res: Response): Promise<void> {
+    try {
+      const recordId = Number.parseInt(req.params.recordId, 10);
+      if (!Number.isFinite(recordId)) {
+        res.status(400).json({ success: false, message: "Invalid recordId" });
+        return;
+      }
+
+      const data = await RevenueModel.restoreBooking(getDb(req), recordId);
+      if (!data) {
+        res
+          .status(404)
+          .json({
+            success: false,
+            message: "Revenue record not found or not cancelled",
+          });
+        return;
+      }
+      res.status(200).json({ success: true, data });
+      if (req.tenant)
+        queueEvents.publish(
+          req.tenant.id,
+          "appointment.status_changed",
+          data.appointmentId,
+        );
+    } catch (error) {
+      console.error("RevenueController.restoreBooking error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to restore booking",
       });
     }
   },

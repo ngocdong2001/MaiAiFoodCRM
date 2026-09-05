@@ -9,13 +9,13 @@ import { settingsService } from "../../services/settings.service";
 /* ── Comprehensive timezone list with UTC offset labels ── */
 const TIMEZONE_ENTRIES: { value: string; utc: string }[] = [
   // UTC± offsets
-  { value: "Etc/GMT+12",   utc: "UTC−12:00" },
-  { value: "Etc/GMT+11",   utc: "UTC−11:00" },
+  { value: "Etc/GMT+12", utc: "UTC−12:00" },
+  { value: "Etc/GMT+11", utc: "UTC−11:00" },
   { value: "Pacific/Pago_Pago", utc: "UTC−11:00 (Pago Pago)" },
-  { value: "Pacific/Honolulu",  utc: "UTC−10:00 (Hawaii)" },
+  { value: "Pacific/Honolulu", utc: "UTC−10:00 (Hawaii)" },
   { value: "America/Anchorage", utc: "UTC−09:00 (Alaska)" },
   { value: "America/Los_Angeles", utc: "UTC−08:00 (Pacific)" },
-  { value: "America/Denver",  utc: "UTC−07:00 (Mountain)" },
+  { value: "America/Denver", utc: "UTC−07:00 (Mountain)" },
   { value: "America/Chicago", utc: "UTC−06:00 (Central)" },
   { value: "America/New_York", utc: "UTC−05:00 (Eastern)" },
   { value: "America/Caracas", utc: "UTC−04:30 (Caracas)" },
@@ -25,43 +25,43 @@ const TIMEZONE_ENTRIES: { value: string; utc: string }[] = [
   { value: "America/Argentina/Buenos_Aires", utc: "UTC−03:00 (Buenos Aires)" },
   { value: "America/Noronha", utc: "UTC−02:00 (Fernando de Noronha)" },
   { value: "Atlantic/Azores", utc: "UTC−01:00 (Azores)" },
-  { value: "UTC",           utc: "UTC±00:00 (UTC)" },
+  { value: "UTC", utc: "UTC±00:00 (UTC)" },
   { value: "Europe/London", utc: "UTC+00:00 (London)" },
   { value: "Europe/Dublin", utc: "UTC+00:00 (Dublin)" },
-  { value: "Africa/Lagos",  utc: "UTC+01:00 (Lagos)" },
-  { value: "Europe/Paris",  utc: "UTC+01:00 (Paris)" },
+  { value: "Africa/Lagos", utc: "UTC+01:00 (Lagos)" },
+  { value: "Europe/Paris", utc: "UTC+01:00 (Paris)" },
   { value: "Europe/Berlin", utc: "UTC+01:00 (Berlin)" },
-  { value: "Europe/Rome",   utc: "UTC+01:00 (Rome)" },
+  { value: "Europe/Rome", utc: "UTC+01:00 (Rome)" },
   { value: "Europe/Madrid", utc: "UTC+01:00 (Madrid)" },
   { value: "Africa/Johannesburg", utc: "UTC+02:00 (Johannesburg)" },
   { value: "Europe/Athens", utc: "UTC+02:00 (Athens)" },
   { value: "Europe/Bucharest", utc: "UTC+02:00 (Bucharest)" },
-  { value: "Africa/Cairo",  utc: "UTC+02:00 (Cairo)" },
+  { value: "Africa/Cairo", utc: "UTC+02:00 (Cairo)" },
   { value: "Europe/Helsinki", utc: "UTC+02:00 (Helsinki)" },
   { value: "Europe/Istanbul", utc: "UTC+03:00 (Istanbul)" },
   { value: "Europe/Moscow", utc: "UTC+03:00 (Moscow)" },
-  { value: "Asia/Riyadh",   utc: "UTC+03:00 (Riyadh)" },
-  { value: "Asia/Dubai",    utc: "UTC+04:00 (Dubai)" },
-  { value: "Asia/Tehran",   utc: "UTC+03:30 (Tehran)" },
-  { value: "Asia/Karachi",  utc: "UTC+05:00 (Karachi)" },
-  { value: "Asia/Kolkata",  utc: "UTC+05:30 (India)" },
-  { value: "Asia/Dhaka",    utc: "UTC+06:00 (Dhaka)" },
-  { value: "Asia/Almaty",   utc: "UTC+06:00 (Almaty)" },
-  { value: "Asia/Bangkok",  utc: "UTC+07:00 (Bangkok)" },
+  { value: "Asia/Riyadh", utc: "UTC+03:00 (Riyadh)" },
+  { value: "Asia/Dubai", utc: "UTC+04:00 (Dubai)" },
+  { value: "Asia/Tehran", utc: "UTC+03:30 (Tehran)" },
+  { value: "Asia/Karachi", utc: "UTC+05:00 (Karachi)" },
+  { value: "Asia/Kolkata", utc: "UTC+05:30 (India)" },
+  { value: "Asia/Dhaka", utc: "UTC+06:00 (Dhaka)" },
+  { value: "Asia/Almaty", utc: "UTC+06:00 (Almaty)" },
+  { value: "Asia/Bangkok", utc: "UTC+07:00 (Bangkok)" },
   { value: "Asia/Ho_Chi_Minh", utc: "UTC+07:00 (Ho Chi Minh)" },
-  { value: "Asia/Jakarta",  utc: "UTC+07:00 (Jakarta)" },
+  { value: "Asia/Jakarta", utc: "UTC+07:00 (Jakarta)" },
   { value: "Asia/Shanghai", utc: "UTC+08:00 (Shanghai)" },
   { value: "Asia/Singapore", utc: "UTC+08:00 (Singapore)" },
   { value: "Asia/Hong_Kong", utc: "UTC+08:00 (Hong Kong)" },
-  { value: "Asia/Taipei",   utc: "UTC+08:00 (Taipei)" },
-  { value: "Asia/Perth",    utc: "UTC+08:00 (Perth)" },
-  { value: "Asia/Seoul",    utc: "UTC+09:00 (Seoul)" },
-  { value: "Asia/Tokyo",    utc: "UTC+09:00 (Tokyo)" },
+  { value: "Asia/Taipei", utc: "UTC+08:00 (Taipei)" },
+  { value: "Asia/Perth", utc: "UTC+08:00 (Perth)" },
+  { value: "Asia/Seoul", utc: "UTC+09:00 (Seoul)" },
+  { value: "Asia/Tokyo", utc: "UTC+09:00 (Tokyo)" },
   { value: "Australia/Adelaide", utc: "UTC+09:30 (Adelaide)" },
   { value: "Australia/Sydney", utc: "UTC+10:00 (Sydney)" },
   { value: "Australia/Melbourne", utc: "UTC+10:00 (Melbourne)" },
   { value: "Pacific/Auckland", utc: "UTC+12:00 (Auckland)" },
-  { value: "Pacific/Fiji",  utc: "UTC+12:00 (Fiji)" },
+  { value: "Pacific/Fiji", utc: "UTC+12:00 (Fiji)" },
   { value: "Pacific/Tongatapu", utc: "UTC+13:00 (Tonga)" },
 ];
 
@@ -86,11 +86,11 @@ const BusinessProfileSection = () => {
   useEffect(() => {
     settingsService.getSalonSettings().then((s) => {
       setForm({
-        salonName:    s.salonName   || "",
+        salonName: s.salonName || "",
         businessType: s.businessType || "Hair Salon",
-        email:        s.email       || "",
-        phone:        s.phone       || "",
-        address:      s.address     || "",
+        email: s.email || "",
+        phone: s.phone || "",
+        address: s.address || "",
       });
       setTimezone(s.timezone || "UTC");
     });
@@ -122,7 +122,7 @@ const BusinessProfileSection = () => {
       <div className="mt-6 rounded-[14px] border border-[#DEE1E7] bg-white shadow-[0px_2px_4px_0px_#00000012]">
         <div className="p-6">
           {/* Logo + fields row */}
-          <div className="flex gap-8">
+          <div className="flex flex-col gap-8 sm:flex-row">
             {/* Logo upload */}
             <div className="flex flex-col items-center gap-3">
               <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-[#DEE1E7] bg-[#F3F4F7]/50">
@@ -140,7 +140,7 @@ const BusinessProfileSection = () => {
 
             {/* Fields grid */}
             <div className="flex flex-1 flex-col gap-5">
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {/* Salon Name */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
@@ -213,7 +213,7 @@ const BusinessProfileSection = () => {
               </div>
 
               {/* Salon Timezone */}
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
                     Salon Timezone

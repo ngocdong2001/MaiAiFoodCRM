@@ -409,6 +409,7 @@ export const ModelName = {
   revenuerecord: 'revenuerecord',
   revenuerecorddetail: 'revenuerecorddetail',
   paymentdetail: 'paymentdetail',
+  callanalysis: 'callanalysis',
   refund: 'refund',
   service: 'service',
   servicecategory: 'servicecategory',
@@ -433,7 +434,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "airecommendation" | "appointment" | "appointmentservice" | "auditlog" | "guest" | "guestnote" | "guesttag" | "guesttagmapping" | "payment" | "revenuerecord" | "revenuerecorddetail" | "paymentdetail" | "refund" | "service" | "servicecategory" | "setting" | "staff" | "staffschedule" | "staffspecialty" | "staffspecialtymapping" | "upsellcampaign"
+    modelProps: "airecommendation" | "appointment" | "appointmentservice" | "auditlog" | "guest" | "guestnote" | "guesttag" | "guesttagmapping" | "payment" | "revenuerecord" | "revenuerecorddetail" | "paymentdetail" | "callanalysis" | "refund" | "service" | "servicecategory" | "setting" | "staff" | "staffschedule" | "staffspecialty" | "staffspecialtymapping" | "upsellcampaign"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1226,6 +1227,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.paymentdetailCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PaymentdetailCountAggregateOutputType> | number
+        }
+      }
+    }
+    callanalysis: {
+      payload: Prisma.$callanalysisPayload<ExtArgs>
+      fields: Prisma.callanalysisFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.callanalysisFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.callanalysisFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>
+        }
+        findFirst: {
+          args: Prisma.callanalysisFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.callanalysisFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>
+        }
+        findMany: {
+          args: Prisma.callanalysisFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>[]
+        }
+        create: {
+          args: Prisma.callanalysisCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>
+        }
+        createMany: {
+          args: Prisma.callanalysisCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.callanalysisDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>
+        }
+        update: {
+          args: Prisma.callanalysisUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>
+        }
+        deleteMany: {
+          args: Prisma.callanalysisDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.callanalysisUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.callanalysisUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$callanalysisPayload>
+        }
+        aggregate: {
+          args: Prisma.CallanalysisAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCallanalysis>
+        }
+        groupBy: {
+          args: Prisma.callanalysisGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CallanalysisGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.callanalysisCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CallanalysisCountAggregateOutputType> | number
         }
       }
     }
@@ -2025,6 +2092,9 @@ export const RevenuerecordScalarFieldEnum = {
   finalAmount: 'finalAmount',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
+  status: 'status',
+  cancelReason: 'cancelReason',
+  cancelReasonStatus: 'cancelReasonStatus',
   receiptNumber: 'receiptNumber',
   paidAt: 'paidAt',
   recordedAt: 'recordedAt'
@@ -2056,6 +2126,48 @@ export const PaymentdetailScalarFieldEnum = {
 } as const
 
 export type PaymentdetailScalarFieldEnum = (typeof PaymentdetailScalarFieldEnum)[keyof typeof PaymentdetailScalarFieldEnum]
+
+
+export const CallanalysisScalarFieldEnum = {
+  id: 'id',
+  callId: 'callId',
+  roomName: 'roomName',
+  callerNumber: 'callerNumber',
+  calledNumber: 'calledNumber',
+  direction: 'direction',
+  status: 'status',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  duration: 'duration',
+  sttModel: 'sttModel',
+  llmModel: 'llmModel',
+  ttsModel: 'ttsModel',
+  cacheEnabled: 'cacheEnabled',
+  eotThreshold: 'eotThreshold',
+  tenantSlug: 'tenantSlug',
+  turnCount: 'turnCount',
+  avgLatencyMs: 'avgLatencyMs',
+  minLatencyMs: 'minLatencyMs',
+  maxLatencyMs: 'maxLatencyMs',
+  firstAudioMs: 'firstAudioMs',
+  cacheHits: 'cacheHits',
+  cacheMisses: 'cacheMisses',
+  cacheBypasses: 'cacheBypasses',
+  audioSentBytes: 'audioSentBytes',
+  audioRecvBytes: 'audioRecvBytes',
+  functionCalls: 'functionCalls',
+  errorMessage: 'errorMessage',
+  errorCode: 'errorCode',
+  errorDetails: 'errorDetails',
+  deepgramError: 'deepgramError',
+  ttsError: 'ttsError',
+  turnsData: 'turnsData',
+  transcript: 'transcript',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CallanalysisScalarFieldEnum = (typeof CallanalysisScalarFieldEnum)[keyof typeof CallanalysisScalarFieldEnum]
 
 
 export const RefundScalarFieldEnum = {
@@ -2304,6 +2416,9 @@ export const revenuerecordOrderByRelevanceFieldEnum = {
   staffAvatarUrl: 'staffAvatarUrl',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
+  status: 'status',
+  cancelReason: 'cancelReason',
+  cancelReasonStatus: 'cancelReasonStatus',
   receiptNumber: 'receiptNumber'
 } as const
 
@@ -2316,6 +2431,44 @@ export const revenuerecorddetailOrderByRelevanceFieldEnum = {
 } as const
 
 export type revenuerecorddetailOrderByRelevanceFieldEnum = (typeof revenuerecorddetailOrderByRelevanceFieldEnum)[keyof typeof revenuerecorddetailOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const callanalysisOrderByRelevanceFieldEnum = {
+  callId: 'callId',
+  roomName: 'roomName',
+  callerNumber: 'callerNumber',
+  calledNumber: 'calledNumber',
+  direction: 'direction',
+  status: 'status',
+  sttModel: 'sttModel',
+  llmModel: 'llmModel',
+  ttsModel: 'ttsModel',
+  tenantSlug: 'tenantSlug',
+  errorMessage: 'errorMessage',
+  errorCode: 'errorCode',
+  errorDetails: 'errorDetails',
+  deepgramError: 'deepgramError',
+  ttsError: 'ttsError'
+} as const
+
+export type callanalysisOrderByRelevanceFieldEnum = (typeof callanalysisOrderByRelevanceFieldEnum)[keyof typeof callanalysisOrderByRelevanceFieldEnum]
 
 
 export const refundOrderByRelevanceFieldEnum = {
@@ -2354,23 +2507,6 @@ export const settingOrderByRelevanceFieldEnum = {
 } as const
 
 export type settingOrderByRelevanceFieldEnum = (typeof settingOrderByRelevanceFieldEnum)[keyof typeof settingOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const staffOrderByRelevanceFieldEnum = {
@@ -2638,6 +2774,7 @@ export type GlobalOmitConfig = {
   revenuerecord?: Prisma.revenuerecordOmit
   revenuerecorddetail?: Prisma.revenuerecorddetailOmit
   paymentdetail?: Prisma.paymentdetailOmit
+  callanalysis?: Prisma.callanalysisOmit
   refund?: Prisma.refundOmit
   service?: Prisma.serviceOmit
   servicecategory?: Prisma.servicecategoryOmit

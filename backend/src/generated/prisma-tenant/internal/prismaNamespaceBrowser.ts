@@ -63,6 +63,7 @@ export const ModelName = {
   revenuerecord: 'revenuerecord',
   revenuerecorddetail: 'revenuerecorddetail',
   paymentdetail: 'paymentdetail',
+  callanalysis: 'callanalysis',
   refund: 'refund',
   service: 'service',
   servicecategory: 'servicecategory',
@@ -253,6 +254,9 @@ export const RevenuerecordScalarFieldEnum = {
   finalAmount: 'finalAmount',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
+  status: 'status',
+  cancelReason: 'cancelReason',
+  cancelReasonStatus: 'cancelReasonStatus',
   receiptNumber: 'receiptNumber',
   paidAt: 'paidAt',
   recordedAt: 'recordedAt'
@@ -284,6 +288,48 @@ export const PaymentdetailScalarFieldEnum = {
 } as const
 
 export type PaymentdetailScalarFieldEnum = (typeof PaymentdetailScalarFieldEnum)[keyof typeof PaymentdetailScalarFieldEnum]
+
+
+export const CallanalysisScalarFieldEnum = {
+  id: 'id',
+  callId: 'callId',
+  roomName: 'roomName',
+  callerNumber: 'callerNumber',
+  calledNumber: 'calledNumber',
+  direction: 'direction',
+  status: 'status',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  duration: 'duration',
+  sttModel: 'sttModel',
+  llmModel: 'llmModel',
+  ttsModel: 'ttsModel',
+  cacheEnabled: 'cacheEnabled',
+  eotThreshold: 'eotThreshold',
+  tenantSlug: 'tenantSlug',
+  turnCount: 'turnCount',
+  avgLatencyMs: 'avgLatencyMs',
+  minLatencyMs: 'minLatencyMs',
+  maxLatencyMs: 'maxLatencyMs',
+  firstAudioMs: 'firstAudioMs',
+  cacheHits: 'cacheHits',
+  cacheMisses: 'cacheMisses',
+  cacheBypasses: 'cacheBypasses',
+  audioSentBytes: 'audioSentBytes',
+  audioRecvBytes: 'audioRecvBytes',
+  functionCalls: 'functionCalls',
+  errorMessage: 'errorMessage',
+  errorCode: 'errorCode',
+  errorDetails: 'errorDetails',
+  deepgramError: 'deepgramError',
+  ttsError: 'ttsError',
+  turnsData: 'turnsData',
+  transcript: 'transcript',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CallanalysisScalarFieldEnum = (typeof CallanalysisScalarFieldEnum)[keyof typeof CallanalysisScalarFieldEnum]
 
 
 export const RefundScalarFieldEnum = {
@@ -532,6 +578,9 @@ export const revenuerecordOrderByRelevanceFieldEnum = {
   staffAvatarUrl: 'staffAvatarUrl',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
+  status: 'status',
+  cancelReason: 'cancelReason',
+  cancelReasonStatus: 'cancelReasonStatus',
   receiptNumber: 'receiptNumber'
 } as const
 
@@ -544,6 +593,44 @@ export const revenuerecorddetailOrderByRelevanceFieldEnum = {
 } as const
 
 export type revenuerecorddetailOrderByRelevanceFieldEnum = (typeof revenuerecorddetailOrderByRelevanceFieldEnum)[keyof typeof revenuerecorddetailOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const callanalysisOrderByRelevanceFieldEnum = {
+  callId: 'callId',
+  roomName: 'roomName',
+  callerNumber: 'callerNumber',
+  calledNumber: 'calledNumber',
+  direction: 'direction',
+  status: 'status',
+  sttModel: 'sttModel',
+  llmModel: 'llmModel',
+  ttsModel: 'ttsModel',
+  tenantSlug: 'tenantSlug',
+  errorMessage: 'errorMessage',
+  errorCode: 'errorCode',
+  errorDetails: 'errorDetails',
+  deepgramError: 'deepgramError',
+  ttsError: 'ttsError'
+} as const
+
+export type callanalysisOrderByRelevanceFieldEnum = (typeof callanalysisOrderByRelevanceFieldEnum)[keyof typeof callanalysisOrderByRelevanceFieldEnum]
 
 
 export const refundOrderByRelevanceFieldEnum = {
@@ -582,23 +669,6 @@ export const settingOrderByRelevanceFieldEnum = {
 } as const
 
 export type settingOrderByRelevanceFieldEnum = (typeof settingOrderByRelevanceFieldEnum)[keyof typeof settingOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const staffOrderByRelevanceFieldEnum = {

@@ -57,8 +57,8 @@ const RoleCard = ({
       </p>
 
       <ul className="mt-6 space-y-3 sm:mt-8">
-        {benefits.map((benefit, index) => (
-          <li key={index} className="flex items-center gap-3">
+        {benefits.map((benefit) => (
+          <li key={benefit} className="flex items-center gap-3">
             <CircleCheck
               className={cn("h-4 w-4 shrink-0", checkColorMap[checkColor])}
             />

@@ -133,6 +133,9 @@ export type StaffRevenueDetailJob = {
   finalAmount: number;
   paymentMethod: string;
   receiptNumber: string | null;
+  status: string;
+  cancelReason: string | null;
+  cancelReasonStatus: string | null;
 };
 
 export type StaffRevenueDetailResponse = {
@@ -180,8 +183,11 @@ export const RevenueModel = {
     const jobs: StaffRevenueDetailJob[] = records.map((r) => {
       const finalAmt = decimalToNumber(r.finalAmount);
       const tipAmt = decimalToNumber(r.tipAmount);
-      totalRevenue += finalAmt;
-      totalTips += tipAmt;
+      // Only count non-cancelled records towards totals
+      if (r.status !== "cancelled") {
+        totalRevenue += finalAmt;
+        totalTips += tipAmt;
+      }
 
       return {
         paymentId: r.paymentId,
@@ -200,6 +206,9 @@ export const RevenueModel = {
         finalAmount: finalAmt,
         paymentMethod: r.paymentMethod,
         receiptNumber: r.receiptNumber ?? null,
+        status: r.status ?? "completed",
+        cancelReason: r.cancelReason ?? null,
+        cancelReasonStatus: r.cancelReasonStatus ?? null,
       };
     });
 
@@ -303,6 +312,8 @@ export const RevenueModel = {
         gte: currentRange.start,
         lte: currentRange.end,
       },
+      // Exclude cancelled records from revenue totals
+      status: { not: "cancelled" },
     };
 
     const previousWhere: Prisma.revenuerecordWhereInput = {
@@ -311,9 +322,20 @@ export const RevenueModel = {
         gte: previousRange.start,
         lte: previousRange.end,
       },
+      // Exclude cancelled records from revenue totals
+      status: { not: "cancelled" },
     };
 
-    const [currentAggregate, previousAggregate, currentRecords] =
+    // For the staff row map, we need all records including cancelled ones
+    const currentAllWhere: Prisma.revenuerecordWhereInput = {
+      ...filterWhere,
+      paidAt: {
+        gte: currentRange.start,
+        lte: currentRange.end,
+      },
+    };
+
+    const [currentAggregate, previousAggregate, currentRecords, currentAllRecords] =
       await Promise.all([
         db.revenuerecord.aggregate({
           where: currentWhere,
@@ -339,6 +361,15 @@ export const RevenueModel = {
         }),
         db.revenuerecord.findMany({
           where: currentWhere,
+          orderBy: {
+            paidAt: "desc",
+          },
+          include: {
+            revenuerecorddetail: true,
+          },
+        }),
+        db.revenuerecord.findMany({
+          where: currentAllWhere,
           orderBy: {
             paidAt: "desc",
           },
@@ -404,7 +435,8 @@ export const RevenueModel = {
 
     const staffServiceNamesMap = new Map<number, Set<string>>();
 
-    currentRecords.forEach((record) => {
+    // Use currentAllRecords for staff map so cancelled bookings appear in the list
+    currentAllRecords.forEach((record) => {
       if (record.staffId) {
         const existing = staffMap.get(record.staffId) ?? {
           key: String(record.staffId),
@@ -498,5 +530,72 @@ export const RevenueModel = {
       paymentMethods,
       recentRevenueActivities,
     };
+  },
+
+  async updateCancelReason(
+    db: PrismaClient,
+    recordId: number,
+    cancelReason: string,
+  ) {
+    const record = await db.revenuerecord.findUnique({
+      where: { paymentId: recordId },
+      select: { id: true, status: true },
+    });
+    if (!record || record.status !== "cancelled") return null;
+
+    const updated = await db.revenuerecord.update({
+      where: { id: record.id },
+      data: {
+        cancelReason,
+        cancelReasonStatus: "pending",
+      },
+    });
+    return {
+      id: updated.id,
+      cancelReason: updated.cancelReason,
+      cancelReasonStatus: updated.cancelReasonStatus,
+    };
+  },
+
+  async restoreBooking(
+    db: PrismaClient,
+    recordId: number,
+  ) {
+    const record = await db.revenuerecord.findUnique({
+      where: { paymentId: recordId },
+      select: { id: true, status: true, appointmentId: true, paymentId: true },
+    });
+    if (!record || record.status !== "cancelled") return null;
+
+    await db.$transaction(async (tx) => {
+      // 1. Delete the cancelled revenue record
+      await tx.revenuerecord.delete({ where: { id: record.id } });
+
+      // 2. Restore the appointment to "pending"
+      await tx.appointment.update({
+        where: { id: record.appointmentId },
+        data: {
+          status: "pending",
+          cancelReason: null,
+          updatedAt: new Date(),
+          appointmentservice: {
+            updateMany: { where: {}, data: { status: "pending" } },
+          },
+        },
+      });
+
+      // 3. Delete the zero-amount payment that was auto-created on cancel
+      const payment = await tx.payment.findUnique({
+        where: { id: record.paymentId },
+        select: { amount: true, paymentStatus: true },
+      });
+      if (payment && Number(payment.amount) === 0 && payment.paymentStatus === "cancelled") {
+        // Delete payment details first (cascade should handle, but be explicit)
+        await tx.paymentdetail.deleteMany({ where: { paymentId: record.paymentId } });
+        await tx.payment.delete({ where: { id: record.paymentId } });
+      }
+    });
+
+    return { success: true, appointmentId: record.appointmentId };
   },
 };

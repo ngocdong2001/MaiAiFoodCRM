@@ -1,6 +1,9 @@
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import type { PrismaClient } from "../generated/prisma-tenant/client.js";
-import { resolveDayScheduleFromWeekly, type DaySchedule } from "./schedule.helpers.js";
+import {
+  resolveDayScheduleFromWeekly,
+  type DaySchedule,
+} from "./schedule.helpers.js";
 
 export const APPOINTMENT_STATUSES = [
   "pending",
@@ -97,7 +100,10 @@ const timeStringMinutes = (datetimeStr: string): number => {
 
 // Convert a UTC datetime string to salon-local minutes-of-day.
 // Used when comparing UTC-stored appointment times against local-time break/schedule.
-const utcToLocalMinutes = (datetimeStr: string, tzOffsetMinutes: number): number => {
+const utcToLocalMinutes = (
+  datetimeStr: string,
+  tzOffsetMinutes: number,
+): number => {
   const match = datetimeStr.match(/T(\d{2}):(\d{2})/);
   if (!match) return 0;
   const utcMinutes = Number(match[1]) * 60 + Number(match[2]);
@@ -238,7 +244,11 @@ const ensureRevenueSnapshot = async (
       : Promise.resolve(null),
     transaction.service.findMany({
       where: { id: { in: services.map((item) => item.serviceId) } },
-      select: { id: true, name: true, servicecategory: { select: { name: true } } },
+      select: {
+        id: true,
+        name: true,
+        servicecategory: { select: { name: true } },
+      },
     }),
   ]);
 
@@ -299,25 +309,31 @@ const validateRelationsAndAvailability = async (
   const datePart = input.startTime.slice(0, 10);
   const scheduleDate = new Date(`${datePart}T00:00:00.000Z`);
 
-  const [guest, staff, services, overrideSchedule, storeHoursSetting, salonTzRow] =
-    await Promise.all([
-      transaction.guest.findUnique({
-        where: { id: input.guestId },
-        select: { isActive: true },
-      }),
-      transaction.staff.findUnique({
-        where: { id: input.staffId },
-        select: { status: true, weeklySchedule: true },
-      }),
-      transaction.service.findMany({
-        where: { id: { in: input.serviceIds }, isActive: true },
-      }),
-      transaction.staffschedule.findUnique({
-        where: { staffId_date: { staffId: input.staffId, date: scheduleDate } },
-      }),
-      transaction.setting.findUnique({ where: { key: "operating_hours" } }),
-      transaction.setting.findUnique({ where: { key: "salon_timezone" } }),
-    ]);
+  const [
+    guest,
+    staff,
+    services,
+    overrideSchedule,
+    storeHoursSetting,
+    salonTzRow,
+  ] = await Promise.all([
+    transaction.guest.findUnique({
+      where: { id: input.guestId },
+      select: { isActive: true },
+    }),
+    transaction.staff.findUnique({
+      where: { id: input.staffId },
+      select: { status: true, weeklySchedule: true },
+    }),
+    transaction.service.findMany({
+      where: { id: { in: input.serviceIds }, isActive: true },
+    }),
+    transaction.staffschedule.findUnique({
+      where: { staffId_date: { staffId: input.staffId, date: scheduleDate } },
+    }),
+    transaction.setting.findUnique({ where: { key: "operating_hours" } }),
+    transaction.setting.findUnique({ where: { key: "salon_timezone" } }),
+  ]);
 
   if (!guest?.isActive) throw new CalendarDomainError("Guest is unavailable");
   if (!staff || staff.status === "inactive" || staff.status === "on_leave")
@@ -332,20 +348,33 @@ const validateRelationsAndAvailability = async (
   try {
     // salon_timezone key stores the raw timezone string, e.g. "America/Halifax"
     const salonTz = salonTzRow?.value || "UTC";
-    // Compute UTC offset for the salon timezone on the booking date
-    const localNoon = new Date(`${datePart}T12:00:00`);
-    const tzDate = new Date(localNoon.toLocaleString("en-US", { timeZone: salonTz }));
-    salonTzOffsetMinutes = (tzDate.getTime() - localNoon.getTime()) / 60000;
-    process.stderr.write(`[BREAK-CHECK] salon_tz=${salonTz} offset=${salonTzOffsetMinutes}min salonTzRow=${!!salonTzRow}\n`);
+    // Compute the salon timezone's UTC offset for this date using a fixed UTC
+    // instant, so the result never depends on the server's own local timezone.
+    const [y, m, d] = datePart.split("-").map(Number);
+    const instant = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+    const utcAsDate = new Date(
+      instant.toLocaleString("en-US", { timeZone: "UTC" }),
+    );
+    const tzAsDate = new Date(
+      instant.toLocaleString("en-US", { timeZone: salonTz }),
+    );
+    salonTzOffsetMinutes = (tzAsDate.getTime() - utcAsDate.getTime()) / 60000;
+    process.stderr.write(
+      `[BREAK-CHECK] salon_tz=${salonTz} offset=${salonTzOffsetMinutes}min salonTzRow=${!!salonTzRow}\n`,
+    );
   } catch {
     salonTzOffsetMinutes = 0;
-    process.stderr.write(`[BREAK-CHECK] timezone lookup FAILED, defaulting to UTC offset=0\n`);
+    process.stderr.write(
+      `[BREAK-CHECK] timezone lookup FAILED, defaulting to UTC offset=0\n`,
+    );
   }
 
   // Convert UTC booking times to local minutes for comparison with local schedules
   const bookingStart = utcToLocalMinutes(input.startTime, salonTzOffsetMinutes);
   const bookingEnd = utcToLocalMinutes(input.endTime, salonTzOffsetMinutes);
-  process.stderr.write(`[BREAK-CHECK] startTime=${input.startTime} endTime=${input.endTime} → local: ${bookingStart}-${bookingEnd} min | break would be 720-780\n`);
+  process.stderr.write(
+    `[BREAK-CHECK] startTime=${input.startTime} endTime=${input.endTime} → local: ${bookingStart}-${bookingEnd} min | break would be 720-780\n`,
+  );
 
   // Validate against store operating hours
   let storeHours: DayHours[] | null = null;
@@ -359,7 +388,9 @@ const validateRelationsAndAvailability = async (
   if (storeHours) {
     const dayName = dayNameFromDateStr(datePart);
     const dayConfig = storeHours.find((d) => d.day === dayName);
-    process.stderr.write(`[STORE-HOURS] datePart=${datePart} dayName=${dayName} storeHours=${JSON.stringify(storeHours)} dayConfig=${JSON.stringify(dayConfig)}\n`);
+    process.stderr.write(
+      `[STORE-HOURS] datePart=${datePart} dayName=${dayName} storeHours=${JSON.stringify(storeHours)} dayConfig=${JSON.stringify(dayConfig)}\n`,
+    );
     if (!dayConfig || !dayConfig.open)
       throw new CalendarDomainError("Store is closed on the selected day", 409);
     if (
@@ -398,7 +429,10 @@ const validateRelationsAndAvailability = async (
 
   // No schedule found means staff not available
   if (!resolvedSchedule) {
-    throw new CalendarDomainError("Staff has no working schedule for the selected date", 409);
+    throw new CalendarDomainError(
+      "Staff has no working schedule for the selected date",
+      409,
+    );
   }
 
   // Validate booking against resolved schedule
@@ -697,6 +731,109 @@ export const CalendarModel = {
         await ensurePaymentForCompletedAppointment(transaction, updated);
       }
 
+      // Create a zero-amount revenue record for cancelled bookings,
+      // so they appear in the revenue page with a "cancelled" badge.
+      if (status === "cancelled") {
+        // Ensure there's a payment record — create one if the booking was never paid.
+        let payment = await transaction.payment.findFirst({
+          where: { appointmentId: id },
+          orderBy: { createdAt: "desc" },
+        });
+        if (!payment) {
+          payment = await transaction.payment.create({
+            data: {
+              appointmentId: id,
+              guestId: updated.guestId,
+              staffId: updated.staffId,
+              amount: 0,
+              finalAmount: 0,
+              paymentMethod: "none",
+              paymentStatus: "cancelled",
+            },
+          });
+        }
+
+        const existingRecord = await transaction.revenuerecord.findUnique({
+          where: { paymentId: payment.id },
+          select: { id: true },
+        });
+        if (!existingRecord) {
+          const [guest, staff, serviceRows] = await Promise.all([
+            transaction.guest.findUnique({
+              where: { id: updated.guestId },
+              select: { name: true, phone: true, avatarUrl: true },
+            }),
+            transaction.staff.findUnique({
+              where: { id: updated.staffId },
+              select: { name: true, role: true, avatarUrl: true },
+            }),
+            transaction.appointmentservice.findMany({
+              where: { appointmentId: id },
+              select: { serviceId: true, priceAtBooking: true },
+            }),
+          ]);
+          const serviceIds = serviceRows.map((s) => s.serviceId);
+          const services =
+            serviceIds.length > 0
+              ? await transaction.service.findMany({
+                  where: { id: { in: serviceIds } },
+                  select: {
+                    id: true,
+                    name: true,
+                    servicecategory: { select: { name: true } },
+                  },
+                })
+              : [];
+          const serviceMap = new Map(services.map((s) => [s.id, s]));
+          await transaction.revenuerecord.create({
+            data: {
+              paymentId: payment.id,
+              appointmentId: id,
+              guestId: updated.guestId,
+              guestName: guest?.name ?? "Walk-in Guest",
+              guestPhone: guest?.phone ?? null,
+              guestAvatarUrl: guest?.avatarUrl ?? null,
+              staffId: updated.staffId,
+              staffName: staff?.name ?? null,
+              staffRole: staff?.role ?? null,
+              staffAvatarUrl: staff?.avatarUrl ?? null,
+              amount: 0,
+              discountAmount: 0,
+              tipAmount: 0,
+              finalAmount: 0,
+              paymentMethod: payment.paymentMethod,
+              paymentStatus: payment.paymentStatus,
+              status: "cancelled",
+              cancelReason: updated.cancelReason ?? null,
+              receiptNumber: payment.receiptNumber ?? null,
+              paidAt: payment.paidAt,
+              revenuerecorddetail: {
+                create: serviceRows.map((sr) => {
+                  const svc = serviceMap.get(sr.serviceId);
+                  return {
+                    serviceId: sr.serviceId,
+                    serviceName: svc?.name ?? "Unknown Service",
+                    categoryName: svc?.servicecategory?.name ?? null,
+                    price: sr.priceAtBooking,
+                    quantity: 1,
+                  };
+                }),
+              },
+            },
+          });
+        } else if (existingRecord) {
+          // Update existing record to mark as cancelled
+          await transaction.revenuerecord.update({
+            where: { id: existingRecord.id },
+            data: {
+              status: "cancelled",
+              cancelReason: updated.cancelReason ?? null,
+              cancelReasonStatus: "pending",
+            },
+          });
+        }
+      }
+
       return transaction.appointment.findUniqueOrThrow({
         where: { id },
         include,
@@ -740,13 +877,23 @@ export const CalendarModel = {
     const dayOfWeek = targetDate.getDay();
 
     // Resolve salon timezone offset for converting local slots to UTC
-    const salonTzRow = await db.setting.findUnique({ where: { key: "salon_timezone" } });
+    const salonTzRow = await db.setting.findUnique({
+      where: { key: "salon_timezone" },
+    });
     let salonTzOffsetMinutes = 0;
     try {
       const salonTz = salonTzRow?.value || "UTC";
-      const localNoon = new Date(`${params.date}T12:00:00`);
-      const tzDate = new Date(localNoon.toLocaleString("en-US", { timeZone: salonTz }));
-      salonTzOffsetMinutes = (tzDate.getTime() - localNoon.getTime()) / 60000;
+      // Compute the offset from a fixed UTC instant so it never depends on
+      // the server's own local timezone (see validateRelationsAndAvailability).
+      const [y, m, d] = params.date.split("-").map(Number);
+      const instant = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+      const utcAsDate = new Date(
+        instant.toLocaleString("en-US", { timeZone: "UTC" }),
+      );
+      const tzAsDate = new Date(
+        instant.toLocaleString("en-US", { timeZone: salonTz }),
+      );
+      salonTzOffsetMinutes = (tzAsDate.getTime() - utcAsDate.getTime()) / 60000;
     } catch {
       salonTzOffsetMinutes = 0;
     }
@@ -789,7 +936,16 @@ export const CalendarModel = {
 
     // Resolve schedule per staff: per-date override > weeklySchedule template
     const datePart = params.date;
-    const scheduleMap = new Map<number, { startTime: string; endTime: string; isDayOff: boolean; breakStart: string | null; breakEnd: string | null }>();
+    const scheduleMap = new Map<
+      number,
+      {
+        startTime: string;
+        endTime: string;
+        isDayOff: boolean;
+        breakStart: string | null;
+        breakEnd: string | null;
+      }
+    >();
     for (const staff of staffList) {
       if (!effectiveStaffIds.includes(staff.id)) continue;
 
@@ -799,7 +955,10 @@ export const CalendarModel = {
         scheduleMap.set(staff.id, override);
       } else if (staff.weeklySchedule) {
         // Fallback to weekly template
-        const resolved = resolveDayScheduleFromWeekly(staff.weeklySchedule as any, datePart);
+        const resolved = resolveDayScheduleFromWeekly(
+          staff.weeklySchedule as any,
+          datePart,
+        );
         if (resolved) {
           scheduleMap.set(staff.id, {
             startTime: resolved.startTime,
@@ -831,7 +990,9 @@ export const CalendarModel = {
         where: { isActive: true },
         select: { name: true, durationMinutes: true },
       });
-      const match = services.find(s => s.name.toLowerCase().includes(params.service!.toLowerCase()));
+      const match = services.find((s) =>
+        s.name.toLowerCase().includes(params.service!.toLowerCase()),
+      );
       if (match) durationMinutes = match.durationMinutes;
     }
 
@@ -850,14 +1011,22 @@ export const CalendarModel = {
 
       const staffStart = parseTime(schedule.startTime);
       const staffEnd = parseTime(schedule.endTime);
-      const breakStart = schedule.breakStart ? parseTime(schedule.breakStart) : null;
+      const breakStart = schedule.breakStart
+        ? parseTime(schedule.breakStart)
+        : null;
       const breakEnd = schedule.breakEnd ? parseTime(schedule.breakEnd) : null;
 
       // Get staff's appointments for the day
-      const staffAppts = existingAppointments.filter((a) => a.staffId === staff.id);
+      const staffAppts = existingAppointments.filter(
+        (a) => a.staffId === staff.id,
+      );
 
       // Generate 30-min slots within working hours
-      for (let startMin = staffStart; startMin + durationMinutes <= staffEnd; startMin += 30) {
+      for (
+        let startMin = staffStart;
+        startMin + durationMinutes <= staffEnd;
+        startMin += 30
+      ) {
         const endMin = startMin + durationMinutes;
 
         // Check break overlap (both in local time — no conversion needed)
@@ -921,7 +1090,12 @@ export const CalendarModel = {
       available: availableSlots.length > 0,
       available_slots: availableSlots,
       suggested_times: suggestedTimes,
-      ...(params.preferredTime ? { preferred_time: params.preferredTime, available: preferredAvailable } : {}),
+      ...(params.preferredTime
+        ? {
+            preferred_time: params.preferredTime,
+            available: preferredAvailable,
+          }
+        : {}),
     };
   },
 };

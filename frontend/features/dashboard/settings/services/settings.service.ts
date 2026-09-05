@@ -12,6 +12,36 @@ export type SalonSettings = {
   timezone: string;
 };
 
+export type SystemLogItem = {
+  id: number;
+  action: string;
+  entityType: string;
+  entityId: number;
+  performedBy: string;
+  ipAddress: string | null;
+  requestBody: string | null;
+  method: string | null;
+  path: string | null;
+  statusCode: number | null;
+  durationMs: number | null;
+  success: boolean | null;
+  createdAt: string;
+};
+
+export type SystemLogsQuery = {
+  page?: number;
+  pageSize?: number;
+  entityType?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+};
+
+export type SystemLogsResponse = {
+  data: SystemLogItem[];
+  pagination: { page: number; pageSize: number; total: number; totalPages: number };
+};
+
 export const settingsService = {
   async getOperatingHours(): Promise<DayHours[]> {
     const res = await apiClient.get<ApiResponse<DayHours[]>>(
@@ -33,5 +63,12 @@ export const settingsService = {
   async updateSalonSettings(data: SalonSettings): Promise<SalonSettings> {
     const res = await apiClient.put<ApiResponse<SalonSettings>>("/settings/salon", data);
     return res.data.data;
+  },
+  async getSystemLogs(params?: SystemLogsQuery): Promise<SystemLogsResponse> {
+    const res = await apiClient.get<{ success: boolean } & SystemLogsResponse>(
+      "/settings/system-logs",
+      { params },
+    );
+    return { data: res.data.data, pagination: res.data.pagination };
   },
 };

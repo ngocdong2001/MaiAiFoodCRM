@@ -4,7 +4,8 @@ export type SettingsTab =
   | "operating-hours"
   | "integrations"
   | "communications"
-  | "security";
+  | "security"
+  | "system-logs";
 
 export interface SettingsNavItem {
   key: SettingsTab;

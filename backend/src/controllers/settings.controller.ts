@@ -170,4 +170,95 @@ export const SettingsController = {
       res.status(500).json({ success: false, message: "Failed to update salon settings" });
     }
   },
+
+  // ── System logs (read-only, immutable audit trail) ─────────────
+
+  async getSystemLogs(req: Request, res: Response): Promise<void> {
+    const db = req.tenantClient!;
+    try {
+      const pageRaw = Number.parseInt(String(req.query.page ?? "1"), 10);
+      const pageSizeRaw = Number.parseInt(String(req.query.pageSize ?? "25"), 10);
+      const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+      const pageSize =
+        Number.isFinite(pageSizeRaw) && pageSizeRaw > 0 && pageSizeRaw <= 100
+          ? pageSizeRaw
+          : 25;
+
+      const entityType =
+        typeof req.query.entityType === "string" && req.query.entityType.trim()
+          ? req.query.entityType.trim()
+          : undefined;
+      const search =
+        typeof req.query.search === "string" && req.query.search.trim()
+          ? req.query.search.trim()
+          : undefined;
+      const startDate =
+        typeof req.query.startDate === "string" ? new Date(req.query.startDate) : undefined;
+      const endDate =
+        typeof req.query.endDate === "string" ? new Date(req.query.endDate) : undefined;
+
+      const where = {
+        ...(entityType ? { entityType } : {}),
+        ...(search
+          ? {
+              OR: [
+                { action: { contains: search } },
+                { performedBy: { contains: search } },
+              ],
+            }
+          : {}),
+        ...(startDate || endDate
+          ? {
+              createdAt: {
+                ...(startDate && !Number.isNaN(startDate.getTime()) ? { gte: startDate } : {}),
+                ...(endDate && !Number.isNaN(endDate.getTime()) ? { lte: endDate } : {}),
+              },
+            }
+          : {}),
+      };
+
+      const [total, rows] = await Promise.all([
+        db.auditlog.count({ where }),
+        db.auditlog.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+        }),
+      ]);
+
+      const data = rows.map((row) => {
+        let details: Record<string, unknown> = {};
+        try {
+          details = row.newValues ? JSON.parse(row.newValues) : {};
+        } catch {
+          details = {};
+        }
+        return {
+          id: row.id,
+          action: row.action,
+          entityType: row.entityType,
+          entityId: row.entityId,
+          performedBy: row.performedBy,
+          ipAddress: row.ipAddress,
+          requestBody: row.oldValues,
+          method: (details.method as string) ?? null,
+          path: (details.path as string) ?? null,
+          statusCode: (details.statusCode as number) ?? null,
+          durationMs: (details.durationMs as number) ?? null,
+          success: (details.success as boolean) ?? null,
+          createdAt: row.createdAt.toISOString(),
+        };
+      });
+
+      res.status(200).json({
+        success: true,
+        data,
+        pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
+      });
+    } catch (error) {
+      console.error("Failed to load system logs", error);
+      res.status(500).json({ success: false, message: "Failed to load system logs" });
+    }
+  },
 };

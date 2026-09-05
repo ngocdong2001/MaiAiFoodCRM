@@ -63,7 +63,10 @@ const OperatingHoursSection = ({
       <div className="mt-6 rounded-[14px] border border-[#DEE1E7] bg-white shadow-[0px_2px_4px_0px_#00000012]">
         <div className="divide-y divide-[#DEE1E7]">
           {hours.map((row, i) => (
-            <div key={row.day} className="flex items-center gap-4 px-6 py-4">
+            <div
+              key={row.day}
+              className="flex flex-wrap items-center gap-4 px-6 py-4"
+            >
               {/* Toggle */}
               <Switch
                 checked={row.open}
@@ -77,19 +80,19 @@ const OperatingHoursSection = ({
 
               {/* Time pickers or Closed */}
               {row.open ? (
-                <div className="ml-auto flex items-center gap-3">
+                <div className="flex w-full items-center gap-3 sm:ml-auto sm:w-auto">
                   <input
                     type="time"
                     value={row.from}
                     onChange={(e) => updateDay(i, { from: e.target.value })}
-                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
+                    className="min-w-0 flex-1 rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary sm:flex-none"
                   />
                   <span className="text-sm text-[#8D95A5]">to</span>
                   <input
                     type="time"
                     value={row.to}
                     onChange={(e) => updateDay(i, { to: e.target.value })}
-                    className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
+                    className="min-w-0 flex-1 rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary sm:flex-none"
                   />
                 </div>
               ) : (

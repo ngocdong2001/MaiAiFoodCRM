@@ -395,7 +395,7 @@
     "overview": {
       "welcome": {
         "title": "Xin chào, {{name}}!",
-        "subtitle": "Đây là tổng quan salon của bạn hôm nay, ngày 24 tháng 9 năm 2023.",
+        "subtitle": "Đây là tổng quan salon của bạn hôm nay, ngày {{date}}.",
         "newBooking": "Đặt lịch mới",
         "addWalkIn": "Khách vãng lai",
         "fallbackName": "bạn"
@@ -435,6 +435,7 @@
         "title": "Hàng đợi Trực tiếp",
         "subtitle": "Theo dõi và quản lý lịch hẹn trong ngày hôm nay",
         "viewFullQueue": "Xem toàn bộ hàng đợi",
+        "collapseQueue": "Thu gọn",
         "loading": "Đang tải…",
         "empty": "Không có lịch hẹn nào hôm nay.",
         "col": {
@@ -703,7 +704,8 @@
         "operatingHours": "Giờ hoạt động",
         "integrations": "Tích hợp",
         "communications": "Liên lạc",
-        "security": "Bảo mật và truy cập"
+        "security": "Bảo mật và truy cập",
+        "systemLogs": "Nhật ký hệ thống"
       },
       "profile": {
         "title": "Hồ sơ của tôi",
@@ -721,6 +723,69 @@
         "emailInUse": "Email này đã được sử dụng.",
         "saveError": "Không thể cập nhật hồ sơ.",
         "loading": "Đang tải hồ sơ..."
+      },
+      "systemLogs": {
+        "title": "Nhật ký hệ thống",
+        "description": "Ghi lại toàn bộ hành động thêm, sửa, xóa trên hệ thống, không thể chỉnh sửa, kèm theo người thực hiện và thời gian.",
+        "searchPlaceholder": "Tìm theo hành động hoặc người dùng...",
+        "loading": "Đang tải nhật ký...",
+        "loadError": "Không thể tải nhật ký hệ thống.",
+        "empty": "Chưa có hoạt động nào được ghi nhận.",
+        "col": {
+          "time": "Thời gian",
+          "action": "Hành động",
+          "user": "Người thực hiện",
+          "status": "Trạng thái",
+          "ip": "Địa chỉ IP",
+          "entity": "Đối tượng",
+          "path": "Yêu cầu",
+          "duration": "Thời lượng",
+          "payload": "Dữ liệu gửi"
+        },
+        "pageLabel": "Trang {{page}}/{{totalPages}}",
+        "prev": "Trước",
+        "next": "Sau",
+        "actions": {
+          "calendar.createAppointment": "Tạo lịch hẹn",
+          "calendar.updateAppointment": "Cập nhật lịch hẹn",
+          "calendar.cancelAppointment": "Hủy lịch hẹn",
+          "calendar.completeAppointment": "Hoàn thành lịch hẹn",
+          "calendar.confirmAppointment": "Xác nhận lịch hẹn",
+          "calendar.startAppointment": "Bắt đầu lịch hẹn",
+          "calendar.restoreAppointment": "Hoàn trả lịch hẹn",
+          "calendar.updateAppointmentStatus": "Cập nhật trạng thái lịch hẹn",
+          "calendar.deleteAppointment": "Xóa lịch hẹn",
+          "revenue.restoreBooking": "Hoàn trả lịch hẹn đã hủy",
+          "revenue.updateCancelReason": "Cập nhật lý do hủy",
+          "crm.createGuest": "Tạo khách hàng",
+          "crm.updateGuest": "Cập nhật khách hàng",
+          "crm.updateGuestNotes": "Cập nhật ghi chú khách hàng",
+          "crm.deleteGuest": "Xóa khách hàng",
+          "staff.createStaff": "Tạo nhân viên",
+          "staff.updateStaff": "Cập nhật nhân viên",
+          "staff.deleteStaff": "Xóa nhân viên",
+          "service.createCategory": "Tạo nhóm dịch vụ",
+          "service.updateCategory": "Cập nhật nhóm dịch vụ",
+          "service.deleteCategory": "Xóa nhóm dịch vụ",
+          "service.bulkSave": "Lưu hàng loạt dịch vụ",
+          "service.toggleActive": "Ẩn/hiện dịch vụ",
+          "service.createService": "Tạo dịch vụ",
+          "service.updateService": "Cập nhật dịch vụ",
+          "service.deleteService": "Xóa dịch vụ",
+          "settings.updateOperatingHours": "Cập nhật giờ hoạt động",
+          "settings.updateSalonSettings": "Cập nhật thông tin doanh nghiệp",
+          "auth.updateProfile": "Cập nhật hồ sơ cá nhân"
+        },
+        "resources": {
+          "calendar": "lịch hẹn",
+          "revenue": "bản ghi doanh thu",
+          "crm": "khách hàng",
+          "staff": "nhân viên",
+          "services": "dịch vụ",
+          "settings": "cài đặt",
+          "auth": "hồ sơ",
+          "unknown": "mục"
+        }
       }
     },
     "services": {
@@ -819,5 +884,10 @@
     "label": "Ngôn ngữ",
     "en": "English",
     "vi": "Tiếng Việt"
+  },
+  "generic": {
+    "create": "Đã tạo",
+    "update": "Đã cập nhật",
+    "delete": "Đã xóa"
   }
 }

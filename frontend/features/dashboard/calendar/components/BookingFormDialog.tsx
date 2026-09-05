@@ -192,24 +192,21 @@ export const BookingFormContent = ({
 
   const handleDelete = () => {
     if (!appointment) return;
-    
+
     const confirmDelete = window.confirm(
-      t("dashboard.calendar.booking.deleteConfirmation")
+      t("dashboard.calendar.booking.deleteConfirmation"),
     );
     if (!confirmDelete) return;
 
     setError(null);
-    deleteAppointment.mutate(
-      appointment.id,
-      {
-        onSuccess: () => {
-          onOpenChange(false);
-        },
-        onError: () => {
-          setError(t("dashboard.calendar.booking.errors.deleteFailed"));
-        },
+    deleteAppointment.mutate(appointment.id, {
+      onSuccess: () => {
+        onOpenChange(false);
       },
-    );
+      onError: () => {
+        setError(t("dashboard.calendar.booking.errors.deleteFailed"));
+      },
+    });
   };
 
   const submit = async (event: FormEvent) => {
@@ -217,6 +214,7 @@ export const BookingFormContent = ({
     setError(null);
 
     let resolvedGuestId = values.guestId;
+    let createdGuestId: number | null = null;
 
     if (isWalkIn) {
       if (!walkInName.trim())
@@ -230,6 +228,7 @@ export const BookingFormContent = ({
           walkInPhone.trim() || undefined,
         );
         resolvedGuestId = String(newGuest.id);
+        if (newGuest.created) createdGuestId = newGuest.id;
         // Refresh options so the new guest appears in future dropdowns
         void queryClient.invalidateQueries({
           queryKey: ["calendar", "options"],
@@ -268,10 +267,14 @@ export const BookingFormContent = ({
       onCreated(startDate);
       onOpenChange(false);
     };
-    const onError = (mutationError: unknown) =>
+    const onError = (mutationError: unknown) => {
+      // Roll back the just-created walk-in guest so a failed booking doesn't
+      // leave an orphaned guest record behind.
+      if (createdGuestId) void calendarService.deleteGuest(createdGuestId);
       setError(
         t(`dashboard.calendar.booking.errors.${errorKey(mutationError)}`),
       );
+    };
 
     if (appointment) {
       updateAppointment.mutate(

@@ -68,6 +68,9 @@ export type RevenuerecordMinAggregateOutputType = {
   finalAmount: runtime.Decimal | null
   paymentMethod: string | null
   paymentStatus: string | null
+  status: string | null
+  cancelReason: string | null
+  cancelReasonStatus: string | null
   receiptNumber: string | null
   paidAt: Date | null
   recordedAt: Date | null
@@ -91,6 +94,9 @@ export type RevenuerecordMaxAggregateOutputType = {
   finalAmount: runtime.Decimal | null
   paymentMethod: string | null
   paymentStatus: string | null
+  status: string | null
+  cancelReason: string | null
+  cancelReasonStatus: string | null
   receiptNumber: string | null
   paidAt: Date | null
   recordedAt: Date | null
@@ -114,6 +120,9 @@ export type RevenuerecordCountAggregateOutputType = {
   finalAmount: number
   paymentMethod: number
   paymentStatus: number
+  status: number
+  cancelReason: number
+  cancelReasonStatus: number
   receiptNumber: number
   paidAt: number
   recordedAt: number
@@ -163,6 +172,9 @@ export type RevenuerecordMinAggregateInputType = {
   finalAmount?: true
   paymentMethod?: true
   paymentStatus?: true
+  status?: true
+  cancelReason?: true
+  cancelReasonStatus?: true
   receiptNumber?: true
   paidAt?: true
   recordedAt?: true
@@ -186,6 +198,9 @@ export type RevenuerecordMaxAggregateInputType = {
   finalAmount?: true
   paymentMethod?: true
   paymentStatus?: true
+  status?: true
+  cancelReason?: true
+  cancelReasonStatus?: true
   receiptNumber?: true
   paidAt?: true
   recordedAt?: true
@@ -209,6 +224,9 @@ export type RevenuerecordCountAggregateInputType = {
   finalAmount?: true
   paymentMethod?: true
   paymentStatus?: true
+  status?: true
+  cancelReason?: true
+  cancelReasonStatus?: true
   receiptNumber?: true
   paidAt?: true
   recordedAt?: true
@@ -319,6 +337,9 @@ export type RevenuerecordGroupByOutputType = {
   finalAmount: runtime.Decimal
   paymentMethod: string
   paymentStatus: string
+  status: string
+  cancelReason: string | null
+  cancelReasonStatus: string | null
   receiptNumber: string | null
   paidAt: Date
   recordedAt: Date
@@ -365,6 +386,9 @@ export type revenuerecordWhereInput = {
   finalAmount?: Prisma.DecimalFilter<"revenuerecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFilter<"revenuerecord"> | string
   paymentStatus?: Prisma.StringFilter<"revenuerecord"> | string
+  status?: Prisma.StringFilter<"revenuerecord"> | string
+  cancelReason?: Prisma.StringNullableFilter<"revenuerecord"> | string | null
+  cancelReasonStatus?: Prisma.StringNullableFilter<"revenuerecord"> | string | null
   receiptNumber?: Prisma.StringNullableFilter<"revenuerecord"> | string | null
   paidAt?: Prisma.DateTimeFilter<"revenuerecord"> | Date | string
   recordedAt?: Prisma.DateTimeFilter<"revenuerecord"> | Date | string
@@ -390,6 +414,9 @@ export type revenuerecordOrderByWithRelationInput = {
   finalAmount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelReasonStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   receiptNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
@@ -419,6 +446,9 @@ export type revenuerecordWhereUniqueInput = Prisma.AtLeast<{
   finalAmount?: Prisma.DecimalFilter<"revenuerecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFilter<"revenuerecord"> | string
   paymentStatus?: Prisma.StringFilter<"revenuerecord"> | string
+  status?: Prisma.StringFilter<"revenuerecord"> | string
+  cancelReason?: Prisma.StringNullableFilter<"revenuerecord"> | string | null
+  cancelReasonStatus?: Prisma.StringNullableFilter<"revenuerecord"> | string | null
   receiptNumber?: Prisma.StringNullableFilter<"revenuerecord"> | string | null
   paidAt?: Prisma.DateTimeFilter<"revenuerecord"> | Date | string
   recordedAt?: Prisma.DateTimeFilter<"revenuerecord"> | Date | string
@@ -444,6 +474,9 @@ export type revenuerecordOrderByWithAggregationInput = {
   finalAmount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelReasonStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   receiptNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
@@ -475,6 +508,9 @@ export type revenuerecordScalarWhereWithAggregatesInput = {
   finalAmount?: Prisma.DecimalWithAggregatesFilter<"revenuerecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringWithAggregatesFilter<"revenuerecord"> | string
   paymentStatus?: Prisma.StringWithAggregatesFilter<"revenuerecord"> | string
+  status?: Prisma.StringWithAggregatesFilter<"revenuerecord"> | string
+  cancelReason?: Prisma.StringNullableWithAggregatesFilter<"revenuerecord"> | string | null
+  cancelReasonStatus?: Prisma.StringNullableWithAggregatesFilter<"revenuerecord"> | string | null
   receiptNumber?: Prisma.StringNullableWithAggregatesFilter<"revenuerecord"> | string | null
   paidAt?: Prisma.DateTimeWithAggregatesFilter<"revenuerecord"> | Date | string
   recordedAt?: Prisma.DateTimeWithAggregatesFilter<"revenuerecord"> | Date | string
@@ -496,6 +532,9 @@ export type revenuerecordCreateInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -521,6 +560,9 @@ export type revenuerecordUncheckedCreateInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -543,6 +585,9 @@ export type revenuerecordUpdateInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -568,6 +613,9 @@ export type revenuerecordUncheckedUpdateInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -592,6 +640,9 @@ export type revenuerecordCreateManyInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -613,6 +664,9 @@ export type revenuerecordUpdateManyMutationInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -636,6 +690,9 @@ export type revenuerecordUncheckedUpdateManyInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -670,6 +727,9 @@ export type revenuerecordCountOrderByAggregateInput = {
   finalAmount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
+  cancelReasonStatus?: Prisma.SortOrder
   receiptNumber?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
@@ -705,6 +765,9 @@ export type revenuerecordMaxOrderByAggregateInput = {
   finalAmount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
+  cancelReasonStatus?: Prisma.SortOrder
   receiptNumber?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
@@ -728,6 +791,9 @@ export type revenuerecordMinOrderByAggregateInput = {
   finalAmount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
+  cancelReasonStatus?: Prisma.SortOrder
   receiptNumber?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
@@ -812,6 +878,9 @@ export type revenuerecordCreateWithoutPaymentInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -835,6 +904,9 @@ export type revenuerecordUncheckedCreateWithoutPaymentInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -873,6 +945,9 @@ export type revenuerecordUpdateWithoutPaymentInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -896,6 +971,9 @@ export type revenuerecordUncheckedUpdateWithoutPaymentInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -918,6 +996,9 @@ export type revenuerecordCreateWithoutRevenuerecorddetailInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -942,6 +1023,9 @@ export type revenuerecordUncheckedCreateWithoutRevenuerecorddetailInput = {
   finalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: string
   paymentStatus: string
+  status?: string
+  cancelReason?: string | null
+  cancelReasonStatus?: string | null
   receiptNumber?: string | null
   paidAt: Date | string
   recordedAt?: Date | string
@@ -979,6 +1063,9 @@ export type revenuerecordUpdateWithoutRevenuerecorddetailInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1003,6 +1090,9 @@ export type revenuerecordUncheckedUpdateWithoutRevenuerecorddetailInput = {
   finalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReasonStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1057,6 +1147,9 @@ export type revenuerecordSelect<ExtArgs extends runtime.Types.Extensions.Interna
   finalAmount?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
+  status?: boolean
+  cancelReason?: boolean
+  cancelReasonStatus?: boolean
   receiptNumber?: boolean
   paidAt?: boolean
   recordedAt?: boolean
@@ -1085,12 +1178,15 @@ export type revenuerecordSelectScalar = {
   finalAmount?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
+  status?: boolean
+  cancelReason?: boolean
+  cancelReasonStatus?: boolean
   receiptNumber?: boolean
   paidAt?: boolean
   recordedAt?: boolean
 }
 
-export type revenuerecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentId" | "appointmentId" | "guestId" | "guestName" | "guestPhone" | "guestAvatarUrl" | "staffId" | "staffName" | "staffRole" | "staffAvatarUrl" | "amount" | "discountAmount" | "tipAmount" | "finalAmount" | "paymentMethod" | "paymentStatus" | "receiptNumber" | "paidAt" | "recordedAt", ExtArgs["result"]["revenuerecord"]>
+export type revenuerecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentId" | "appointmentId" | "guestId" | "guestName" | "guestPhone" | "guestAvatarUrl" | "staffId" | "staffName" | "staffRole" | "staffAvatarUrl" | "amount" | "discountAmount" | "tipAmount" | "finalAmount" | "paymentMethod" | "paymentStatus" | "status" | "cancelReason" | "cancelReasonStatus" | "receiptNumber" | "paidAt" | "recordedAt", ExtArgs["result"]["revenuerecord"]>
 export type revenuerecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payment?: boolean | Prisma.paymentDefaultArgs<ExtArgs>
   revenuerecorddetail?: boolean | Prisma.revenuerecord$revenuerecorddetailArgs<ExtArgs>
@@ -1121,6 +1217,9 @@ export type $revenuerecordPayload<ExtArgs extends runtime.Types.Extensions.Inter
     finalAmount: runtime.Decimal
     paymentMethod: string
     paymentStatus: string
+    status: string
+    cancelReason: string | null
+    cancelReasonStatus: string | null
     receiptNumber: string | null
     paidAt: Date
     recordedAt: Date
@@ -1512,6 +1611,9 @@ export interface revenuerecordFieldRefs {
   readonly finalAmount: Prisma.FieldRef<"revenuerecord", 'Decimal'>
   readonly paymentMethod: Prisma.FieldRef<"revenuerecord", 'String'>
   readonly paymentStatus: Prisma.FieldRef<"revenuerecord", 'String'>
+  readonly status: Prisma.FieldRef<"revenuerecord", 'String'>
+  readonly cancelReason: Prisma.FieldRef<"revenuerecord", 'String'>
+  readonly cancelReasonStatus: Prisma.FieldRef<"revenuerecord", 'String'>
   readonly receiptNumber: Prisma.FieldRef<"revenuerecord", 'String'>
   readonly paidAt: Prisma.FieldRef<"revenuerecord", 'DateTime'>
   readonly recordedAt: Prisma.FieldRef<"revenuerecord", 'DateTime'>

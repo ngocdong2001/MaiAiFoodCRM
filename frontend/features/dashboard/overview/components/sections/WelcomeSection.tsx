@@ -7,7 +7,7 @@ import { useAuthStore } from "@/core/store/authStore";
 import { BookingFormContent } from "@/features/dashboard/calendar/components/BookingFormDialog";
 
 const WelcomeSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const displayName =
     user?.name?.trim() || t("dashboard.overview.welcome.fallbackName");
@@ -19,9 +19,10 @@ const WelcomeSection = () => {
     setBookingOpen(true);
   };
 
-  // Format date in Vietnamese style: "ngày 24 tháng 9 năm 2023"
+  // Format today's date according to the active UI language, not a fixed locale.
   const today = new Date();
-  const dateStr = new Intl.DateTimeFormat("vi-VN", {
+  const locale = i18n.language.startsWith("vi") ? "vi-VN" : "en-US";
+  const dateStr = new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "long",
     year: "numeric",

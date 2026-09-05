@@ -69,6 +69,9 @@ export type StaffRevenueDetailJob = {
   finalAmount: number;
   paymentMethod: string;
   receiptNumber: string | null;
+  status: string;
+  cancelReason: string | null;
+  cancelReasonStatus: string | null;
 };
 
 export type StaffRevenueDetailResponse = {
@@ -98,6 +101,21 @@ export const revenueService = {
     const response = await apiClient.get<StaffRevenueDetailResponse>(
       `/revenue/staff/${staffId}`,
       { params },
+    );
+    return response.data;
+  },
+
+  async updateCancelReason(recordId: number, cancelReason: string) {
+    const response = await apiClient.patch<{ success: boolean; data: { id: number; cancelReason: string; cancelReasonStatus: string } }>(
+      `/revenue/record/${recordId}/cancel-reason`,
+      { cancelReason },
+    );
+    return response.data;
+  },
+
+  async restoreBooking(recordId: number) {
+    const response = await apiClient.patch<{ success: boolean; data: { success: boolean; appointmentId: number } }>(
+      `/revenue/record/${recordId}/restore`,
     );
     return response.data;
   },

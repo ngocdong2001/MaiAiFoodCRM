@@ -70,8 +70,8 @@ const MiniCalendar = () => {
       </div>
 
       <div className="mt-3 grid grid-cols-7 gap-y-2 text-center">
-        {weekdays.map((day, index) => (
-          <span key={`weekday-${index}`} className="text-xs font-medium text-[#8D95A5]">
+        {weekdays.map((day) => (
+          <span key={day} className="text-xs font-medium text-[#8D95A5]">
             {day}
           </span>
         ))}

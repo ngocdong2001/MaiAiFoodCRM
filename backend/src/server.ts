@@ -15,6 +15,7 @@ import reportsRouter from "./routes/reports.route";
 import callAnalysisRouter from "./routes/call-analysis.route";
 import { getPrismaMaster, disconnectPrismaMaster } from "./lib/prisma-master";
 import { disconnectAllTenants } from "./lib/prisma-tenant";
+import { activityLoggerMiddleware } from "./middleware/activity-logger.middleware";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,6 +23,10 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+// Registers a res.on('finish') listener for every mutating request; the
+// listener reads req.user/req.tenantClient once auth middleware (further
+// down the chain) has populated them, then writes an immutable system log.
+app.use(activityLoggerMiddleware);
 
 // Initialize Prisma Master connection on startup
 async function initializePrisma() {

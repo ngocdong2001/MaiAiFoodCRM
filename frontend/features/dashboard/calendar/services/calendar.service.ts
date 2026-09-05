@@ -68,10 +68,37 @@ export const calendarService = {
   async delete(id: number) {
     await apiClient.delete(`/calendar/appointments/${id}`);
   },
+  async deleteGuest(id: number) {
+    await apiClient.delete(`/crm/guests/${id}`);
+  },
+  async findGuestByPhone(phone: string) {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<{ id: number; name: string }>
+      >(`/crm/guests/by-phone/${encodeURIComponent(phone)}`);
+      return response.data.data;
+    } catch (error) {
+      if (isNotFoundError(error)) return null;
+      throw error;
+    }
+  },
   async createQuickGuest(name: string, phone?: string) {
+    const trimmedPhone = phone?.trim();
+    // Reuse an existing guest with the same phone instead of hitting the
+    // unique constraint and leaving an orphaned appointment-less guest behind.
+    if (trimmedPhone) {
+      const existing = await calendarService.findGuestByPhone(trimmedPhone);
+      if (existing) return { ...existing, created: false };
+    }
     const response = await apiClient.post<
       ApiResponse<{ id: number; name: string }>
-    >("/crm/guests", { name: name.trim(), phone: phone?.trim() || undefined });
-    return response.data.data;
+    >("/crm/guests", { name: name.trim(), phone: trimmedPhone || undefined });
+    return { ...response.data.data, created: true };
   },
 };
+
+const isNotFoundError = (error: unknown): boolean =>
+  typeof error === "object" &&
+  error !== null &&
+  "response" in error &&
+  (error as { response?: { status?: number } }).response?.status === 404;

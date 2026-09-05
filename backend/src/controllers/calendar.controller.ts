@@ -89,12 +89,10 @@ export const CalendarController = {
   },
   async getOptions(req: Request, res: Response): Promise<void> {
     try {
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: await CalendarModel.getOptions(getDb(req)),
-        });
+      res.status(200).json({
+        success: true,
+        data: await CalendarModel.getOptions(getDb(req)),
+      });
     } catch (error) {
       handleError(res, error, "Failed to load calendar options");
     }
@@ -107,16 +105,21 @@ export const CalendarController = {
     try {
       const appointment = await CalendarModel.create(getDb(req), input);
 
-      res
-        .status(201)
-        .json({
-          success: true,
-          data: appointment,
-          message: "Appointment created successfully",
-        });
+      res.status(201).json({
+        success: true,
+        data: appointment,
+        message: "Appointment created successfully",
+      });
 
       // ── Send confirmation SMS to guest (non-blocking) ──────────────
       if (appointment) {
+        if (req.tenant)
+          queueEvents.publish(
+            req.tenant.id,
+            "appointment.created",
+            appointment.id,
+          );
+
         const smsData: AppointmentSmsData = {
           guestName: appointment.guest?.name ?? "Valued Customer",
           guestPhone: appointment.guest?.phone ?? null,
@@ -143,13 +146,14 @@ export const CalendarController = {
     if (validation)
       return void res.status(400).json({ success: false, message: validation });
     try {
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: await CalendarModel.update(getDb(req), id, input),
-          message: "Appointment updated successfully",
-        });
+      const data = await CalendarModel.update(getDb(req), id, input);
+      res.status(200).json({
+        success: true,
+        data,
+        message: "Appointment updated successfully",
+      });
+      if (req.tenant)
+        queueEvents.publish(req.tenant.id, "appointment.updated", id);
     } catch (error) {
       handleError(res, error, "Failed to update appointment");
     }
@@ -166,18 +170,19 @@ export const CalendarController = {
         .status(400)
         .json({ success: false, message: "Invalid appointment status" });
     try {
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: await CalendarModel.updateStatus(
-            getDb(req),
-            id,
-            status,
-            req.body.cancelReason,
-          ),
-          message: "Appointment status updated",
-        });
+      const data = await CalendarModel.updateStatus(
+        getDb(req),
+        id,
+        status,
+        req.body.cancelReason,
+      );
+      res.status(200).json({
+        success: true,
+        data,
+        message: "Appointment status updated",
+      });
+      if (req.tenant)
+        queueEvents.publish(req.tenant.id, "appointment.status_changed", id);
     } catch (error) {
       handleError(res, error, "Failed to update appointment status");
     }
@@ -190,15 +195,15 @@ export const CalendarController = {
         .json({ success: false, message: "Invalid appointment ID" });
     try {
       const data = await CalendarModel.delete(getDb(req), id);
-      res
-        .status(200)
-        .json({
-          success: true,
-          data,
-          message: data.cancelled
-            ? "Paid appointment cancelled and preserved"
-            : "Appointment deleted successfully",
-        });
+      res.status(200).json({
+        success: true,
+        data,
+        message: data.cancelled
+          ? "Paid appointment cancelled and preserved"
+          : "Appointment deleted successfully",
+      });
+      if (req.tenant)
+        queueEvents.publish(req.tenant.id, "appointment.deleted", id);
     } catch (error) {
       handleError(res, error, "Failed to delete appointment");
     }

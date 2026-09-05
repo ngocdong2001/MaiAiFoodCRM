@@ -10,6 +10,7 @@ export const settingsNavItems: SettingsNavItem[] = [
   { key: "operating-hours", label: "operatingHours", icon: "clock" },
   { key: "communications", label: "communications", icon: "phone-call" },
   { key: "security", label: "security", icon: "shield-check" },
+  { key: "system-logs", label: "systemLogs", icon: "scroll-text" },
 ];
 
 export const defaultOperatingHours: DayHours[] = [

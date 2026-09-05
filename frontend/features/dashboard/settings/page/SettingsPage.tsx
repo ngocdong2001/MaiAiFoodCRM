@@ -10,6 +10,7 @@ import CommunicationsSection from "../components/sections/CommunicationsSection"
 import OperatingHoursSection from "../components/sections/OperatingHoursSection";
 import SecuritySection from "../components/sections/SecuritySection";
 import SettingsNavSection from "../components/sections/SettingsNavSection";
+import SystemLogsSection from "../components/sections/SystemLogsSection";
 import UserProfileSection from "../components/sections/UserProfileSection";
 
 const SettingsPage = () => {
@@ -39,6 +40,7 @@ const SettingsPage = () => {
         )}
         {activeTab === "communications" && <CommunicationsSection />}
         {activeTab === "security" && <SecuritySection />}
+        {activeTab === "system-logs" && <SystemLogsSection />}
       </main>
     </div>
   );

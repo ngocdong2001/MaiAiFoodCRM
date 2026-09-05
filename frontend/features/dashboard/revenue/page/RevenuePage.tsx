@@ -495,7 +495,7 @@ const RevenuePage = () => {
 
       {/* Staff Revenue — Accordion */}
       <div className="rounded-[12px] bg-white shadow-[0px_2px_4px_0px_#00000012]">
-        <div className="relative flex items-start justify-between px-6 py-5">
+        <div className="relative flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A]">
               {t("dashboard.revenue.staffTable.title")}
@@ -505,8 +505,8 @@ const RevenuePage = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex h-10 items-center gap-2 rounded-[8px] border border-[#DFE1E4] bg-[#F6F7F9] px-3">
-              <Search className="h-4 w-4 text-[#9DA1A7]" />
+            <div className="flex h-10 flex-1 items-center gap-2 rounded-[8px] border border-[#DFE1E4] bg-[#F6F7F9] px-3 sm:flex-none">
+              <Search className="h-4 w-4 shrink-0 text-[#9DA1A7]" />
               <input
                 type="text"
                 value={staffSearch}
@@ -515,41 +515,45 @@ const RevenuePage = () => {
                   "dashboard.revenue.staffTable.searchPlaceholder",
                   { defaultValue: "Tìm nhân viên..." },
                 )}
-                className="w-48 bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9DA1A7] outline-none"
+                className="w-full min-w-0 bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9DA1A7] outline-none sm:w-48"
               />
             </div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-[#DFE1E4] bg-white shadow-[0px_2px_4px_0px_#00000012]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-[#DFE1E4] bg-white shadow-[0px_2px_4px_0px_#00000012]">
               <SlidersHorizontal className="h-4 w-4 text-[#9DA1A7]" />
             </div>
           </div>
         </div>
         <div className="border-t border-[#DFE1E4]" />
 
-        {/* Table header row */}
-        <div className="flex w-full items-center bg-[#FAFAFA]">
-          <div className="w-[320px] shrink-0 px-6 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-            {t("dashboard.revenue.staffTable.colStaff")}
-          </div>
-          <div className="w-35 shrink-0 px-4 py-3 text-center text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-            {t("dashboard.revenue.staffTable.colOrders")}
-          </div>
-          <div className="w-40 shrink-0 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
-            {t("dashboard.revenue.staffTable.colRevenue")}
-          </div>
-          <div className="w-10 shrink-0" />
-        </div>
+        <div className="overflow-x-auto">
+          <div className="min-w-175">
+            {/* Table header row */}
+            <div className="flex w-full items-center bg-[#FAFAFA]">
+              <div className="w-[320px] shrink-0 px-6 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+                {t("dashboard.revenue.staffTable.colStaff")}
+              </div>
+              <div className="w-35 shrink-0 px-4 py-3 text-center text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+                {t("dashboard.revenue.staffTable.colOrders")}
+              </div>
+              <div className="w-40 shrink-0 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+                {t("dashboard.revenue.staffTable.colRevenue")}
+              </div>
+              <div className="w-10 shrink-0" />
+            </div>
 
-        <div>
-          {filteredStaffRows.map((row) => (
-            <StaffRevenueAccordionItem
-              key={row.key}
-              row={row}
-              dateRange={{
-                startDate: appliedFilters.startDate || undefined,
-                endDate: appliedFilters.endDate || undefined,
-              }}
-            />
-          ))}
+            <div>
+              {filteredStaffRows.map((row) => (
+                <StaffRevenueAccordionItem
+                  key={row.key}
+                  row={row}
+                  dateRange={{
+                    startDate: appliedFilters.startDate || undefined,
+                    endDate: appliedFilters.endDate || undefined,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

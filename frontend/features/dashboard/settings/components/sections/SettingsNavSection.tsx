@@ -5,6 +5,7 @@ import {
   CalendarDays,
   Clock,
   PhoneCall,
+  ScrollText,
   ShieldCheck,
   User,
 } from "lucide-react";
@@ -18,6 +19,7 @@ const iconMap = {
   "calendar-days": CalendarDays,
   "phone-call": PhoneCall,
   "shield-check": ShieldCheck,
+  "scroll-text": ScrollText,
   user: User,
 };
 

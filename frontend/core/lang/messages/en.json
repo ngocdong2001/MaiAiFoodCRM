@@ -395,7 +395,7 @@
     "overview": {
       "welcome": {
         "title": "Hello, {{name}}!",
-        "subtitle": "Here's your salon overview for today, September 24, 2023.",
+        "subtitle": "Here's your salon overview for today, {{date}}.",
         "newBooking": "New Booking",
         "addWalkIn": "Walk-in Guest",
         "fallbackName": "there"
@@ -452,6 +452,7 @@
         "title": "Live Queue",
         "subtitle": "Guests waiting or recently checked-in",
         "viewFullQueue": "View Full Queue",
+        "collapseQueue": "Collapse",
         "loading": "Loading…",
         "empty": "No active appointments today.",
         "col": {
@@ -760,7 +761,8 @@
         "operatingHours": "Operating Hours",
         "integrations": "Integrations",
         "communications": "Communications",
-        "security": "Security & Access"
+        "security": "Security & Access",
+        "systemLogs": "System Logs"
       },
       "profile": {
         "title": "My Profile",
@@ -778,6 +780,69 @@
         "emailInUse": "This email is already in use.",
         "saveError": "Unable to update your profile.",
         "loading": "Loading your profile..."
+      },
+      "systemLogs": {
+        "title": "System Logs",
+        "description": "An immutable record of every create, update and delete action performed on the system, including who did it and when.",
+        "searchPlaceholder": "Search by action or user...",
+        "loading": "Loading logs...",
+        "loadError": "Unable to load system logs.",
+        "empty": "No activity has been recorded yet.",
+        "col": {
+          "time": "Time",
+          "action": "Action",
+          "user": "Performed by",
+          "status": "Status",
+          "ip": "IP Address",
+          "entity": "Entity",
+          "path": "Request",
+          "duration": "Duration",
+          "payload": "Payload"
+        },
+        "pageLabel": "Page {{page}} of {{totalPages}}",
+        "prev": "Previous",
+        "next": "Next",
+        "actions": {
+          "calendar.createAppointment": "Created appointment",
+          "calendar.updateAppointment": "Updated appointment",
+          "calendar.cancelAppointment": "Cancelled appointment",
+          "calendar.completeAppointment": "Completed appointment",
+          "calendar.confirmAppointment": "Confirmed appointment",
+          "calendar.startAppointment": "Started appointment",
+          "calendar.restoreAppointment": "Restored appointment",
+          "calendar.updateAppointmentStatus": "Updated appointment status",
+          "calendar.deleteAppointment": "Deleted appointment",
+          "revenue.restoreBooking": "Restored cancelled booking",
+          "revenue.updateCancelReason": "Updated cancellation reason",
+          "crm.createGuest": "Created guest",
+          "crm.updateGuest": "Updated guest",
+          "crm.updateGuestNotes": "Updated guest notes",
+          "crm.deleteGuest": "Deleted guest",
+          "staff.createStaff": "Created staff member",
+          "staff.updateStaff": "Updated staff member",
+          "staff.deleteStaff": "Deleted staff member",
+          "service.createCategory": "Created service category",
+          "service.updateCategory": "Updated service category",
+          "service.deleteCategory": "Deleted service category",
+          "service.bulkSave": "Bulk-saved services",
+          "service.toggleActive": "Toggled service visibility",
+          "service.createService": "Created service",
+          "service.updateService": "Updated service",
+          "service.deleteService": "Deleted service",
+          "settings.updateOperatingHours": "Updated operating hours",
+          "settings.updateSalonSettings": "Updated business profile",
+          "auth.updateProfile": "Updated personal profile"
+        },
+        "resources": {
+          "calendar": "appointment",
+          "revenue": "revenue record",
+          "crm": "guest",
+          "staff": "staff member",
+          "services": "service",
+          "settings": "settings",
+          "auth": "profile",
+          "unknown": "item"
+        }
       }
     },
     "services": {
@@ -876,5 +941,10 @@
     "label": "Language",
     "en": "English",
     "vi": "Tiếng Việt"
+  },
+  "generic": {
+    "create": "Created",
+    "update": "Updated",
+    "delete": "Deleted"
   }
 }

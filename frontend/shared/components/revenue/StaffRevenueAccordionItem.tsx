@@ -1,6 +1,6 @@
 "use client";
 
-import { Tag } from "lucide-react";
+import { MoreVertical, RotateCcw, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +12,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import { Separator } from "@/shared/components/ui/separator";
 import {
   revenueService,
@@ -44,6 +50,7 @@ interface JobDialogProps {
 
 function JobDetailDialog({ job, onClose }: JobDialogProps) {
   const { t } = useTranslation();
+  const isCancelled = job.status === "cancelled";
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[12px] p-0">
@@ -71,6 +78,38 @@ function JobDetailDialog({ job, onClose }: JobDialogProps) {
         </DialogHeader>
 
         <div className="space-y-4 px-6 pb-6 pt-4">
+          {/* Cancel badge */}
+          {isCancelled && (
+            <div className="rounded-lg bg-orange-50 p-3">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-orange-500 text-white">
+                  {t("dashboard.revenue.staffDetail.cancelled", {
+                    defaultValue: "Cancelled",
+                  })}
+                </Badge>
+                {job.cancelReasonStatus && (
+                  <Badge variant="outline" className="border-orange-300 text-orange-600">
+                    {job.cancelReasonStatus === "pending"
+                      ? t("dashboard.revenue.staffDetail.reasonPending", {
+                          defaultValue: "Reason Pending",
+                        })
+                      : t("dashboard.revenue.staffDetail.reasonReviewed", {
+                          defaultValue: "Reason Reviewed",
+                        })}
+                  </Badge>
+                )}
+              </div>
+              {job.cancelReason && (
+                <p className="mt-2 text-sm text-orange-800">
+                  {t("dashboard.revenue.staffDetail.reason", {
+                    defaultValue: "Reason",
+                  })}
+                  : {job.cancelReason}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Services */}
           {job.services.length > 0 && (
             <div>
@@ -166,6 +205,11 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
   const [selectedJob, setSelectedJob] = useState<StaffRevenueDetailJob | null>(
     null,
   );
+  const [reasonDialogJob, setReasonDialogJob] = useState<StaffRevenueDetailJob | null>(null);
+  const [reasonText, setReasonText] = useState("");
+  const [isSubmittingReason, setIsSubmittingReason] = useState(false);
+  const [reasonError, setReasonError] = useState<string | null>(null);
+  const [restoringJob, setRestoringJob] = useState<StaffRevenueDetailJob | null>(null);
 
   const fetchDetail = () => {
     setIsLoading(true);
@@ -175,6 +219,37 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
       .then(setDetail)
       .catch(() => setError(t("dashboard.revenue.errors.loadSummary")))
       .finally(() => setIsLoading(false));
+  };
+
+  const handleSubmitReason = async () => {
+    if (!reasonDialogJob || !reasonText.trim()) return;
+    setIsSubmittingReason(true);
+    setReasonError(null);
+    try {
+      await revenueService.updateCancelReason(reasonDialogJob.paymentId, reasonText.trim());
+      // Refresh detail to show updated reason
+      fetchDetail();
+      setReasonDialogJob(null);
+      setReasonText("");
+    } catch {
+      setReasonError(t("dashboard.revenue.errors.submitReason", {
+        defaultValue: "Failed to submit reason",
+      }));
+    } finally {
+      setIsSubmittingReason(false);
+    }
+  };
+
+  const handleRestore = async (job: StaffRevenueDetailJob) => {
+    setRestoringJob(job);
+    try {
+      await revenueService.restoreBooking(job.paymentId);
+      fetchDetail();
+    } catch {
+      // silently fail — user can retry
+    } finally {
+      setRestoringJob(null);
+    }
   };
 
   useEffect(() => {
@@ -258,23 +333,85 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
                   <th className="px-4 py-1 text-right text-[10px] font-bold uppercase tracking-wide text-[#9DA1A7]">
                     {t("dashboard.revenue.table.totalRevenue")}
                   </th>
+                  <th className="w-10 px-2" />
                 </tr>
               </thead>
               <tbody>
-                {detail!.jobs.map((job) => (
-                  <tr
-                    key={job.paymentId}
-                    onClick={() => setSelectedJob(job)}
-                    className="h-9 cursor-pointer border-b border-[#DFE1E4] transition-colors last:border-b-0 hover:bg-white"
-                  >
-                    <td className="px-4 text-sm font-medium text-[#1D1F23]">
-                      {job.guestName}
-                    </td>
-                    <td className="px-4 text-right text-sm font-bold text-[#1D1F23]">
-                      {fmt(job.finalAmount)}
-                    </td>
-                  </tr>
-                ))}
+                {detail!.jobs.map((job) => {
+                  const isJobCancelled = job.status === "cancelled";
+                  return (
+                    <tr
+                      key={job.paymentId}
+                      className="h-9 border-b border-[#DFE1E4] transition-colors last:border-b-0 hover:bg-white"
+                    >
+                      <td className="px-4 text-sm font-medium text-[#1D1F23]">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="cursor-pointer hover:underline"
+                            onClick={() => setSelectedJob(job)}
+                          >
+                            {job.guestName}
+                          </span>
+                          {isJobCancelled && (
+                            <Badge className="bg-orange-500 text-[10px] text-white">
+                              {t("dashboard.revenue.staffDetail.cancel", {
+                                defaultValue: "Cancel",
+                              })}
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 text-right text-sm font-bold text-[#1D1F23]">
+                        {isJobCancelled ? (
+                          <span className="text-[#9DA1A7] line-through">
+                            {fmt(job.finalAmount)}
+                          </span>
+                        ) : (
+                          fmt(job.finalAmount)
+                        )}
+                      </td>
+                      <td className="w-10 px-2 text-center">
+                        {isJobCancelled && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-[#F3F4F6]">
+                              <MoreVertical className="h-4 w-4 text-[#9DA1A7]" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setReasonDialogJob(job);
+                                  setReasonText(job.cancelReason ?? "");
+                                }}
+                              >
+                                {job.cancelReason
+                                  ? t("dashboard.revenue.staffDetail.editReason", {
+                                      defaultValue: "Edit Reason",
+                                    })
+                                  : t("dashboard.revenue.staffDetail.addReason", {
+                                      defaultValue: "Add Reason",
+                                    })}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleRestore(job)}
+                                disabled={restoringJob?.paymentId === job.paymentId}
+                                className="text-green-600"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                                {restoringJob?.paymentId === job.paymentId
+                                  ? t("dashboard.revenue.staffDetail.restoring", {
+                                      defaultValue: "Restoring...",
+                                    })
+                                  : t("dashboard.revenue.staffDetail.restoreToPending", {
+                                      defaultValue: "Restore to Pending",
+                                    })}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -286,6 +423,73 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
           job={selectedJob}
           onClose={() => setSelectedJob(null)}
         />
+      )}
+
+      {/* Cancel Reason Dialog */}
+      {reasonDialogJob && (
+        <Dialog
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setReasonDialogJob(null);
+              setReasonText("");
+              setReasonError(null);
+            }
+          }}
+        >
+          <DialogContent className="max-w-sm rounded-[12px] p-0">
+            <DialogHeader className="px-6 pt-6 pb-0">
+              <DialogTitle className="text-lg font-bold text-[#1A1A1A]">
+                {t("dashboard.revenue.staffDetail.cancelReasonTitle", {
+                  defaultValue: "Cancellation Reason",
+                })}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 px-6 pb-6 pt-4">
+              <p className="text-sm text-[#9DA1A7]">
+                {t("dashboard.revenue.staffDetail.cancelReasonDescription", {
+                  defaultValue: "Provide a reason for cancelling this booking.",
+                  guestName: reasonDialogJob.guestName,
+                })}
+              </p>
+              <textarea
+                value={reasonText}
+                onChange={(e) => setReasonText(e.target.value)}
+                placeholder={t("dashboard.revenue.staffDetail.cancelReasonPlaceholder", {
+                  defaultValue: "Enter reason...",
+                })}
+                className="w-full rounded-lg border border-[#DFE1E4] p-3 text-sm text-[#1A1A1A] outline-none focus:border-primary"
+                rows={3}
+              />
+              {reasonError && (
+                <p className="text-sm text-red-500">{reasonError}</p>
+              )}
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReasonDialogJob(null);
+                    setReasonText("");
+                    setReasonError(null);
+                  }}
+                  className="rounded-lg border border-[#DFE1E4] px-4 py-2 text-sm font-medium text-[#1A1A1A] hover:bg-[#F3F4F6]"
+                >
+                  {t("common.cancel", { defaultValue: "Cancel" })}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmitReason}
+                  disabled={isSubmittingReason || !reasonText.trim()}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {isSubmittingReason
+                    ? t("common.submitting", { defaultValue: "Submitting..." })
+                    : t("common.submit", { defaultValue: "Submit" })}
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );

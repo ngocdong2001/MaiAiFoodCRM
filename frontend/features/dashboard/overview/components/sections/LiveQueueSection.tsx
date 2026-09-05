@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import LoadingState from "@/shared/components/molecules/LoadingState";
@@ -7,10 +8,15 @@ import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOvervie
 
 import QueueStatusCell from "./QueueStatusCell";
 
+const VISIBLE_LIMIT = 5;
+
 const LiveQueueSection = () => {
   const { t } = useTranslation();
   const { data, isLoading } = useOverviewStats();
   const queue = data?.liveQueue ?? [];
+  const [expanded, setExpanded] = useState(false);
+  const hasOverflow = queue.length > VISIBLE_LIMIT;
+  const visibleQueue = expanded ? queue : queue.slice(0, VISIBLE_LIMIT);
 
   return (
     <section className="rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]">
@@ -31,7 +37,13 @@ const LiveQueueSection = () => {
           {t("dashboard.overview.queue.empty")}
         </p>
       ) : (
-        <div className="mt-4 overflow-x-auto">
+        <div
+          className={
+            expanded
+              ? "mt-4 max-h-105 overflow-y-auto overflow-x-auto"
+              : "mt-4 overflow-x-auto"
+          }
+        >
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-[#DEE1E7]">
@@ -53,7 +65,7 @@ const LiveQueueSection = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EEF0F3]">
-              {queue.map((guest) => {
+              {visibleQueue.map((guest) => {
                 return (
                   <tr key={guest.id} className="group">
                     <td className="py-3 text-base font-medium text-[#171A21]">
@@ -66,10 +78,13 @@ const LiveQueueSection = () => {
                       {guest.notes || t(NULL_TEXT_KEY)}
                     </td>
                     <td className="py-3 text-base text-[#171A21]">
-                      {new Date(`${guest.startTime}`).toLocaleTimeString("vi-VN", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {new Date(`${guest.startTime}`).toLocaleTimeString(
+                        "vi-VN",
+                        {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        },
+                      )}
                     </td>
                     <td className="py-3 text-right">
                       <QueueStatusCell
@@ -85,12 +100,17 @@ const LiveQueueSection = () => {
         </div>
       )}
 
-      <a
-        href="#"
-        className="mt-4 block text-center text-sm font-medium text-primary hover:underline"
-      >
-        {t("dashboard.overview.queue.viewFullQueue")}
-      </a>
+      {hasOverflow && (
+        <button
+          type="button"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="mt-4 block w-full text-center text-sm font-medium text-primary hover:underline"
+        >
+          {expanded
+            ? t("dashboard.overview.queue.collapseQueue")
+            : t("dashboard.overview.queue.viewFullQueue")}
+        </button>
+      )}
     </section>
   );
 };

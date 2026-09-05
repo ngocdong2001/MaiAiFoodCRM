@@ -63,7 +63,7 @@ const FAQSection = ({ className, id }: FAQSectionProps) => {
         <div className="mx-auto mt-12 max-w-3xl lg:mt-16">
           <Accordion multiple defaultValue={["item-0", "item-1"]}>
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionItem key={faq.question} value={`item-${index}`}>
                 <AccordionTrigger className="text-lg font-semibold text-foreground">
                   {faq.question}
                 </AccordionTrigger>

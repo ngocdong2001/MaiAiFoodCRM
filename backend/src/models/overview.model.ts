@@ -148,9 +148,12 @@ export const OverviewModel = {
           },
         },
       }),
-      // Recent guests
+      // Recent guests — only actual past visits, never future/confirmed bookings
       prisma.appointment.findMany({
-        where: { status: { in: ["completed", "confirmed", "in_progress"] } },
+        where: {
+          status: { in: ["completed", "confirmed", "in_progress"] },
+          startTime: { lte: now },
+        },
         orderBy: { startTime: "desc" },
         take: 20,
         distinct: ["guestId"],

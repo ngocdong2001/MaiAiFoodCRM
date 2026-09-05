@@ -6,7 +6,9 @@ import { overviewService } from "../services/overview.service";
 
 const overviewStatsKey = ["overview", "stats"] as const;
 
-export const useOverviewStats = () => {
+// Kept alive at the dashboard layout level (not tied to the Overview page)
+// so restoring/updating a booking from any page still refreshes the Live Queue.
+export const useQueueEventsSubscription = () => {
   const queryClient = useQueryClient();
   const token = useAuthStore((state) => state.token);
   const hydrated = useAuthStore((state) => state.hydrated);
@@ -40,7 +42,9 @@ export const useOverviewStats = () => {
       if (retryTimer) clearTimeout(retryTimer);
     };
   }, [hydrated, queryClient, token]);
+};
 
+export const useOverviewStats = () => {
   return useQuery({
     queryKey: overviewStatsKey,
     queryFn: overviewService.getStats,

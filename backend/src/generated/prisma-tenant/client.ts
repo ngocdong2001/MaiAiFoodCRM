@@ -100,6 +100,11 @@ export type revenuerecorddetail = Prisma.revenuerecorddetailModel
  */
 export type paymentdetail = Prisma.paymentdetailModel
 /**
+ * Model callanalysis
+ * 
+ */
+export type callanalysis = Prisma.callanalysisModel
+/**
  * Model refund
  * 
  */

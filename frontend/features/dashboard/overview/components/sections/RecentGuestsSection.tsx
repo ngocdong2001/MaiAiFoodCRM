@@ -11,7 +11,7 @@ const relativeTime = (
   t: (key: string, options?: Record<string, unknown>) => string,
 ) => {
   const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
+  const mins = Math.max(0, Math.floor(diff / 60000));
   if (mins < 60)
     return t("dashboard.overview.recentGuests.time.minAgo", { count: mins });
   const hours = Math.floor(mins / 60);

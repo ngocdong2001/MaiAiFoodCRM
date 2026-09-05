@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent, ReactNode } from "react";
+import { useId, type FormEvent, type ReactNode } from "react";
 
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -60,8 +60,10 @@ const FormDialog = ({
   scrollable = true,
   children,
 }: FormDialogProps) => {
+  const formId = useId();
   const body = (
     <form
+      id={formId}
       onSubmit={onSubmit}
       className={cn(
         "space-y-5",
@@ -84,7 +86,8 @@ const FormDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          scrollable && "max-h-[90vh] grid-rows-[auto_1fr_auto] overflow-hidden p-0",
+          scrollable &&
+            "max-h-[90vh] grid-rows-[auto_1fr_auto] overflow-hidden p-0",
           contentClassName,
         )}
       >
@@ -101,9 +104,7 @@ const FormDialog = ({
           body
         ) : (
           <div
-            className={cn(
-              scrollable && "min-h-0 overflow-y-auto px-5 py-4",
-            )}
+            className={cn(scrollable && "min-h-0 overflow-y-auto px-5 py-4")}
           >
             {children}
           </div>
@@ -127,6 +128,7 @@ const FormDialog = ({
               {submitLabel !== undefined ? (
                 <Button
                   type={onSubmit ? "submit" : "button"}
+                  form={onSubmit ? formId : undefined}
                   disabled={submitting || submitDisabled}
                 >
                   {submitting ? "Saving..." : submitLabel}
