@@ -3,7 +3,6 @@
 import {
   ArrowDownRight,
   ArrowUpRight,
-  Download,
   DollarSign,
   Search,
   SlidersHorizontal,
@@ -115,30 +114,6 @@ const RevenuePage = () => {
     setDraftFilters(todayFilters);
     setAppliedFilters(todayFilters);
     await loadSummary(buildSummaryParams(todayFilters));
-  };
-
-  const handleExportExcel = async () => {
-    if (!summary) return;
-    try {
-      const xlsx = await import("xlsx");
-      const workbook = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(
-        workbook,
-        xlsx.utils.json_to_sheet(
-          summary.staffRevenueRows.map((row) => ({
-            staffName: row.staffName,
-            services: row.services,
-            tips: row.tips,
-            totalRevenue: row.totalRevenue,
-          })),
-        ),
-        "RevenueByStaff",
-      );
-      const exportDate = new Date().toISOString().slice(0, 10);
-      xlsx.writeFile(workbook, `revenue-report-${exportDate}.xlsx`);
-    } catch {
-      setErrorMessage(t("dashboard.revenue.errors.exportExcel"));
-    }
   };
 
   const formatCurrency = (value: number) =>
@@ -272,19 +247,6 @@ const RevenuePage = () => {
                 })}
               </span>
             )}
-          </div>
-          <div className="absolute right-8 top-8 flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                void handleExportExcel();
-              }}
-              disabled={!summary || isLoading}
-              className="flex h-10 items-center gap-2 rounded-[10px] bg-[#f04cac] px-4 text-sm font-semibold text-white shadow-[0px_4px_8px_0px_#f04cac40] hover:bg-[#e03a9a] disabled:opacity-60"
-            >
-              <Download className="h-4 w-4" />
-              {t("dashboard.revenue.exportExcel")}
-            </button>
           </div>
         </div>
       </div>
@@ -517,9 +479,6 @@ const RevenuePage = () => {
                 )}
                 className="w-full min-w-0 bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9DA1A7] outline-none sm:w-48"
               />
-            </div>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-[#DFE1E4] bg-white shadow-[0px_2px_4px_0px_#00000012]">
-              <SlidersHorizontal className="h-4 w-4 text-[#9DA1A7]" />
             </div>
           </div>
         </div>

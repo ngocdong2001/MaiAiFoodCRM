@@ -5,6 +5,7 @@ import { create } from "zustand";
 export const AUTH_TOKEN_KEY = "maiai-auth-token";
 export const AUTH_USER_KEY = "maiai-auth-user";
 export const AUTH_TENANT_KEY = "maiai-auth-tenant";
+export const AUTH_REMEMBER_KEY = "maiai-auth-remember";
 
 export type AuthUser = {
   id: number;
@@ -27,20 +28,59 @@ type AuthState = {
   user: AuthUser | null;
   tenant: AuthTenant | null;
   token: string | null;
+  remember: boolean;
   hydrated: boolean;
   hydrate: () => void;
-  setSession: (token: string, user: AuthUser, tenant: AuthTenant | null) => void;
+  setSession: (
+    token: string,
+    user: AuthUser,
+    tenant: AuthTenant | null,
+    remember: boolean,
+  ) => void;
   setUser: (user: AuthUser) => void;
   setTenant: (tenant: AuthTenant) => void;
   logout: () => void;
 };
 
-const writeUser = (user: AuthUser) => localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+/**
+ * Persist the session either permanently (localStorage) when "remember me"
+ * is checked, or only for the current tab (sessionStorage) otherwise.
+ */
+const getStorage = () => {
+  const remember =
+    typeof window !== "undefined" &&
+    (sessionStorage.getItem(AUTH_REMEMBER_KEY) ??
+      localStorage.getItem(AUTH_REMEMBER_KEY)) === "true";
+  return remember ? localStorage : sessionStorage;
+};
+
+const write = (key: string, value: string) => {
+  const storage = getStorage();
+  storage.setItem(key, value);
+};
+
+const read = (key: string) => {
+  if (typeof window === "undefined") return null;
+  // Prefer the target storage, but fall back across both so an already
+  // persisted session is never lost during a storage-type transition.
+  return (
+    getStorage().getItem(key) ??
+    localStorage.getItem(key) ??
+    sessionStorage.getItem(key)
+  );
+};
+
+const remove = (key: string) => {
+  localStorage.removeItem(key);
+  sessionStorage.removeItem(key);
+};
+
+const writeUser = (user: AuthUser) => write(AUTH_USER_KEY, JSON.stringify(user));
 const writeTenant = (tenant: AuthTenant | null) => {
   if (tenant) {
-    localStorage.setItem(AUTH_TENANT_KEY, JSON.stringify(tenant));
+    write(AUTH_TENANT_KEY, JSON.stringify(tenant));
   } else {
-    localStorage.removeItem(AUTH_TENANT_KEY);
+    remove(AUTH_TENANT_KEY);
   }
 };
 
@@ -48,26 +88,40 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   tenant: null,
   token: null,
+  remember: false,
   hydrated: false,
   hydrate: () => {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    const storedUser = localStorage.getItem(AUTH_USER_KEY);
-    const storedTenant = localStorage.getItem(AUTH_TENANT_KEY);
+    const token = read(AUTH_TOKEN_KEY);
+    const storedUser = read(AUTH_USER_KEY);
+    const storedTenant = read(AUTH_TENANT_KEY);
     let user: AuthUser | null = null;
     let tenant: AuthTenant | null = null;
     if (storedUser) {
-      try { user = JSON.parse(storedUser) as AuthUser; } catch { localStorage.removeItem(AUTH_USER_KEY); }
+      try { user = JSON.parse(storedUser) as AuthUser; } catch { remove(AUTH_USER_KEY); }
     }
     if (storedTenant) {
-      try { tenant = JSON.parse(storedTenant) as AuthTenant; } catch { localStorage.removeItem(AUTH_TENANT_KEY); }
+      try { tenant = JSON.parse(storedTenant) as AuthTenant; } catch { remove(AUTH_TENANT_KEY); }
     }
-    set({ token, user, tenant, hydrated: true });
+    const remember =
+      (sessionStorage.getItem(AUTH_REMEMBER_KEY) ??
+        localStorage.getItem(AUTH_REMEMBER_KEY)) === "true";
+    set({ token, user, tenant, remember, hydrated: true });
   },
-  setSession: (token, user, tenant) => {
-    localStorage.setItem(AUTH_TOKEN_KEY, token);
+  setSession: (token, user, tenant, remember) => {
+    // Persist the remember preference first so getStorage() resolves correctly.
+    if (remember) {
+      localStorage.setItem(AUTH_REMEMBER_KEY, "true");
+      sessionStorage.removeItem(AUTH_REMEMBER_KEY);
+    } else {
+      sessionStorage.setItem(AUTH_REMEMBER_KEY, "false");
+      localStorage.removeItem(AUTH_REMEMBER_KEY);
+    }
+
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem(AUTH_TOKEN_KEY, token);
     writeUser(user);
     writeTenant(tenant);
-    set({ token, user, tenant, hydrated: true });
+    set({ token, user, tenant, remember, hydrated: true });
   },
   setUser: (user) => {
     writeUser(user);
@@ -78,12 +132,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ tenant });
   },
   logout: () => {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(AUTH_USER_KEY);
-    localStorage.removeItem(AUTH_TENANT_KEY);
-    set({ token: null, user: null, tenant: null, hydrated: true });
+    remove(AUTH_TOKEN_KEY);
+    remove(AUTH_USER_KEY);
+    remove(AUTH_TENANT_KEY);
+    remove(AUTH_REMEMBER_KEY);
+    set({ token: null, user: null, tenant: null, remember: false, hydrated: true });
   },
 }));
 
 export const getStoredAuthToken = () =>
-  typeof window === "undefined" ? null : useAuthStore.getState().token ?? localStorage.getItem(AUTH_TOKEN_KEY);
+  typeof window === "undefined"
+    ? null
+    : useAuthStore.getState().token ?? read(AUTH_TOKEN_KEY);

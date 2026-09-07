@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import FormDialog from "@/shared/components/molecules/FormDialog";
 import FormField from "@/shared/components/molecules/FormField";
@@ -138,6 +139,7 @@ const StaffFormContent = ({
   onOpenChange,
   onSubmit,
 }: StaffFormDialogProps) => {
+  const { t } = useTranslation();
   const [values, setValues] = useState<StaffFormValues>(() =>
     member ? memberValues(member, selectedDate) : emptyValues(selectedDate),
   );
@@ -156,62 +158,79 @@ const StaffFormContent = ({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={member ? "Edit staff" : "Add staff"}
-      description="Manage profile, specialties, and working hours. Set a weekly schedule once, then override for specific dates as needed."
+      title={
+        member
+          ? t("dashboard.staff.form.editTitle")
+          : t("dashboard.staff.form.addTitle")
+      }
+      description={t("dashboard.staff.form.description")}
       error={error}
-      submitLabel={member ? "Save staff" : "Add staff"}
-      cancelLabel="Cancel"
+      submitLabel={
+        member
+          ? t("dashboard.staff.form.saveStaff")
+          : t("dashboard.staff.form.addStaff")
+      }
+      cancelLabel={t("dashboard.staff.form.cancel")}
       submitting={submitting}
       onSubmit={handleSubmit}
       contentClassName="sm:max-w-2xl"
     >
       <FormSection
-        title="Profile"
-        description="Basic identity and compensation information."
+        title={t("dashboard.staff.form.profile")}
+        description={t("dashboard.staff.form.profileDescription")}
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField label="Full name" required>
+          <FormField label={t("dashboard.staff.form.fullName")} required>
             <Input
               value={values.name}
               onChange={(event) => update("name", event.target.value)}
               required
             />
           </FormField>
-          <FormField label="Role" required>
+          <FormField label={t("dashboard.staff.form.role")} required>
             <Input
               value={values.role}
               onChange={(event) => update("role", event.target.value)}
               required
             />
           </FormField>
-          <FormField label="Status">
+          <FormField label={t("dashboard.staff.form.status")}>
             <SelectField
               value={values.status}
               onValueChange={(value) => update("status", value as StaffStatus)}
               options={[
-                { value: "active", label: "Active" },
-                { value: "busy", label: "Busy" },
-                { value: "on_leave", label: "On Leave" },
+                {
+                  value: "active",
+                  label: t("dashboard.staff.form.statusActive"),
+                },
+                {
+                  value: "busy",
+                  label: t("dashboard.staff.form.statusBusy"),
+                },
+                {
+                  value: "on_leave",
+                  label: t("dashboard.staff.form.statusOnLeave"),
+                },
               ]}
-              ariaLabel="Status"
+              ariaLabel={t("dashboard.staff.form.status")}
               className="h-9"
             />
           </FormField>
-          <FormField label="Join date">
+          <FormField label={t("dashboard.staff.form.joinDate")}>
             <Input
               type="date"
               value={values.joinDate}
               onChange={(event) => update("joinDate", event.target.value)}
             />
           </FormField>
-          <FormField label="Email">
+          <FormField label={t("dashboard.staff.form.email")}>
             <Input
               type="email"
               value={values.email}
               onChange={(event) => update("email", event.target.value)}
             />
           </FormField>
-          <FormField label="Phone">
+          <FormField label={t("dashboard.staff.form.phone")}>
             <Input
               value={values.phone}
               onChange={(event) => update("phone", event.target.value)}
@@ -221,11 +240,11 @@ const StaffFormContent = ({
       </FormSection>
 
       <FormSection
-        title="Compensation"
-        description="How this staff member is paid."
+        title={t("dashboard.staff.form.compensation")}
+        description={t("dashboard.staff.form.compensationDescription")}
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField label="Hourly rate">
+          <FormField label={t("dashboard.staff.form.hourlyRate")}>
             <Input
               type="number"
               min="0"
@@ -234,7 +253,7 @@ const StaffFormContent = ({
               onChange={(event) => update("hourlyRate", event.target.value)}
             />
           </FormField>
-          <FormField label="Commission rate (%)">
+          <FormField label={t("dashboard.staff.form.commissionRate")}>
             <Input
               type="number"
               min="0"
@@ -244,7 +263,10 @@ const StaffFormContent = ({
               onChange={(event) => update("commissionRate", event.target.value)}
             />
           </FormField>
-          <FormField label="Avatar URL" className="sm:col-span-2">
+          <FormField
+            label={t("dashboard.staff.form.avatarUrl")}
+            className="sm:col-span-2"
+          >
             <Input
               type="url"
               value={values.avatarUrl}
@@ -255,8 +277,8 @@ const StaffFormContent = ({
       </FormSection>
 
       <FormSection
-        title="Specialties"
-        description="Assign the services this staff member can perform."
+        title={t("dashboard.staff.form.specialties")}
+        description={t("dashboard.staff.form.specialtiesDescription")}
       >
         <div className="flex flex-wrap gap-2">
           {specialties.map((specialty) => {
@@ -264,7 +286,7 @@ const StaffFormContent = ({
             return (
               <label
                 key={specialty.id}
-                className={`cursor-pointer rounded-md border px-3 py-2 text-sm ${checked ? "border-primary bg-primary/10 text-primary" : "border-[#DEE1E7]"}`}
+                className={`relative cursor-pointer rounded-md border px-3 py-2 text-sm ${checked ? "border-primary bg-primary/10 text-primary" : "border-[#DEE1E7]"}`}
               >
                 <input
                   type="checkbox"
@@ -279,9 +301,10 @@ const StaffFormContent = ({
                         : [...values.specialtyIds, specialty.id],
                     )
                   }
-                  className="sr-only"
+                  className="absolute inset-0 h-full w-full opacity-0"
+                  aria-label={specialty.name}
                 />
-                {specialty.name}
+                <span className="pointer-events-none">{specialty.name}</span>
               </label>
             );
           })}
@@ -289,8 +312,8 @@ const StaffFormContent = ({
       </FormSection>
 
       <FormSection
-        title="Weekly Schedule Template"
-        description="Set your default working hours for each day of the week. This will be used for all appointments unless overridden."
+        title={t("dashboard.staff.form.weeklyTemplate")}
+        description={t("dashboard.staff.form.weeklyTemplateDescription")}
       >
         <WeeklyScheduleSection
           weeklySchedule={values.weeklySchedule}
@@ -299,46 +322,46 @@ const StaffFormContent = ({
       </FormSection>
 
       <FormSection
-        title="Per-Date Override (Optional)"
-        description="Set a different schedule for a specific date (e.g., special shift, holiday). Leave empty to use weekly schedule."
+        title={t("dashboard.staff.form.perDateOverride")}
+        description={t("dashboard.staff.form.perDateOverrideDescription")}
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField label="Date">
+          <FormField label={t("dashboard.staff.form.date")}>
             <Input
               type="date"
               value={values.scheduleDate}
               onChange={(event) => update("scheduleDate", event.target.value)}
             />
           </FormField>
-          <FormField label="Station">
+          <FormField label={t("dashboard.staff.form.station")}>
             <Input
               value={values.station}
               onChange={(event) => update("station", event.target.value)}
-              placeholder="Station 1"
+              placeholder={t("dashboard.staff.form.stationPlaceholder")}
             />
           </FormField>
-          <FormField label="Start time">
+          <FormField label={t("dashboard.staff.form.startTime")}>
             <Input
               type="time"
               value={values.startTime}
               onChange={(event) => update("startTime", event.target.value)}
             />
           </FormField>
-          <FormField label="End time">
+          <FormField label={t("dashboard.staff.form.endTime")}>
             <Input
               type="time"
               value={values.endTime}
               onChange={(event) => update("endTime", event.target.value)}
             />
           </FormField>
-          <FormField label="Break start">
+          <FormField label={t("dashboard.staff.form.breakStart")}>
             <Input
               type="time"
               value={values.breakStart}
               onChange={(event) => update("breakStart", event.target.value)}
             />
           </FormField>
-          <FormField label="Break end">
+          <FormField label={t("dashboard.staff.form.breakEnd")}>
             <Input
               type="time"
               value={values.breakEnd}
@@ -352,7 +375,7 @@ const StaffFormContent = ({
             checked={values.isDayOff}
             onChange={(event) => update("isDayOff", event.target.checked)}
           />
-          Mark as day off
+          {t("dashboard.staff.form.dayOff")}
         </label>
       </FormSection>
     </FormDialog>

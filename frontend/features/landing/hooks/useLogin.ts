@@ -7,11 +7,13 @@ export const useLogin = () => {
     mutationFn: async ({
       email,
       password,
+      remember,
     }: {
       email: string;
       password: string;
+      remember: boolean;
     }) => {
-      return authService.login(email, password);
+      return authService.login(email, password, remember);
     },
   });
 };

@@ -23,7 +23,9 @@ type FormDialogProps = {
   /** Optional error message rendered as a banner above the form. */
   error?: ReactNode;
   /** Footer action labels. Omit `submitLabel` to hide the submit button. */
-  submitLabel?: string;
+  submitLabel?: ReactNode;
+  /** Label shown on the submit button while `submitting` is true. */
+  submittingLabel?: ReactNode;
   cancelLabel?: string;
   /** Whether the submit action is in-flight. */
   submitting?: boolean;
@@ -51,6 +53,7 @@ const FormDialog = ({
   description,
   error,
   submitLabel,
+  submittingLabel,
   cancelLabel = "Cancel",
   submitting = false,
   submitDisabled = false,
@@ -131,7 +134,7 @@ const FormDialog = ({
                   form={onSubmit ? formId : undefined}
                   disabled={submitting || submitDisabled}
                 >
-                  {submitting ? "Saving..." : submitLabel}
+                  {submitting ? (submittingLabel ?? "Saving...") : submitLabel}
                 </Button>
               ) : null}
             </div>

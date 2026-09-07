@@ -38,11 +38,13 @@ const TodaysSnapshotSection = () => {
               <div className="flex items-center gap-2">
                 <span
                   className={cn(
-                    "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                    "h-2 w-2 shrink-0 rounded-full",
                     item.status === "break" ? "bg-[#D1D5DB]" : "bg-primary",
                   )}
                 />
-                <span className="text-sm text-[#1d1f23]">{item.title}</span>
+                <span className="text-sm leading-5 text-[#1d1f23]">
+                  {item.title}
+                </span>
               </div>
             </li>
           ))}

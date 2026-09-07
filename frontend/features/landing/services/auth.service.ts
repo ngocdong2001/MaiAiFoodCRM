@@ -18,14 +18,16 @@ type LoginResponse = {
 };
 
 export const authService = {
-  async login(email: string, password: string) {
+  async login(email: string, password: string, remember: boolean) {
     const { data } = await apiClient.post<LoginResponse>("/auth/login", {
       email,
       password,
     });
 
     if (data?.token) {
-      useAuthStore.getState().setSession(data.token, data.user, data.tenant ?? null);
+      useAuthStore
+        .getState()
+        .setSession(data.token, data.user, data.tenant ?? null, remember);
     }
 
     return data;

@@ -1,25 +1,18 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/shared/components/ui/button";
 import SelectField from "@/shared/components/molecules/SelectField";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+import FormDialog from "@/shared/components/molecules/FormDialog";
+import FormField from "@/shared/components/molecules/FormField";
+import FormSection from "@/shared/components/molecules/FormSection";
 import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { cn } from "@/shared/lib/utils";
 
 import { useCalendarData } from "../context/CalendarDataContext";
 import {
@@ -291,9 +284,20 @@ export const BookingFormContent = ({
   };
 
   const isSaving = create.isPending || updateAppointment.isPending;
+  const isSubmitting = isSaving || isCreatingGuest;
+  const submitLabel = isEditing
+    ? t("dashboard.calendar.booking.update")
+    : t("dashboard.calendar.booking.create");
+  const submittingLabel = isCreatingGuest
+    ? t("dashboard.calendar.booking.creatingGuest")
+    : t(
+        isEditing
+          ? "dashboard.calendar.booking.updating"
+          : "dashboard.calendar.booking.creating",
+      );
 
   return (
-    <Dialog
+    <FormDialog
       open={open}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
@@ -302,316 +306,271 @@ export const BookingFormContent = ({
           onOpenChange(true);
         }
       }}
-    >
-      <DialogContent className="flex h-[min(92vh,50rem)] max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
-        <DialogHeader className="shrink-0 border-b border-[#E7EAF0] px-6 py-5">
-          <DialogTitle>
-            {t(
-              isEditing
-                ? "dashboard.calendar.booking.editTitle"
-                : "dashboard.calendar.booking.title",
-            )}
-          </DialogTitle>
-          <DialogDescription>
-            {t(
-              isEditing
-                ? "dashboard.calendar.booking.editDescription"
-                : "dashboard.calendar.booking.description",
-            )}
-          </DialogDescription>
-        </DialogHeader>
-        {error && (
-          <div
-            role="alert"
-            aria-live="assertive"
-            className="mx-6 mt-4 flex shrink-0 items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+      title={t(
+        isEditing
+          ? "dashboard.calendar.booking.editTitle"
+          : "dashboard.calendar.booking.title",
+      )}
+      description={t(
+        isEditing
+          ? "dashboard.calendar.booking.editDescription"
+          : "dashboard.calendar.booking.description",
+      )}
+      error={error}
+      submitLabel={submitLabel}
+      submittingLabel={submittingLabel}
+      cancelLabel={t("dashboard.calendar.booking.cancel")}
+      submitting={isSubmitting}
+      submitDisabled={options.isPending}
+      onSubmit={submit}
+      footerActions={
+        isEditing ? (
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleteAppointment.isPending || isSaving}
           >
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-        <ScrollArea className="min-h-0 flex-1 px-6">
-          <form id="booking-form" onSubmit={submit} className="space-y-5 py-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("dashboard.calendar.booking.guest")} required>
-                {isWalkIn ? (
-                  <div className="space-y-1.5">
-                    <div className="flex gap-1.5">
-                      <Input
-                        placeholder={t("dashboard.calendar.booking.walkInName")}
-                        value={walkInName}
-                        onChange={(e) => {
-                          setWalkInName(e.target.value);
-                          setError(null);
-                        }}
-                        className="h-9 flex-1"
-                        autoFocus
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsWalkIn(false);
-                          setWalkInName("");
-                          setWalkInPhone("");
-                        }}
-                        disabled={isEditing}
-                        className="h-9 rounded-md border border-[#DEE1E7] px-2.5 text-xs text-[#8D95A5] hover:bg-[#F3F4F7]"
-                      >
-                        {t("dashboard.calendar.booking.chooseExisting")}
-                      </button>
-                    </div>
-                    <Input
-                      placeholder={t("dashboard.calendar.booking.walkInPhone")}
-                      value={walkInPhone}
-                      onChange={(e) => setWalkInPhone(e.target.value)}
-                      className="h-9"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex gap-1.5">
-                    <div className="flex-1">
-                      <SelectField
-                        value={values.guestId}
-                        onValueChange={(value) => update("guestId", value)}
-                        options={(options.data?.guests ?? []).map((guest) => ({
-                          value: String(guest.id),
-                          label: guest.phone
-                            ? `${guest.name} · ${guest.phone}`
-                            : guest.name,
-                        }))}
-                        placeholder={t(
-                          "dashboard.calendar.booking.selectGuest",
-                        )}
-                        ariaLabel={t("dashboard.calendar.booking.guest")}
-                        className="h-9"
-                      />
-                    </div>
-                    {!isEditing && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsWalkIn(true);
-                          update("guestId", "");
-                        }}
-                        className="h-9 rounded-md border border-[#DEE1E7] bg-[#F9FAFB] px-2.5 text-xs font-medium text-[#8D95A5] hover:bg-[#F3F4F7] hover:text-[#171A21]"
-                      >
-                        {t("dashboard.calendar.booking.addWalkIn")}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </Field>
-              <Field label={t("dashboard.calendar.booking.staff")} required>
-                <SelectField
-                  value={values.staffId}
-                  onValueChange={(value) => update("staffId", value)}
-                  options={(options.data?.staff ?? []).map((staff) => ({
-                    value: String(staff.id),
-                    label: `${staff.name} · ${staff.role}`,
-                  }))}
-                  placeholder={t("dashboard.calendar.booking.selectStaff")}
-                  ariaLabel={t("dashboard.calendar.booking.staff")}
-                  className="h-9"
-                />
-              </Field>
-              <Field label={t("dashboard.calendar.booking.date")} required>
-                <Input
-                  type="date"
-                  value={values.date}
-                  onChange={(event) => update("date", event.target.value)}
-                  required
-                />
-              </Field>
-              <Field label={t("dashboard.calendar.booking.startTime")} required>
-                <Input
-                  type="time"
-                  value={values.startTime}
-                  onChange={(event) => update("startTime", event.target.value)}
-                  required
-                />
-              </Field>
-              <Field label={t("dashboard.calendar.booking.status")}>
-                <SelectField
-                  value={values.status}
-                  onValueChange={(value) => update("status", value)}
-                  options={[
-                    {
-                      value: "pending",
-                      label: t("dashboard.calendar.booking.pending"),
-                    },
-                    {
-                      value: "confirmed",
-                      label: t("dashboard.calendar.booking.confirmed"),
-                    },
-                  ]}
-                  ariaLabel={t("dashboard.calendar.booking.status")}
-                  className="h-9"
-                />
-              </Field>
-              <Field label={t("dashboard.calendar.booking.priority")}>
-                <SelectField
-                  value={values.priority}
-                  onValueChange={(value) => update("priority", value)}
-                  options={[
-                    {
-                      value: "normal",
-                      label: t("dashboard.calendar.booking.normal"),
-                    },
-                    {
-                      value: "high",
-                      label: t("dashboard.calendar.booking.high"),
-                    },
-                  ]}
-                  ariaLabel={t("dashboard.calendar.booking.priority")}
-                  className="h-9"
-                />
-              </Field>
-            </div>
-
-            <fieldset>
-              <legend className="mb-2 text-sm font-medium">
-                {t("dashboard.calendar.booking.services")}{" "}
-                <span className="text-destructive">*</span>
-              </legend>
-              <div className="space-y-4">
-                {groupedServices.map((group) => (
-                  <div key={group.category || "__uncategorised"}>
-                    {group.category ? (
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#8D95A5]">
-                        {group.category}
-                      </p>
-                    ) : null}
-                    <div className="grid gap-2 sm:grid-cols-3">
-                      {group.services.map((service) => {
-                        const checked = values.serviceIds.includes(service.id);
-                        return (
-                          <label
-                            key={service.id}
-                            className={
-                              checked
-                                ? "relative cursor-pointer rounded-lg border border-primary bg-primary/5 p-3"
-                                : "relative cursor-pointer rounded-lg border border-[#DEE1E7] p-3 hover:bg-[#F9FAFB]"
-                            }
-                          >
-                            <input
-                              type="checkbox"
-                              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                              checked={checked}
-                              aria-label={`${service.name} ${t(
-                                "dashboard.calendar.booking.minutes",
-                                { count: service.durationMinutes },
-                              )} · $${service.price.toFixed(2)}`}
-                              onChange={() =>
-                                update(
-                                  "serviceIds",
-                                  checked
-                                    ? values.serviceIds.filter(
-                                        (id) => id !== service.id,
-                                      )
-                                    : [...values.serviceIds, service.id],
-                                )
-                              }
-                            />
-                            <span className="pointer-events-none block text-sm font-semibold text-[#171A21]">
-                              {service.name}
-                            </span>
-                            <span className="pointer-events-none mt-1 block text-xs text-[#8D95A5]">
-                              {t("dashboard.calendar.booking.minutes", {
-                                count: service.durationMinutes,
-                              })}{" "}
-                              · ${service.price.toFixed(2)}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+            {deleteAppointment.isPending
+              ? t("dashboard.calendar.booking.deleting")
+              : t("dashboard.calendar.booking.delete")}
+          </Button>
+        ) : null
+      }
+      contentClassName="sm:max-w-2xl"
+    >
+      <FormSection title={t("dashboard.calendar.booking.detailsSection")}>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            {!isEditing && (
+              <div className="mb-4 flex rounded-lg border border-[#DEE1E7] p-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsWalkIn(false);
+                    setWalkInName("");
+                    setWalkInPhone("");
+                  }}
+                  className={cn(
+                    "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                    !isWalkIn
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-[#F3F4F7]",
+                  )}
+                >
+                  {t("dashboard.calendar.booking.guestTypeExisting")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsWalkIn(true);
+                    update("guestId", "");
+                  }}
+                  className={cn(
+                    "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                    isWalkIn
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-[#F3F4F7]",
+                  )}
+                >
+                  {t("dashboard.calendar.booking.guestTypeWalkIn")}
+                </button>
               </div>
-              {selectedServices.length > 0 && (
-                <p className="mt-2 text-sm font-medium text-[#4B5563]">
-                  {t("dashboard.calendar.booking.total", {
-                    duration: durationMinutes,
-                    price: totalPrice.toFixed(2),
-                  })}
-                </p>
-              )}
-            </fieldset>
-
-            <Field label={t("dashboard.calendar.booking.notes")}>
-              <Textarea
-                rows={3}
-                value={values.notes}
-                onChange={(event) => update("notes", event.target.value)}
-                placeholder={t("dashboard.calendar.booking.notesPlaceholder")}
-              />
-            </Field>
-            {options.isError && (
-              <p className="text-sm text-destructive">
-                {t("dashboard.calendar.booking.loadOptionsError")}
-              </p>
             )}
-          </form>
-        </ScrollArea>
-        <DialogFooter className="shrink-0 border-t border-[#E7EAF0] flex items-center gap-3 px-6 py-4">
-          {isEditing && (
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteAppointment.isPending || isSaving}
-            >
-              {deleteAppointment.isPending
-                ? t("dashboard.calendar.booking.deleting")
-                : t("dashboard.calendar.booking.delete")}
-            </Button>
-          )}
-          <div className="ml-auto flex gap-3">
-            <Button type="button" variant="outline" onClick={requestClose}>
-              {t("dashboard.calendar.booking.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              form="booking-form"
-              disabled={isSaving || options.isPending || isCreatingGuest}
-            >
-              {isCreatingGuest
-                ? t("dashboard.calendar.booking.creatingGuest")
-                : isSaving
-                  ? t(
-                      isEditing
-                        ? "dashboard.calendar.booking.updating"
-                        : "dashboard.calendar.booking.creating",
-                    )
-                  : t(
-                      isEditing
-                        ? "dashboard.calendar.booking.update"
-                        : "dashboard.calendar.booking.create",
-                    )}
-            </Button>
+
+            {isWalkIn ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  label={t("dashboard.calendar.booking.walkInName")}
+                  required
+                >
+                  <Input
+                    value={walkInName}
+                    onChange={(e) => {
+                      setWalkInName(e.target.value);
+                      setError(null);
+                    }}
+                    autoFocus
+                  />
+                </FormField>
+                <FormField label={t("dashboard.calendar.booking.walkInPhone")}>
+                  <Input
+                    value={walkInPhone}
+                    onChange={(e) => setWalkInPhone(e.target.value)}
+                  />
+                </FormField>
+              </div>
+            ) : (
+              <FormField label={t("dashboard.calendar.booking.guest")} required>
+                <SelectField
+                  value={values.guestId}
+                  onValueChange={(value) => update("guestId", value)}
+                  options={(options.data?.guests ?? []).map((guest) => ({
+                    value: String(guest.id),
+                    label: guest.phone
+                      ? `${guest.name} · ${guest.phone}`
+                      : guest.name,
+                  }))}
+                  placeholder={t("dashboard.calendar.booking.selectGuest")}
+                  ariaLabel={t("dashboard.calendar.booking.guest")}
+                />
+              </FormField>
+            )}
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+
+          <FormField label={t("dashboard.calendar.booking.staff")} required>
+            <SelectField
+              value={values.staffId}
+              onValueChange={(value) => update("staffId", value)}
+              options={(options.data?.staff ?? []).map((staff) => ({
+                value: String(staff.id),
+                label: `${staff.name} · ${staff.role}`,
+              }))}
+              placeholder={t("dashboard.calendar.booking.selectStaff")}
+              ariaLabel={t("dashboard.calendar.booking.staff")}
+            />
+          </FormField>
+
+          <FormField label={t("dashboard.calendar.booking.date")} required>
+            <Input
+              type="date"
+              value={values.date}
+              onChange={(event) => update("date", event.target.value)}
+              required
+            />
+          </FormField>
+          <FormField label={t("dashboard.calendar.booking.startTime")} required>
+            <Input
+              type="time"
+              value={values.startTime}
+              onChange={(event) => update("startTime", event.target.value)}
+              required
+            />
+          </FormField>
+          <FormField label={t("dashboard.calendar.booking.status")}>
+            <SelectField
+              value={values.status}
+              onValueChange={(value) => update("status", value)}
+              options={[
+                {
+                  value: "pending",
+                  label: t("dashboard.calendar.booking.pending"),
+                },
+                {
+                  value: "confirmed",
+                  label: t("dashboard.calendar.booking.confirmed"),
+                },
+              ]}
+              ariaLabel={t("dashboard.calendar.booking.status")}
+            />
+          </FormField>
+          <FormField label={t("dashboard.calendar.booking.priority")}>
+            <SelectField
+              value={values.priority}
+              onValueChange={(value) => update("priority", value)}
+              options={[
+                {
+                  value: "normal",
+                  label: t("dashboard.calendar.booking.normal"),
+                },
+                {
+                  value: "high",
+                  label: t("dashboard.calendar.booking.high"),
+                },
+              ]}
+              ariaLabel={t("dashboard.calendar.booking.priority")}
+            />
+          </FormField>
+        </div>
+      </FormSection>
+
+      <FormSection
+        title={t("dashboard.calendar.booking.servicesSection")}
+        description={`${t("dashboard.calendar.booking.services")} *`}
+      >
+        <div className="space-y-4">
+          {groupedServices.map((group) => (
+            <div key={group.category || "__uncategorised"}>
+              {group.category ? (
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#8D95A5]">
+                  {group.category}
+                </p>
+              ) : null}
+              <div className="grid gap-2 sm:grid-cols-3">
+                {group.services.map((service) => {
+                  const checked = values.serviceIds.includes(service.id);
+                  return (
+                    <label
+                      key={service.id}
+                      className={cn(
+                        "relative cursor-pointer rounded-lg border p-3",
+                        checked
+                          ? "border-primary bg-primary/5"
+                          : "border-[#DEE1E7] hover:bg-[#F9FAFB]",
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        checked={checked}
+                        aria-label={`${service.name} ${t(
+                          "dashboard.calendar.booking.minutes",
+                          { count: service.durationMinutes },
+                        )} · $${service.price.toFixed(2)}`}
+                        onChange={() =>
+                          update(
+                            "serviceIds",
+                            checked
+                              ? values.serviceIds.filter(
+                                  (id) => id !== service.id,
+                                )
+                              : [...values.serviceIds, service.id],
+                          )
+                        }
+                      />
+                      <span className="pointer-events-none block text-sm font-semibold text-[#171A21]">
+                        {service.name}
+                      </span>
+                      <span className="pointer-events-none mt-1 block text-xs text-[#8D95A5]">
+                        {t("dashboard.calendar.booking.minutes", {
+                          count: service.durationMinutes,
+                        })}{" "}
+                        · ${service.price.toFixed(2)}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+        {selectedServices.length > 0 && (
+          <p className="mt-2 text-sm font-medium text-[#4B5563]">
+            {t("dashboard.calendar.booking.total", {
+              duration: durationMinutes,
+              price: totalPrice.toFixed(2),
+            })}
+          </p>
+        )}
+      </FormSection>
+
+      <FormSection title={t("dashboard.calendar.booking.notesSection")}>
+        <FormField label={t("dashboard.calendar.booking.notes")}>
+          <Textarea
+            rows={3}
+            value={values.notes}
+            onChange={(event) => update("notes", event.target.value)}
+            placeholder={t("dashboard.calendar.booking.notesPlaceholder")}
+          />
+        </FormField>
+        {options.isError && (
+          <p className="text-sm text-destructive">
+            {t("dashboard.calendar.booking.loadOptionsError")}
+          </p>
+        )}
+      </FormSection>
+    </FormDialog>
   );
 };
-
-const Field = ({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: ReactNode;
-}) => (
-  <div className="space-y-1.5">
-    <Label>
-      {label}
-      {required && <span className="text-destructive"> *</span>}
-    </Label>
-    {children}
-  </div>
-);
 
 export default BookingFormDialog;
