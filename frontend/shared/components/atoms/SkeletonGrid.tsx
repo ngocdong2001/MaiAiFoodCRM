@@ -15,9 +15,9 @@ const SkeletonGrid = ({
   className,
   itemClassName,
 }: SkeletonGridProps) => {
-  // Placeholders carry no identity of their own, so mint stable ids once per count.
+  // Placeholders carry no identity of their own, so stable keys per count.
   const ids = useMemo(
-    () => Array.from({ length: count }, () => crypto.randomUUID()),
+    () => Array.from({ length: count }, (_, i) => `skel-${i}`),
     [count],
   );
 
