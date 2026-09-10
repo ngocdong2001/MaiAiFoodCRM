@@ -38,9 +38,12 @@ const SystemLogsSection = () => {
       const verbLabel = t(GENERIC_VERB_KEY[verb] ?? "generic.update", {
         defaultValue: verb,
       });
-      const resourceLabel = t(`dashboard.settings.systemLogs.resources.${resource}`, {
-        defaultValue: resource,
-      });
+      const resourceLabel = t(
+        `dashboard.settings.systemLogs.resources.${resource}`,
+        {
+          defaultValue: resource,
+        },
+      );
       return `${verbLabel} ${resourceLabel}`;
     }
 
@@ -193,14 +196,22 @@ const SystemLogsSection = () => {
                             </p>
                             <p>
                               <span className="font-medium">
-                                {t("dashboard.settings.systemLogs.col.duration")}:
+                                {t(
+                                  "dashboard.settings.systemLogs.col.duration",
+                                )}
+                                :
                               </span>{" "}
-                              {log.durationMs != null ? `${log.durationMs}ms` : "—"}
+                              {log.durationMs != null
+                                ? `${log.durationMs}ms`
+                                : "—"}
                             </p>
                             {log.requestBody && (
                               <p className="col-span-2 break-all">
                                 <span className="font-medium">
-                                  {t("dashboard.settings.systemLogs.col.payload")}:
+                                  {t(
+                                    "dashboard.settings.systemLogs.col.payload",
+                                  )}
+                                  :
                                 </span>{" "}
                                 {log.requestBody}
                               </p>
