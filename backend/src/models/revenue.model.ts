@@ -335,49 +335,53 @@ export const RevenueModel = {
       },
     };
 
-    const [currentAggregate, previousAggregate, currentRecords, currentAllRecords] =
-      await Promise.all([
-        db.revenuerecord.aggregate({
-          where: currentWhere,
-          _sum: {
-            finalAmount: true,
-            amount: true,
-            tipAmount: true,
-          },
-          _count: {
-            id: true,
-          },
-        }),
-        db.revenuerecord.aggregate({
-          where: previousWhere,
-          _sum: {
-            finalAmount: true,
-            amount: true,
-            tipAmount: true,
-          },
-          _count: {
-            id: true,
-          },
-        }),
-        db.revenuerecord.findMany({
-          where: currentWhere,
-          orderBy: {
-            paidAt: "desc",
-          },
-          include: {
-            revenuerecorddetail: true,
-          },
-        }),
-        db.revenuerecord.findMany({
-          where: currentAllWhere,
-          orderBy: {
-            paidAt: "desc",
-          },
-          include: {
-            revenuerecorddetail: true,
-          },
-        }),
-      ]);
+    const [
+      currentAggregate,
+      previousAggregate,
+      currentRecords,
+      currentAllRecords,
+    ] = await Promise.all([
+      db.revenuerecord.aggregate({
+        where: currentWhere,
+        _sum: {
+          finalAmount: true,
+          amount: true,
+          tipAmount: true,
+        },
+        _count: {
+          id: true,
+        },
+      }),
+      db.revenuerecord.aggregate({
+        where: previousWhere,
+        _sum: {
+          finalAmount: true,
+          amount: true,
+          tipAmount: true,
+        },
+        _count: {
+          id: true,
+        },
+      }),
+      db.revenuerecord.findMany({
+        where: currentWhere,
+        orderBy: {
+          paidAt: "desc",
+        },
+        include: {
+          revenuerecorddetail: true,
+        },
+      }),
+      db.revenuerecord.findMany({
+        where: currentAllWhere,
+        orderBy: {
+          paidAt: "desc",
+        },
+        include: {
+          revenuerecorddetail: true,
+        },
+      }),
+    ]);
 
     const settingRows = await db.setting.findMany({
       where: { group: SETTING_GROUP },
@@ -557,15 +561,16 @@ export const RevenueModel = {
     };
   },
 
-  async restoreBooking(
-    db: PrismaClient,
-    recordId: number,
-  ) {
+  async restoreBooking(db: PrismaClient, recordId: number) {
     const record = await db.revenuerecord.findUnique({
       where: { paymentId: recordId },
       select: { id: true, status: true, appointmentId: true, paymentId: true },
     });
-    if (!record || record.status !== "cancelled") return null;
+    if (
+      !record ||
+      (record.status !== "cancelled" && record.status !== "completed")
+    )
+      return null;
 
     await db.$transaction(async (tx) => {
       // 1. Delete the cancelled revenue record
@@ -589,9 +594,15 @@ export const RevenueModel = {
         where: { id: record.paymentId },
         select: { amount: true, paymentStatus: true },
       });
-      if (payment && Number(payment.amount) === 0 && payment.paymentStatus === "cancelled") {
+      if (
+        payment &&
+        Number(payment.amount) === 0 &&
+        payment.paymentStatus === "cancelled"
+      ) {
         // Delete payment details first (cascade should handle, but be explicit)
-        await tx.paymentdetail.deleteMany({ where: { paymentId: record.paymentId } });
+        await tx.paymentdetail.deleteMany({
+          where: { paymentId: record.paymentId },
+        });
         await tx.payment.delete({ where: { id: record.paymentId } });
       }
     });

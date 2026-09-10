@@ -16,17 +16,8 @@ const GENERIC_VERB_KEY: Record<string, string> = {
   delete: "generic.delete",
 };
 
-// Loopback addresses shown to non-technical users with a friendly suffix.
-const formatIpAddress = (ip: string | null) => {
-  if (!ip) return "—";
-  if (ip === "::1" || ip === "127.0.0.1" || ip === "::ffff:127.0.0.1") {
-    return "127.0.0.1 (localhost)";
-  }
-  return ip.replace("::ffff:", "");
-};
-
 const SystemLogsSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [logs, setLogs] = useState<SystemLogItem[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -55,6 +46,18 @@ const SystemLogsSection = () => {
 
     return action;
   };
+
+  // Loopback addresses shown with a friendly, localized suffix.
+  const formatIpAddress = (ip: string | null) => {
+    if (!ip) return "—";
+    if (ip === "::1" || ip === "127.0.0.1" || ip === "::ffff:127.0.0.1") {
+      return `127.0.0.1 (${t("dashboard.settings.systemLogs.col.localhost")})`;
+    }
+    return ip.replace("::ffff:", "");
+  };
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleString(i18n.language === "vi" ? "vi-VN" : "en-US");
 
   useEffect(() => {
     let cancelled = false;
@@ -145,7 +148,7 @@ const SystemLogsSection = () => {
                       }
                     >
                       <td className="whitespace-nowrap px-6 py-3 text-sm text-[#171A21]">
-                        {new Date(log.createdAt).toLocaleString("vi-VN")}
+                        {formatDate(log.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-sm font-medium text-[#171A21]">
                         {translateAction(log.action)}
@@ -176,7 +179,10 @@ const SystemLogsSection = () => {
                               <span className="font-medium">
                                 {t("dashboard.settings.systemLogs.col.entity")}:
                               </span>{" "}
-                              {log.entityType}
+                              {t(
+                                `dashboard.settings.systemLogs.resources.${log.entityType}`,
+                                { defaultValue: log.entityType },
+                              )}
                               {log.entityId ? ` #${log.entityId}` : ""}
                             </p>
                             <p>

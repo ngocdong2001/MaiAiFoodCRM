@@ -755,7 +755,8 @@
           "entity": "Đối tượng",
           "path": "Yêu cầu",
           "duration": "Thời lượng",
-          "payload": "Dữ liệu gửi"
+          "payload": "Dữ liệu gửi",
+          "localhost": "máy nội bộ"
         },
         "pageLabel": "Trang {{page}}/{{totalPages}}",
         "prev": "Trước",
@@ -770,7 +771,7 @@
           "calendar.restoreAppointment": "Hoàn trả lịch hẹn",
           "calendar.updateAppointmentStatus": "Cập nhật trạng thái lịch hẹn",
           "calendar.deleteAppointment": "Xóa lịch hẹn",
-          "revenue.restoreBooking": "Hoàn trả lịch hẹn đã hủy",
+          "revenue.restoreBooking": "Khôi phục lịch hẹn",
           "revenue.updateCancelReason": "Cập nhật lý do hủy",
           "crm.createGuest": "Tạo khách hàng",
           "crm.updateGuest": "Cập nhật khách hàng",

@@ -488,16 +488,15 @@ const RevenuePage = () => {
           <div className="min-w-175">
             {/* Table header row */}
             <div className="flex w-full items-center bg-[#FAFAFA]">
-              <div className="w-[320px] shrink-0 px-6 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+              <div className="w-[320px] shrink-0 flex-1 px-6 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
                 {t("dashboard.revenue.staffTable.colStaff")}
               </div>
               <div className="w-35 shrink-0 px-4 py-3 text-center text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
                 {t("dashboard.revenue.staffTable.colOrders")}
               </div>
-              <div className="w-40 shrink-0 px-4 py-3 text-left text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
+              <div className="w-40 shrink-0 px-4 py-3 text-center text-[12px] font-medium uppercase tracking-wide text-[#9DA1A7]">
                 {t("dashboard.revenue.staffTable.colRevenue")}
               </div>
-              <div className="w-10 shrink-0" />
             </div>
 
             <div>

@@ -812,7 +812,8 @@
           "entity": "Entity",
           "path": "Request",
           "duration": "Duration",
-          "payload": "Payload"
+          "payload": "Payload",
+          "localhost": "localhost"
         },
         "pageLabel": "Page {{page}} of {{totalPages}}",
         "prev": "Previous",
@@ -827,7 +828,7 @@
           "calendar.restoreAppointment": "Restored appointment",
           "calendar.updateAppointmentStatus": "Updated appointment status",
           "calendar.deleteAppointment": "Deleted appointment",
-          "revenue.restoreBooking": "Restored cancelled booking",
+          "revenue.restoreBooking": "Restored booking",
           "revenue.updateCancelReason": "Updated cancellation reason",
           "crm.createGuest": "Created guest",
           "crm.updateGuest": "Updated guest",
