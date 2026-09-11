@@ -88,7 +88,10 @@ function JobDetailDialog({ job, onClose }: JobDialogProps) {
                   })}
                 </Badge>
                 {job.cancelReasonStatus && (
-                  <Badge variant="outline" className="border-orange-300 text-orange-600">
+                  <Badge
+                    variant="outline"
+                    className="border-orange-300 text-orange-600"
+                  >
                     {job.cancelReasonStatus === "pending"
                       ? t("dashboard.revenue.staffDetail.reasonPending", {
                           defaultValue: "Reason Pending",
@@ -205,11 +208,13 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
   const [selectedJob, setSelectedJob] = useState<StaffRevenueDetailJob | null>(
     null,
   );
-  const [reasonDialogJob, setReasonDialogJob] = useState<StaffRevenueDetailJob | null>(null);
+  const [reasonDialogJob, setReasonDialogJob] =
+    useState<StaffRevenueDetailJob | null>(null);
   const [reasonText, setReasonText] = useState("");
   const [isSubmittingReason, setIsSubmittingReason] = useState(false);
   const [reasonError, setReasonError] = useState<string | null>(null);
-  const [restoringJob, setRestoringJob] = useState<StaffRevenueDetailJob | null>(null);
+  const [restoringJob, setRestoringJob] =
+    useState<StaffRevenueDetailJob | null>(null);
 
   const fetchDetail = () => {
     setIsLoading(true);
@@ -226,15 +231,20 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
     setIsSubmittingReason(true);
     setReasonError(null);
     try {
-      await revenueService.updateCancelReason(reasonDialogJob.paymentId, reasonText.trim());
+      await revenueService.updateCancelReason(
+        reasonDialogJob.paymentId,
+        reasonText.trim(),
+      );
       // Refresh detail to show updated reason
       fetchDetail();
       setReasonDialogJob(null);
       setReasonText("");
     } catch {
-      setReasonError(t("dashboard.revenue.errors.submitReason", {
-        defaultValue: "Failed to submit reason",
-      }));
+      setReasonError(
+        t("dashboard.revenue.errors.submitReason", {
+          defaultValue: "Failed to submit reason",
+        }),
+      );
     } finally {
       setIsSubmittingReason(false);
     }
@@ -262,7 +272,7 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
       {/* Data row */}
       <div className="flex w-full items-center border-b border-[#DFE1E4] last:border-b-0">
         {/* Nhân viên */}
-        <div className="flex w-[320px] shrink-0 items-center gap-3 px-6 py-4">
+        <div className="flex w-[320px] shrink-0 flex-1 items-center gap-3 px-6 py-4">
           {row.avatarUrl ? (
             <img
               src={row.avatarUrl}
@@ -294,17 +304,10 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
         </div>
 
         {/* Tổng doanh thu */}
-        <div className="flex w-40 shrink-0 items-center px-4 py-4">
+        <div className="flex w-40 shrink-0 items-center justify-center px-4 py-4">
           <span className="text-sm font-bold text-[#f04cac]">
             {fmt(row.totalRevenue)}
           </span>
-        </div>
-
-        {/* Menu */}
-        <div className="flex w-10 shrink-0 items-center justify-center">
-          <button className="flex h-8 w-8 items-center justify-center rounded-[6px] transition-colors hover:bg-[#F3F4F6]">
-            <span className="text-lg leading-none text-[#9DA1A7]">⋮</span>
-          </button>
         </div>
       </div>
 
@@ -339,6 +342,8 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
               <tbody>
                 {detail!.jobs.map((job) => {
                   const isJobCancelled = job.status === "cancelled";
+                  const isJobCompleted = job.status === "completed";
+                  const canRestore = isJobCancelled || isJobCompleted;
                   return (
                     <tr
                       key={job.paymentId}
@@ -371,39 +376,55 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
                         )}
                       </td>
                       <td className="w-10 px-2 text-center">
-                        {isJobCancelled && (
+                        {canRestore && (
                           <DropdownMenu>
                             <DropdownMenuTrigger className="flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-[#F3F4F6]">
                               <MoreVertical className="h-4 w-4 text-[#9DA1A7]" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setReasonDialogJob(job);
-                                  setReasonText(job.cancelReason ?? "");
-                                }}
-                              >
-                                {job.cancelReason
-                                  ? t("dashboard.revenue.staffDetail.editReason", {
-                                      defaultValue: "Edit Reason",
-                                    })
-                                  : t("dashboard.revenue.staffDetail.addReason", {
-                                      defaultValue: "Add Reason",
-                                    })}
-                              </DropdownMenuItem>
+                              {isJobCancelled && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setReasonDialogJob(job);
+                                    setReasonText(job.cancelReason ?? "");
+                                  }}
+                                >
+                                  {job.cancelReason
+                                    ? t(
+                                        "dashboard.revenue.staffDetail.editReason",
+                                        {
+                                          defaultValue: "Edit Reason",
+                                        },
+                                      )
+                                    : t(
+                                        "dashboard.revenue.staffDetail.addReason",
+                                        {
+                                          defaultValue: "Add Reason",
+                                        },
+                                      )}
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 onClick={() => handleRestore(job)}
-                                disabled={restoringJob?.paymentId === job.paymentId}
+                                disabled={
+                                  restoringJob?.paymentId === job.paymentId
+                                }
                                 className="text-green-600"
                               >
                                 <RotateCcw className="h-4 w-4" />
                                 {restoringJob?.paymentId === job.paymentId
-                                  ? t("dashboard.revenue.staffDetail.restoring", {
-                                      defaultValue: "Restoring...",
-                                    })
-                                  : t("dashboard.revenue.staffDetail.restoreToPending", {
-                                      defaultValue: "Restore to Pending",
-                                    })}
+                                  ? t(
+                                      "dashboard.revenue.staffDetail.restoring",
+                                      {
+                                        defaultValue: "Restoring...",
+                                      },
+                                    )
+                                  : t(
+                                      "dashboard.revenue.staffDetail.restoreToPending",
+                                      {
+                                        defaultValue: "Restore to Pending",
+                                      },
+                                    )}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -455,9 +476,12 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
               <textarea
                 value={reasonText}
                 onChange={(e) => setReasonText(e.target.value)}
-                placeholder={t("dashboard.revenue.staffDetail.cancelReasonPlaceholder", {
-                  defaultValue: "Enter reason...",
-                })}
+                placeholder={t(
+                  "dashboard.revenue.staffDetail.cancelReasonPlaceholder",
+                  {
+                    defaultValue: "Enter reason...",
+                  },
+                )}
                 className="w-full rounded-lg border border-[#DFE1E4] p-3 text-sm text-[#1A1A1A] outline-none focus:border-primary"
                 rows={3}
               />
