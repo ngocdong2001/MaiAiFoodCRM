@@ -52,20 +52,33 @@ export const activityLoggerMiddleware = (
   }
 
   const startedAt = Date.now();
+  // Capture path/body at request time — Express mutates req.path as it
+  // traverses routers, so by the time res.on('finish') fires the value
+  // is wrong (e.g. "/7" instead of "/api/staff/7").
+  const capturedPath = req.path;
+  const capturedOriginalUrl = req.originalUrl;
+  const capturedBody = req.body ? { ...req.body } : undefined;
 
   res.on("finish", () => {
-    void recordActivity(req, res, Date.now() - startedAt);
+    void recordActivity(req, res, Date.now() - startedAt, capturedPath, capturedOriginalUrl, capturedBody);
   });
 
   next();
 };
 
-async function recordActivity(req: Request, res: Response, durationMs: number) {
+async function recordActivity(
+  req: Request,
+  res: Response,
+  durationMs: number,
+  capturedPath: string,
+  capturedOriginalUrl: string,
+  capturedBody: Record<string, unknown> | undefined,
+) {
   // No tenant context (e.g. failed auth, or master-only routes) — nothing to attribute this to.
   const db = req.tenantClient;
   if (!db) return;
 
-  const { entityType, entityId } = extractEntityInfo(req.path);
+  const { entityType, entityId } = extractEntityInfo(capturedPath);
   const user = req.user;
   const performedBy = user ? `${user.name} <${user.email}> (${user.role})` : "Unknown";
   const ipAddress =
@@ -75,20 +88,23 @@ async function recordActivity(req: Request, res: Response, durationMs: number) {
 
   const newValues = JSON.stringify({
     method: req.method,
-    path: req.originalUrl,
+    path: capturedOriginalUrl,
     statusCode: res.statusCode,
     durationMs,
     userAgent: req.headers["user-agent"] ?? null,
     success: res.statusCode < 400,
   }).slice(0, 2000);
 
+  // Build a temporary req-like object for resolveActionKey since it reads req.path
+  const fakeReq = { ...req, path: capturedPath, body: capturedBody } as Request;
+
   try {
     await db.auditlog.create({
       data: {
         entityType,
         entityId,
-        action: resolveActionKey(req),
-        oldValues: sanitizeBody(req.body),
+        action: resolveActionKey(fakeReq),
+        oldValues: sanitizeBody(capturedBody),
         newValues,
         performedBy,
         ipAddress,
