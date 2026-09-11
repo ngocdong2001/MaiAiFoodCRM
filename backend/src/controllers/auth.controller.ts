@@ -36,7 +36,8 @@ export const login = async (req: Request, res: Response) => {
   }
 
   if (!jwtSecret) {
-    return res.status(500).json({ message: "JWT secret is not configured" });
+    console.error("JWT secret is not configured");
+    return res.status(500).json({ message: "Unable to process login" });
   }
 
   const normalizedEmail = String(email).trim().toLowerCase();
@@ -44,7 +45,6 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     const prismaMaster = getPrismaMaster();
-
 
     const user = await prismaMaster.user.findUnique({
       where: { email: normalizedEmail },
@@ -87,11 +87,11 @@ export const login = async (req: Request, res: Response) => {
       user: toAuthUser(user),
       tenant: user.tenant
         ? {
-          id: user.tenant.id,
-          name: user.tenant.name,
-          slug: user.tenant.slug,
-          databaseName: user.tenant.databaseName,
-        }
+            id: user.tenant.id,
+            name: user.tenant.name,
+            slug: user.tenant.slug,
+            databaseName: user.tenant.databaseName,
+          }
         : null,
     });
   } catch (error) {
@@ -117,9 +117,14 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 
   const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
-  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
-  const phone = typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
-  const avatarUrl = typeof req.body?.avatarUrl === "string" ? req.body.avatarUrl.trim() : "";
+  const email =
+    typeof req.body?.email === "string"
+      ? req.body.email.trim().toLowerCase()
+      : "";
+  const phone =
+    typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
+  const avatarUrl =
+    typeof req.body?.avatarUrl === "string" ? req.body.avatarUrl.trim() : "";
 
   if (!name || !email) {
     return res.status(400).json({ message: "Name and email are required" });

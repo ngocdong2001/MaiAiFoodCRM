@@ -13,6 +13,7 @@ export type QueueItem = {
   id: number;
   guestName: string;
   serviceName: string;
+  staffName: string;
   startTime: string;
   notes: string | null;
   status: string;
@@ -22,7 +23,7 @@ export type QueueItem = {
 export type SnapshotItem = {
   id: number;
   time: string;
-  title: string;
+  serviceName: string;
   staffName: string;
   status: string;
 };
@@ -126,6 +127,7 @@ export const OverviewModel = {
           notes: true,
           status: true,
           guest: { select: { name: true } },
+          staff: { select: { name: true } },
           appointmentservice: {
             take: 1,
             select: { service: { select: { name: true } } },
@@ -197,6 +199,7 @@ export const OverviewModel = {
       id: row.id,
       guestName: row.guest?.name ?? "Walk-in Guest",
       serviceName: row.appointmentservice[0]?.service.name ?? "—",
+      staffName: row.staff?.name ?? "—",
       startTime: row.startTime.toISOString(),
       notes: row.notes,
       status: row.status,
@@ -206,7 +209,7 @@ export const OverviewModel = {
     const todaysSnapshot: SnapshotItem[] = snapshotRows.map((row) => ({
       id: row.id,
       time: fmt12h(row.startTime),
-      title: `${row.appointmentservice[0]?.service.name ?? "Appointment"} with ${row.staff.name}`,
+      serviceName: row.appointmentservice[0]?.service.name ?? "—",
       staffName: row.staff.name,
       status: row.status,
     }));

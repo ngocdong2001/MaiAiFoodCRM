@@ -324,6 +324,7 @@
         "col": {
           "guest": "Guest",
           "service": "Service",
+          "staff": "Staff",
           "notes": "Notes / Special Requests",
           "status": "Status"
         },
@@ -444,6 +445,7 @@
         "subtitle": "Upcoming appointments and staff shifts",
         "loading": "Loading…",
         "empty": "No appointments scheduled for today.",
+        "withStaff": "{{service}} with {{staff}}",
         "items": {
           "haircut-style": {
             "title": "Haircut & Style with Emily"
@@ -472,6 +474,7 @@
         "col": {
           "guest": "Guest",
           "service": "Service",
+          "staff": "Staff",
           "notes": "Notes / Special Requests",
           "appointmentTime": "Appointment Time",
           "status": "Status"
@@ -660,7 +663,20 @@
       "title": "Reports & Exports",
       "filters": "Filters",
       "exportData": "Export Data",
-      "loading": "Loading reports…"
+      "loading": "Loading reports…",
+      "filtersPanel": {
+        "title": "Report Filters",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "apply": "Apply",
+        "reset": "Reset",
+        "preset": "Time range",
+        "presetToday": "Today",
+        "presetWeek": "1 week",
+        "presetMonth": "1 month",
+        "presetAll": "All",
+        "presetCustom": "Custom"
+      }
     },
     "revenue": {
       "title": "Daily Revenue Summary",

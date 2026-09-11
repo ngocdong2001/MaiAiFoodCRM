@@ -4,12 +4,16 @@ import {
   Building2,
   CalendarDays,
   Clock,
+  LogOut,
   PhoneCall,
   ScrollText,
   ShieldCheck,
   User,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+
+import { authService } from "@/features/landing/services/auth.service";
 
 import type { SettingsNavItem, SettingsTab } from "../../types/settings.types";
 
@@ -35,6 +39,13 @@ const SettingsNavSection = ({
   onChange,
 }: SettingsNavSectionProps) => {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    authService.logout();
+    router.replace("/login");
+  };
+
   return (
     <nav className="flex flex-col gap-1">
       {items.map((item) => {
@@ -55,6 +66,16 @@ const SettingsNavSection = ({
           </button>
         );
       })}
+
+      <div className="my-2 border-t border-[#DEE1E7]" />
+
+      <button
+        onClick={handleLogout}
+        className="flex w-full items-center gap-3 rounded-[10px] px-4 py-2.5 text-sm font-medium text-[#EB5656] transition-colors hover:bg-[#FDF0F0] hover:text-[#D64545]"
+      >
+        <LogOut className="h-4 w-4 shrink-0" />
+        {t("dashboard.header.logout")}
+      </button>
     </nav>
   );
 };

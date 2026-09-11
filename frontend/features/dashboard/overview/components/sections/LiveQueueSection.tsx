@@ -54,6 +54,9 @@ const LiveQueueSection = () => {
                   {t("dashboard.overview.queue.col.service")}
                 </th>
                 <th className="pb-2 text-left text-[13px] font-medium text-[#8D95A5]">
+                  {t("dashboard.overview.queue.col.staff")}
+                </th>
+                <th className="pb-2 text-left text-[13px] font-medium text-[#8D95A5]">
                   {t("dashboard.overview.queue.col.notes")}
                 </th>
                 <th className="pb-2 text-left text-[13px] font-medium text-[#8D95A5]">
@@ -73,6 +76,9 @@ const LiveQueueSection = () => {
                     </td>
                     <td className="py-3 text-base text-[#171A21]">
                       {guest.serviceName}
+                    </td>
+                    <td className="py-3 text-base text-[#171A21]">
+                      {guest.staffName}
                     </td>
                     <td className="py-3 text-base italic text-[#8D95A5]">
                       {guest.notes || t(NULL_TEXT_KEY)}
