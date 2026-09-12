@@ -78,8 +78,9 @@ const WeeklyScheduleSection = ({
         const schedule = member.schedules[0];
 
         // Individual appointment blocks for this staff member
+        // (cancelled bookings are hidden from the schedule)
         const apptSlots = appointments
-          .filter((a) => a.staffId === member.id)
+          .filter((a) => a.staffId === member.id && a.status !== "cancelled")
           .map((a) => {
             const { bg, text } = statusColor(a.status);
             return {

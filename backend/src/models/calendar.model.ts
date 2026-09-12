@@ -504,7 +504,9 @@ export const CalendarModel = {
         ...(filters.staffIds?.length
           ? { staffId: { in: filters.staffIds } }
           : {}),
-        ...(filters.status ? { status: filters.status } : {}),
+        // Cancelled bookings are hidden from the calendar/staff schedule by default.
+        // They are only returned when an explicit "cancelled" status filter is set.
+        status: filters.status ?? { not: "cancelled" },
       },
       include,
       orderBy: { startTime: "asc" },

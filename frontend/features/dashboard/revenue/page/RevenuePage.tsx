@@ -508,6 +508,9 @@ const RevenuePage = () => {
                     startDate: appliedFilters.startDate || undefined,
                     endDate: appliedFilters.endDate || undefined,
                   }}
+                  onDataChanged={() => {
+                    void loadSummary(buildSummaryParams(appliedFilters));
+                  }}
                 />
               ))}
             </div>
