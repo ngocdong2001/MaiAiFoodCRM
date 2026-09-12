@@ -43,7 +43,10 @@ const TodaysSnapshotSection = () => {
                   )}
                 />
                 <span className="text-sm leading-5 text-[#1d1f23]">
-                  {item.title}
+                  {t("dashboard.overview.snapshot.withStaff", {
+                    service: item.serviceName,
+                    staff: item.staffName,
+                  })}
                 </span>
               </div>
             </li>

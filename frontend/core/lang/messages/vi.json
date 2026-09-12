@@ -324,6 +324,7 @@
         "col": {
           "guest": "Tên Khách Hàng",
           "service": "Loại Dịch Vụ/Hẹn",
+          "staff": "Nhân viên",
           "notes": "Ghi chú/Yêu cầu đặc biệt",
           "status": "Trạng thái"
         },
@@ -443,7 +444,8 @@
         "title": "Tổng quan lịch trình",
         "subtitle": "Lịch hẹn sắp tới và ca làm việc",
         "loading": "Đang tải…",
-        "empty": "Không có lịch hẹn nào cho hôm nay."
+        "empty": "Không có lịch hẹn nào cho hôm nay.",
+        "withStaff": "{{service}} với {{staff}}"
       },
       "queue": {
         "title": "Hàng đợi Trực tiếp",
@@ -455,6 +457,7 @@
         "col": {
           "guest": "Tên Khách Hàng",
           "service": "Loại Dịch Vụ/Hẹn",
+          "staff": "Nhân viên",
           "notes": "Ghi chú/Yêu cầu đặc biệt",
           "appointmentTime": "Giờ hẹn",
           "status": "Trạng thái"
@@ -603,7 +606,20 @@
       "title": "Báo cáo & Xuất dữ liệu",
       "filters": "Bộ lọc",
       "exportData": "Xuất dữ liệu",
-      "loading": "Đang tải báo cáo…"
+      "loading": "Đang tải báo cáo…",
+      "filtersPanel": {
+        "title": "Bộ lọc báo cáo",
+        "startDate": "Ngày bắt đầu",
+        "endDate": "Ngày kết thúc",
+        "apply": "Áp dụng",
+        "reset": "Đặt lại",
+        "preset": "Khoảng thời gian",
+        "presetToday": "Hôm nay",
+        "presetWeek": "1 tuần",
+        "presetMonth": "1 tháng",
+        "presetAll": "Tất cả",
+        "presetCustom": "Tùy chỉnh"
+      }
     },
     "revenue": {
       "title": "Tổng kết doanh thu trong ngày",

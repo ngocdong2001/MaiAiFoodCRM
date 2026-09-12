@@ -198,9 +198,14 @@ function JobDetailDialog({ job, onClose }: JobDialogProps) {
 interface Props {
   row: StaffRevenueRow;
   dateRange?: { startDate?: string; endDate?: string };
+  onDataChanged?: () => void;
 }
 
-export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
+export function StaffRevenueAccordionItem({
+  row,
+  dateRange,
+  onDataChanged,
+}: Props) {
   const { t } = useTranslation();
   const [detail, setDetail] = useState<StaffRevenueDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -255,6 +260,8 @@ export function StaffRevenueAccordionItem({ row, dateRange }: Props) {
     try {
       await revenueService.restoreBooking(job.paymentId);
       fetchDetail();
+      // Notify the page to silently reload the revenue summary
+      onDataChanged?.();
     } catch {
       // silently fail — user can retry
     } finally {

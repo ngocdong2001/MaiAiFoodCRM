@@ -5,6 +5,7 @@ import { useAuthStore } from "@/core/store/authStore";
 import { overviewService } from "../services/overview.service";
 
 const overviewStatsKey = ["overview", "stats"] as const;
+const calendarAppointmentsKey = ["calendar", "appointments"] as const;
 
 // Kept alive at the dashboard layout level (not tied to the Overview page)
 // so restoring/updating a booking from any page still refreshes the Live Queue.
@@ -23,6 +24,9 @@ export const useQueueEventsSubscription = () => {
       try {
         await overviewService.streamQueue(controller.signal, () => {
           void queryClient.invalidateQueries({ queryKey: overviewStatsKey });
+          void queryClient.invalidateQueries({
+            queryKey: calendarAppointmentsKey,
+          });
         });
         if (!controller.signal.aborted) retryTimer = setTimeout(connect, 3_000);
       } catch (error) {

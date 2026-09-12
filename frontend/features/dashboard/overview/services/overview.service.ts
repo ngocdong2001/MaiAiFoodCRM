@@ -16,6 +16,7 @@ export type QueueItem = {
   id: number;
   guestName: string;
   serviceName: string;
+  staffName: string;
   startTime: string;
   notes: string | null;
   status: string;
@@ -25,7 +26,7 @@ export type QueueItem = {
 export type SnapshotItem = {
   id: number;
   time: string;
-  title: string;
+  serviceName: string;
   staffName: string;
   status: string;
 };

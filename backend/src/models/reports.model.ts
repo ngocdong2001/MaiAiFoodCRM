@@ -38,7 +38,20 @@ export type ReportsSummaryFilters = {
   endDate?: string;
 };
 
-const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const toNum = (v: unknown): number => {
@@ -73,55 +86,65 @@ export const ReportsModel = {
 
     // Determine the period window — default to last 6 months
     const endDate = filters.endDate
-      ? new Date(filters.endDate)
+      ? new Date(`${filters.endDate}T00:00:00`)
       : new Date(now.getFullYear(), now.getMonth() + 1, 0); // end of current month
+    // Date-only strings (e.g. from a date input) default to midnight, which
+    // would exclude the entire day — extend to the last millisecond of the day.
+    endDate.setHours(23, 59, 59, 999);
 
     const startDate = filters.startDate
-      ? new Date(filters.startDate)
+      ? new Date(`${filters.startDate}T00:00:00`)
       : new Date(now.getFullYear(), now.getMonth() - 5, 1); // 6 months ago start
+    startDate.setHours(0, 0, 0, 0);
 
     // Previous period of same length for delta comparison
     const periodMs = endDate.getTime() - startDate.getTime();
     const prevEnd = new Date(startDate.getTime() - 1);
     const prevStart = new Date(prevEnd.getTime() - periodMs);
 
-    const [currentPayments, previousPayments, appointments, appointmentServices] =
-      await Promise.all([
-        db.payment.findMany({
-          where: {
-            paidAt: { gte: startDate, lte: endDate },
-            paymentStatus: "paid",
-          },
-          select: { finalAmount: true, paidAt: true },
-        }),
-        db.payment.findMany({
-          where: {
-            paidAt: { gte: prevStart, lte: prevEnd },
-            paymentStatus: "paid",
-          },
-          select: { finalAmount: true },
-        }),
-        db.appointment.findMany({
-          where: {
+    const [
+      currentPayments,
+      previousPayments,
+      appointments,
+      appointmentServices,
+    ] = await Promise.all([
+      db.payment.findMany({
+        where: {
+          paidAt: { gte: startDate, lte: endDate },
+          paymentStatus: "paid",
+        },
+        select: { finalAmount: true, paidAt: true },
+      }),
+      db.payment.findMany({
+        where: {
+          paidAt: { gte: prevStart, lte: prevEnd },
+          paymentStatus: "paid",
+        },
+        select: { finalAmount: true },
+      }),
+      db.appointment.findMany({
+        where: {
+          startTime: { gte: startDate, lte: endDate },
+          status: { not: "cancelled" },
+        },
+        select: {
+          id: true,
+          startTime: true,
+          status: true,
+        },
+      }),
+      db.appointmentservice.findMany({
+        where: {
+          appointment: {
             startTime: { gte: startDate, lte: endDate },
+            status: { not: "cancelled" },
           },
-          select: {
-            id: true,
-            startTime: true,
-            status: true,
-          },
-        }),
-        db.appointmentservice.findMany({
-          where: {
-            appointment: {
-              startTime: { gte: startDate, lte: endDate },
-            },
-          },
-          select: {
-            service: { select: { name: true } },
-          },
-        }),
-      ]);
+        },
+        select: {
+          service: { select: { name: true } },
+        },
+      }),
+    ]);
 
     // ── Metrics ──────────────────────────────────────────────────────────────
     const totalRevenue = currentPayments.reduce(
@@ -135,9 +158,12 @@ export const ReportsModel = {
     const revDelta = deltaPct(totalRevenue, prevRevenue);
 
     const totalBookings = appointments.length;
-    // previous period bookings count
+    // previous period bookings count (excluding cancelled)
     const prevBookingsCount = await db.appointment.count({
-      where: { startTime: { gte: prevStart, lte: prevEnd } },
+      where: {
+        startTime: { gte: prevStart, lte: prevEnd },
+        status: { not: "cancelled" },
+      },
     });
     const bookingsDelta = deltaPct(totalBookings, prevBookingsCount);
 
@@ -151,7 +177,8 @@ export const ReportsModel = {
     const completedCount = appointments.filter(
       (a) => a.status === "completed",
     ).length;
-    const utilization = totalBookings > 0 ? (completedCount / totalBookings) * 100 : 0;
+    const utilization =
+      totalBookings > 0 ? (completedCount / totalBookings) * 100 : 0;
 
     const metrics: ReportStatMetric[] = [
       {
@@ -250,9 +277,7 @@ export const ReportsModel = {
         name,
         count,
         value:
-          totalServices > 0
-            ? Math.round((count / totalServices) * 100)
-            : 0,
+          totalServices > 0 ? Math.round((count / totalServices) * 100) : 0,
       }));
 
     // ── Weekly Utilization ────────────────────────────────────────────────────

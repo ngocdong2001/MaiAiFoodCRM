@@ -29,7 +29,13 @@ import {
   AlertDialogTitle,
 } from "@/shared/components/ui/alert-dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/shared/components/ui/input-group";
 import { Spinner } from "@/shared/components/ui/spinner";
 
 const LoginForm = () => {
@@ -69,7 +75,11 @@ const LoginForm = () => {
     setErrorMessage("");
 
     try {
-      await loginMutation.mutateAsync({ email, password, remember: rememberMe });
+      await loginMutation.mutateAsync({
+        email,
+        password,
+        remember: rememberMe,
+      });
       router.replace("/dashboard/overview");
     } catch (err) {
       setErrorMessage(getLoginErrorMessage(err));
@@ -86,7 +96,10 @@ const LoginForm = () => {
             {/* Brand */}
             <div className="flex items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <Activity className="h-6 w-6 text-[#f6f7f9]" strokeWidth={2.5} />
+                <Activity
+                  className="h-6 w-6 text-[#f6f7f9]"
+                  strokeWidth={2.5}
+                />
               </div>
               <span className="text-[26px] font-bold leading-[26px] text-primary">
                 {t("auth.login.brand")}
@@ -110,9 +123,11 @@ const LoginForm = () => {
                 >
                   {t("auth.login.email")}
                 </label>
-                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#dfe1e4] bg-[#f6f7f9] px-3 py-2">
-                  <Mail className="h-5 w-5 shrink-0 text-[#9da1a7]" />
-                  <Input
+                <InputGroup className="h-auto gap-1.5 rounded-[10px] border-[#dfe1e4] bg-[#f6f7f9] px-3 py-2">
+                  <InputGroupAddon align="inline-start">
+                    <Mail className="h-5 w-5 shrink-0 text-[#9da1a7]" />
+                  </InputGroupAddon>
+                  <InputGroupInput
                     id="email"
                     name="email"
                     type="text"
@@ -120,10 +135,10 @@ const LoginForm = () => {
                     placeholder={t("auth.login.emailPlaceholder")}
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    className="h-auto flex-1 border-none bg-transparent p-0 text-sm leading-[22px] text-[#1d1f23] placeholder:text-[#9da1a7] shadow-none outline-none focus-visible:ring-0"
+                    className="h-auto text-sm leading-[22px] text-[#1d1f23] placeholder:text-[#9da1a7]"
                     required
                   />
-                </div>
+                </InputGroup>
               </div>
 
               {/* Password */}
@@ -134,11 +149,13 @@ const LoginForm = () => {
                     className="block text-sm font-medium leading-[14px] text-[#1d1f23]"
                   >
                     {t("auth.login.password")}
-                  </label> 
+                  </label>
                 </div>
-                <div className="mt-[11px] flex items-center gap-1.5 rounded-[10px] border border-[#dfe1e4] bg-[#f6f7f9] px-3 py-2">
-                  <Lock className="h-5 w-5 shrink-0 text-[#9da1a7]" />
-                  <Input
+                <InputGroup className="mt-[11px] h-auto gap-1.5 rounded-[10px] border-[#dfe1e4] bg-[#f6f7f9] px-3 py-2">
+                  <InputGroupAddon align="inline-start">
+                    <Lock className="h-5 w-5 shrink-0 text-[#9da1a7]" />
+                  </InputGroupAddon>
+                  <InputGroupInput
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
@@ -146,39 +163,32 @@ const LoginForm = () => {
                     placeholder={t("auth.login.passwordPlaceholder")}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    className="h-auto flex-1 border-none bg-transparent p-0 text-sm leading-[22px] text-[#1d1f23] placeholder:text-[#9da1a7] shadow-none outline-none focus-visible:ring-0"
+                    className="h-auto text-sm leading-[22px] text-[#1d1f23] placeholder:text-[#9da1a7]"
                     required
                   />
-                  <button
-                    type="button"
+                  <InputGroupButton
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="shrink-0 text-[#9da1a7]"
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
+                    className="h-5 w-5 shrink-0 p-0 text-[#9da1a7] hover:bg-transparent"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
                     ) : (
                       <Eye className="h-5 w-5" />
                     )}
-                  </button>
-                </div>
+                  </InputGroupButton>
+                </InputGroup>
               </div>
 
               {/* Remember me */}
               <label className="flex cursor-pointer items-center gap-2">
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={rememberMe}
-                  onClick={() => setRememberMe((prev) => !prev)}
-                  className="flex h-4 w-4 items-center justify-center rounded-[2px] border border-[#7a7e84] bg-white"
-                >
-                  {rememberMe && (
-                    <span className="h-2 w-2 rounded-[1px] bg-primary" />
-                  )}
-                </button>
+                <Checkbox
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(Boolean(checked))}
+                  aria-label={t("auth.login.rememberMe")}
+                />
                 <span className="text-sm font-medium leading-[22px] text-[#9da1a7]">
                   {t("auth.login.rememberMe")}
                 </span>

@@ -297,7 +297,7 @@ const RevenuePage = () => {
                 }))
               }
             >
-              <SelectTrigger className="h-9 rounded-[8px] border-[#DEE1E7] text-sm">
+              <SelectTrigger className="h-9 w-full rounded-[8px] border-[#DEE1E7] text-sm">
                 <SelectValue>{selectedStaffLabel}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -507,6 +507,9 @@ const RevenuePage = () => {
                   dateRange={{
                     startDate: appliedFilters.startDate || undefined,
                     endDate: appliedFilters.endDate || undefined,
+                  }}
+                  onDataChanged={() => {
+                    void loadSummary(buildSummaryParams(appliedFilters));
                   }}
                 />
               ))}
