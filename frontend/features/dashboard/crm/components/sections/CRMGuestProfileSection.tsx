@@ -1,9 +1,27 @@
-import { CalendarDays, CalendarHeart, Cake, Dot, Mail, MoreHorizontal, Pencil, Phone, Sparkles, Star, Trash2, UserRoundPen } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarHeart,
+  Cake,
+  Dot,
+  Mail,
+  MoreHorizontal,
+  Pencil,
+  Phone,
+  Sparkles,
+  Star,
+  Trash2,
+  UserRoundPen,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import { Badge } from "@/shared/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 
 import type { GuestCard } from "../../types/crm.types";
 
@@ -33,7 +51,12 @@ const STATUS_LABEL_KEY: Record<string, string> = {
   in_progress: "dashboard.calendar.statusControl.inProgress",
 };
 
-const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
 
 const CRMGuestProfileSection = ({
   guest,
@@ -42,7 +65,14 @@ const CRMGuestProfileSection = ({
   onDelete,
 }: CRMGuestProfileSectionProps) => {
   const { t, i18n } = useTranslation();
-  const formatDate = (value: string | null) => value ? new Date(value).toLocaleDateString(i18n.language, { month: "short", day: "numeric", year: "numeric" }) : t("dashboard.crm.profile.notAvailable");
+  const formatDate = (value: string | null) =>
+    value
+      ? new Date(value).toLocaleDateString(i18n.language, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : t("dashboard.crm.profile.notAvailable");
   return (
     <section className="border-t border-[#EEF1F5] p-4 sm:p-5 xl:border-l xl:border-t-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -57,7 +87,9 @@ const CRMGuestProfileSection = ({
               <h2 className="truncate text-[30px] leading-none font-semibold text-[#171A21]">
                 {guest.name}
               </h2>
-              <span className="rounded-full bg-[#F2EEFF] px-2 py-0.5 text-[10px] font-semibold text-[#7A63B8]">{t(`dashboard.crm.segments.${guest.segment}`)}</span>
+              <span className="rounded-full bg-[#F2EEFF] px-2 py-0.5 text-[10px] font-semibold text-[#7A63B8]">
+                {t(`dashboard.crm.segments.${guest.segment}`)}
+              </span>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[#8D95A5]">
               <span className="inline-flex items-center gap-1">
@@ -72,13 +104,32 @@ const CRMGuestProfileSection = ({
           </div>
         </div>
 
-        <DropdownMenu><DropdownMenuTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#DEE1E7] text-[#8D95A5]" aria-label="Guest actions"><MoreHorizontal className="h-4 w-4" /></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={onEdit}><UserRoundPen />{t("dashboard.crm.profile.editGuest")}</DropdownMenuItem><DropdownMenuItem onClick={onDelete} className="text-destructive"><Trash2 />{t("dashboard.crm.profile.deleteGuest")}</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#DEE1E7] text-[#8D95A5]"
+            aria-label="Guest actions"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onEdit}>
+              <UserRoundPen />
+              {t("dashboard.crm.profile.editGuest")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDelete} className="text-destructive">
+              <Trash2 />
+              {t("dashboard.crm.profile.deleteGuest")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         <div className="rounded-xl border border-[#E7EBF2] bg-[#FAFBFE] p-3.5">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] text-[#8D95A5]">{t("dashboard.crm.profile.totalSpend")}</p>
+            <p className="text-[11px] text-[#8D95A5]">
+              {t("dashboard.crm.profile.totalSpend")}
+            </p>
             <Sparkles className="h-3.5 w-3.5 text-[#A6B0C2]" />
           </div>
           <p className="mt-1 text-sm font-bold text-[#171A21]">
@@ -86,19 +137,25 @@ const CRMGuestProfileSection = ({
           </p>
         </div>
         <div className="rounded-xl border border-[#E7EBF2] bg-[#FAFBFE] p-3.5">
-          <p className="text-[11px] text-[#8D95A5]">{t("dashboard.crm.profile.totalVisits")}</p>
+          <p className="text-[11px] text-[#8D95A5]">
+            {t("dashboard.crm.profile.totalVisits")}
+          </p>
           <p className="mt-1 text-sm font-bold text-[#171A21]">
             {guest.totalVisits}
           </p>
         </div>
         <div className="rounded-xl border border-[#E7EBF2] bg-[#FAFBFE] p-3.5">
-          <p className="text-[11px] text-[#8D95A5]">{t("dashboard.crm.profile.noShows")}</p>
+          <p className="text-[11px] text-[#8D95A5]">
+            {t("dashboard.crm.profile.noShows")}
+          </p>
           <p className="mt-1 text-sm font-bold text-[#171A21]">
             {guest.noShows}
           </p>
         </div>
         <div className="rounded-xl border border-[#E7EBF2] bg-[#FAFBFE] p-3.5">
-          <p className="text-[11px] text-[#8D95A5]">{t("dashboard.crm.profile.clientSince")}</p>
+          <p className="text-[11px] text-[#8D95A5]">
+            {t("dashboard.crm.profile.clientSince")}
+          </p>
           <p className="mt-1 text-sm font-bold text-[#171A21]">
             {guest.clientSince}
           </p>
@@ -193,7 +250,17 @@ const CRMGuestProfileSection = ({
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#EEF1F5] p-3"><h3 className="text-sm font-semibold text-[#171A21]">{t("dashboard.crm.profile.loyalty")}</h3><p className="mt-2 text-2xl font-bold text-primary">{guest.loyaltyPoints.toLocaleString()}</p><p className="text-xs text-[#8D95A5]">{t("dashboard.crm.profile.loyaltyPoints")}</p></div>
+          <div className="rounded-xl border border-[#EEF1F5] p-3">
+            <h3 className="text-sm font-semibold text-[#171A21]">
+              {t("dashboard.crm.profile.loyalty")}
+            </h3>
+            <p className="mt-2 text-2xl font-bold text-primary">
+              {guest.loyaltyPoints.toLocaleString()}
+            </p>
+            <p className="text-xs text-[#8D95A5]">
+              {t("dashboard.crm.profile.loyaltyPoints")}
+            </p>
+          </div>
 
           <div className="rounded-xl border border-[#EEF1F5] p-3">
             <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#171A21]">
@@ -204,12 +271,16 @@ const CRMGuestProfileSection = ({
               <p className="text-[10px] font-semibold text-[#8D95A5]">
                 {t("dashboard.crm.profile.birthday")}
               </p>
-              <p className="text-xs text-[#374357]">{formatDate(guest.dateOfBirth)}</p>
+              <p className="text-xs text-[#374357]">
+                {formatDate(guest.dateOfBirth)}
+              </p>
               <p className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#8D95A5]">
                 <CalendarHeart className="h-3 w-3" />
                 {t("dashboard.crm.profile.nextAppointment")}
               </p>
-              <p className="text-xs text-[#374357]">{formatDate(guest.nextAppointment)}</p>
+              <p className="text-xs text-[#374357]">
+                {formatDate(guest.nextAppointment)}
+              </p>
             </div>
           </div>
         </div>

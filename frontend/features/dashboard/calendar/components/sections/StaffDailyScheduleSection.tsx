@@ -89,7 +89,8 @@ const StaffDailyScheduleSection = () => {
   const slots = useMemo(
     () =>
       visibleEvents.map((event) => {
-        const palette = STATUS_COLORS[event.detail.status] ?? STATUS_COLORS.pending;
+        const palette =
+          STATUS_COLORS[event.detail.status] ?? STATUS_COLORS.pending;
         return {
           resourceKey: event.resourceKey!,
           startHour: event.startHour,
