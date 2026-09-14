@@ -816,7 +816,9 @@ export const CalendarModel = {
                     serviceId: sr.serviceId,
                     serviceName: svc?.name ?? "Unknown Service",
                     categoryName: svc?.servicecategory?.name ?? null,
-                    price: sr.priceAtBooking,
+                    // A cancelled booking produces no revenue, so the unit
+                    // price must be zero to match the zeroed record totals.
+                    price: 0,
                     quantity: 1,
                   };
                 }),
@@ -824,14 +826,23 @@ export const CalendarModel = {
             },
           });
         } else if (existingRecord) {
-          // Update existing record to mark as cancelled
+          // A previously completed booking is being cancelled: zero out the
+          // snapshot amounts and unit prices so it no longer counts as revenue.
           await transaction.revenuerecord.update({
             where: { id: existingRecord.id },
             data: {
               status: "cancelled",
               cancelReason: updated.cancelReason ?? null,
               cancelReasonStatus: "pending",
+              amount: 0,
+              discountAmount: 0,
+              tipAmount: 0,
+              finalAmount: 0,
             },
+          });
+          await transaction.revenuerecorddetail.updateMany({
+            where: { revenueRecordId: existingRecord.id },
+            data: { price: 0 },
           });
         }
       }

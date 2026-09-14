@@ -342,6 +342,8 @@
         "ready": "Sẵn sàng",
         "completed": "Hoàn thành",
         "cancelled": "Đã hủy",
+        "noShow": "Vắng mặt",
+        "inProgress": "Đang thực hiện",
         "updating": "Đang cập nhật...",
         "error": "Cập nhật trạng thái thất bại. Vui lòng thử lại.",
         "confirmTitle": "Xác nhận đổi trạng thái",

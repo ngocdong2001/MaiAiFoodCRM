@@ -190,13 +190,6 @@ const ReportsPage = () => {
     setAppliedFilters({ ...draftFilters });
   };
 
-  const handleResetFilters = () => {
-    const today = createTodayFilterDraft();
-    setPreset("today");
-    setDraftFilters(today);
-    setAppliedFilters(today);
-  };
-
   return (
     <div className="flex min-h-full flex-col gap-6 px-12 py-8">
       <PageHeader
@@ -282,13 +275,6 @@ const ReportsPage = () => {
               className="h-9 rounded-[8px] bg-primary px-4 text-sm font-semibold text-white hover:opacity-90"
             >
               {t("dashboard.reports.filtersPanel.apply")}
-            </button>
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="h-9 rounded-[8px] border border-[#DEE1E7] bg-white px-4 text-sm font-semibold text-[#1D1F23]"
-            >
-              {t("dashboard.reports.filtersPanel.reset")}
             </button>
           </div>
         </div>

@@ -14,6 +14,16 @@ import WeeklyAppointmentBoard from "./WeeklyAppointmentBoard";
 const DEFAULT_START_HOUR = 8;
 const DEFAULT_END_HOUR = 18;
 
+// Matches the palette used by BookingStatusControl/QueueStatusCell badges.
+const STATUS_COLORS: Record<string, { color: string; textColor: string }> = {
+  pending: { color: "#F59E0B", textColor: "#B45309" },
+  confirmed: { color: "#F04CAC", textColor: "#C91D8F" },
+  completed: { color: "#10B981", textColor: "#0F766E" },
+  cancelled: { color: "#EF4444", textColor: "#B91C1C" },
+  no_show: { color: "#EF4444", textColor: "#B91C1C" },
+  in_progress: { color: "#8A4CE0", textColor: "#6D28D9" },
+};
+
 const getWeekStart = (date: Date) => {
   const copy = new Date(date);
   const day = copy.getDay();
@@ -78,27 +88,32 @@ const StaffDailyScheduleSection = () => {
 
   const slots = useMemo(
     () =>
-      visibleEvents.map((event) => ({
-        resourceKey: event.resourceKey!,
-        startHour: event.startHour,
-        endHour: event.endHour,
-        label: event.title,
-        sublabel: event.subtitle,
-        workItems: [
-          {
-            id: event.key,
-            title: `${event.title} – ${event.subtitle}`,
-            timeRange: event.detail.timeRange,
-            detail: event.detail.status,
-          },
-        ],
-        extra: (
-          <BookingStatusControl
-            appointmentId={Number(event.key)}
-            status={event.detail.status}
-          />
-        ),
-      })),
+      visibleEvents.map((event) => {
+        const palette = STATUS_COLORS[event.detail.status] ?? STATUS_COLORS.pending;
+        return {
+          resourceKey: event.resourceKey!,
+          startHour: event.startHour,
+          endHour: event.endHour,
+          label: event.title,
+          sublabel: event.subtitle,
+          color: palette.color,
+          textColor: palette.textColor,
+          workItems: [
+            {
+              id: event.key,
+              title: `${event.title} – ${event.subtitle}`,
+              timeRange: event.detail.timeRange,
+              detail: event.detail.status,
+            },
+          ],
+          extra: (
+            <BookingStatusControl
+              appointmentId={Number(event.key)}
+              status={event.detail.status}
+            />
+          ),
+        };
+      }),
     [visibleEvents],
   );
 

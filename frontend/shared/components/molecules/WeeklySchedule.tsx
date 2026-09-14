@@ -385,7 +385,7 @@ const WeeklySchedule = ({
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden py-4">
+                <div className="relative py-4">
                   <div
                     className="pointer-events-none absolute inset-0 grid"
                     style={{
@@ -412,29 +412,28 @@ const WeeklySchedule = ({
                         key={`${slot.resourceKey}-${slot.startHour}-${slot.endHour}-${slot.label ?? "slot"}`}
                       >
                         <PopoverTrigger
-                          className="absolute z-10 mx-1.5 flex min-w-0 cursor-pointer flex-col justify-center overflow-hidden rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                          className="absolute z-10 mx-1.5 flex w-max max-w-none cursor-pointer flex-col justify-center whitespace-nowrap rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                           style={{
                             left: `${Math.max(0, ((slot.startHour - startHour) / totalHours) * 100)}%`,
-                            right: `${Math.max(0, ((endHour - slot.endHour) / totalHours) * 100)}%`,
                             top: 8 + slot.lane * 58,
-                            height: 46,
+                            minHeight: 46,
                             backgroundColor: `${accent}1A`,
                             borderColor: `${accent}55`,
                             color: text,
                           }}
                         >
                           <span
-                            className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold"
+                            className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold"
                             style={{ color: text }}
                           >
                             <span
                               className="h-1.5 w-1.5 shrink-0 rounded-full"
                               style={{ backgroundColor: accent }}
                             />
-                            <span className="truncate">{primary}</span>
+                            <span className="whitespace-nowrap">{primary}</span>
                           </span>
                           {slot.sublabel ? (
-                            <span className="mt-0.5 truncate text-[10px] font-normal opacity-80">
+                            <span className="mt-0.5 whitespace-nowrap text-[10px] font-normal opacity-80">
                               {slot.sublabel}
                             </span>
                           ) : null}

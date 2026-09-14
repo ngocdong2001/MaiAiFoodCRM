@@ -2,6 +2,7 @@ import { CalendarDays, CalendarHeart, Cake, Dot, Mail, MoreHorizontal, Pencil, P
 import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
+import { Badge } from "@/shared/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/components/ui/dropdown-menu";
 
 import type { GuestCard } from "../../types/crm.types";
@@ -11,6 +12,25 @@ type CRMGuestProfileSectionProps = {
   onEdit: () => void;
   onEditNotes: () => void;
   onDelete: () => void;
+};
+
+// Matches the palette used across the calendar's booking status controls.
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  pending: "bg-[#F59E0B] text-white",
+  confirmed: "bg-primary text-white",
+  completed: "bg-[#10B981] text-white",
+  cancelled: "bg-[#EF4444] text-white",
+  no_show: "bg-[#EF4444] text-white",
+  in_progress: "bg-[#8A4CE0] text-white",
+};
+
+const STATUS_LABEL_KEY: Record<string, string> = {
+  pending: "dashboard.calendar.statusControl.waiting",
+  confirmed: "dashboard.calendar.statusControl.ready",
+  completed: "dashboard.calendar.statusControl.completed",
+  cancelled: "dashboard.calendar.statusControl.cancelled",
+  no_show: "dashboard.calendar.statusControl.noShow",
+  in_progress: "dashboard.calendar.statusControl.inProgress",
 };
 
 const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
@@ -128,6 +148,16 @@ const CRMGuestProfileSection = ({
                       <p className="text-sm font-medium text-[#171A21]">
                         {activity.title}
                       </p>
+                      <Badge
+                        className={
+                          STATUS_BADGE_CLASS[activity.status] ??
+                          "bg-[#8D95A5] text-white"
+                        }
+                      >
+                        {STATUS_LABEL_KEY[activity.status]
+                          ? t(STATUS_LABEL_KEY[activity.status])
+                          : activity.status}
+                      </Badge>
                     </div>
                     <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-[#8D95A5]">
                       <CalendarDays className="h-3 w-3" />
