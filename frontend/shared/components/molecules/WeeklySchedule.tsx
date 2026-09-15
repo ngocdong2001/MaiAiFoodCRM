@@ -356,14 +356,16 @@ const WeeklySchedule = ({
             const resourceSlots = positionSlots(
               slots.filter((item) => item.resourceKey === resource.key),
             );
-            const laneCount = resourceSlots[0]?.laneCount ?? 1;
-            const rowHeight = Math.max(86, laneCount * 58 + 16);
+            const laneGroups: PositionedSlot[][] = [];
+            resourceSlots.forEach((slot) => {
+              if (!laneGroups[slot.lane]) laneGroups[slot.lane] = [];
+              laneGroups[slot.lane].push(slot);
+            });
 
             return (
               <div
                 key={resource.key}
-                className="grid grid-cols-[240px_1fr] border-b border-[#DEE1E7] last:border-b-0"
-                style={{ minHeight: rowHeight }}
+                className="grid min-h-[86px] grid-cols-[240px_1fr] border-b border-[#DEE1E7] last:border-b-0"
               >
                 <div className="sticky left-0 z-20 flex items-center gap-3 border-r border-[#DEE1E7] bg-[#F9FAFB] px-4 py-4">
                   {resource.avatarUrl && (
@@ -385,7 +387,7 @@ const WeeklySchedule = ({
                   </div>
                 </div>
 
-                <div className="relative py-4">
+                <div className="relative flex flex-col gap-2 py-4">
                   <div
                     className="pointer-events-none absolute inset-0 grid"
                     style={{
@@ -400,60 +402,81 @@ const WeeklySchedule = ({
                     ))}
                   </div>
 
-                  {resourceSlots.map((slot) => {
-                    const accent = slot.color ?? "#F04CAC";
-                    const text = slot.textColor ?? "#C91D8F";
-                    const primary =
-                      slot.label ??
-                      `${formatHour(slot.startHour)} - ${formatHour(slot.endHour)}`;
+                  {laneGroups.map((laneSlots, laneIndex) => {
+                    let previousRightPct = 0;
 
                     return (
-                      <Popover
-                        key={`${slot.resourceKey}-${slot.startHour}-${slot.endHour}-${slot.label ?? "slot"}`}
+                      <div
+                        key={laneIndex}
+                        className="relative z-10 flex min-h-[46px] items-stretch"
                       >
-                        <PopoverTrigger
-                          className="absolute z-10 mx-1.5 flex w-max max-w-none cursor-pointer flex-col justify-center whitespace-nowrap rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                          style={{
-                            left: `${Math.max(0, ((slot.startHour - startHour) / totalHours) * 100)}%`,
-                            top: 8 + slot.lane * 58,
-                            minHeight: 46,
-                            backgroundColor: `${accent}1A`,
-                            borderColor: `${accent}55`,
-                            color: text,
-                          }}
-                        >
-                          <span
-                            className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold"
-                            style={{ color: text }}
-                          >
-                            <span
-                              className="h-1.5 w-1.5 shrink-0 rounded-full"
-                              style={{ backgroundColor: accent }}
-                            />
-                            <span className="whitespace-nowrap">{primary}</span>
-                          </span>
-                          {slot.sublabel ? (
-                            <span className="mt-0.5 whitespace-nowrap text-[10px] font-normal opacity-80">
-                              {slot.sublabel}
-                            </span>
-                          ) : null}
-                        </PopoverTrigger>
-                        <PopoverContent
-                          align="start"
-                          side="top"
-                          className="w-84"
-                        >
-                          <ScheduleSlotPopoverContent
-                            staffName={resource.name}
-                            staffRole={resource.subtitle}
-                            periodLabel={primary}
-                            slotType={slot.slotType ?? "work"}
-                            note={slot.note}
-                            workItems={slot.workItems ?? []}
-                          />
-                          {slot.extra}
-                        </PopoverContent>
-                      </Popover>
+                        {laneSlots.map((slot) => {
+                          const accent = slot.color ?? "#F04CAC";
+                          const text = slot.textColor ?? "#C91D8F";
+                          const primary =
+                            slot.label ??
+                            `${formatHour(slot.startHour)} - ${formatHour(slot.endHour)}`;
+                          const leftPct = Math.max(
+                            0,
+                            ((slot.startHour - startHour) / totalHours) * 100,
+                          );
+                          const widthPct = Math.max(
+                            0,
+                            ((slot.endHour - slot.startHour) / totalHours) *
+                              100,
+                          );
+                          const marginLeftPct = leftPct - previousRightPct;
+                          previousRightPct = leftPct + widthPct;
+
+                          return (
+                            <Popover
+                              key={`${slot.resourceKey}-${slot.startHour}-${slot.endHour}-${slot.label ?? "slot"}`}
+                            >
+                              <PopoverTrigger
+                                className="flex w-max min-w-0 cursor-pointer flex-col justify-center whitespace-nowrap rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                                style={{
+                                  marginLeft: `${marginLeftPct}%`,
+                                  minWidth: `${widthPct}%`,
+                                  backgroundColor: `${accent}1A`,
+                                  borderColor: `${accent}55`,
+                                  color: text,
+                                }}
+                              >
+                                <span
+                                  className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold"
+                                  style={{ color: text }}
+                                >
+                                  <span
+                                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                                    style={{ backgroundColor: accent }}
+                                  />
+                                  <span className="whitespace-nowrap">{primary}</span>
+                                </span>
+                                {slot.sublabel ? (
+                                  <span className="mt-0.5 whitespace-nowrap text-[10px] font-normal opacity-80">
+                                    {slot.sublabel}
+                                  </span>
+                                ) : null}
+                              </PopoverTrigger>
+                              <PopoverContent
+                                align="start"
+                                side="top"
+                                className="w-84"
+                              >
+                                <ScheduleSlotPopoverContent
+                                  staffName={resource.name}
+                                  staffRole={resource.subtitle}
+                                  periodLabel={primary}
+                                  slotType={slot.slotType ?? "work"}
+                                  note={slot.note}
+                                  workItems={slot.workItems ?? []}
+                                />
+                                {slot.extra}
+                              </PopoverContent>
+                            </Popover>
+                          );
+                        })}
+                      </div>
                     );
                   })}
                 </div>
