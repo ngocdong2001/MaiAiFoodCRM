@@ -450,7 +450,9 @@ const WeeklySchedule = ({
                                     className="h-1.5 w-1.5 shrink-0 rounded-full"
                                     style={{ backgroundColor: accent }}
                                   />
-                                  <span className="whitespace-nowrap">{primary}</span>
+                                  <span className="whitespace-nowrap">
+                                    {primary}
+                                  </span>
                                 </span>
                                 {slot.sublabel ? (
                                   <span className="mt-0.5 whitespace-nowrap text-[10px] font-normal opacity-80">
