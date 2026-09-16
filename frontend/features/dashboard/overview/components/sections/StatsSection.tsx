@@ -53,7 +53,8 @@ const StatsSection = () => {
       hint: t("dashboard.overview.stats.waitlist.hint"),
       hintTone: "muted" as const,
       icon: Users,
-      iconColor: "text-[#A78BFA]",
+      iconColor: "text-white",
+      variant: "pink" as const,
     },
     {
       key: "guest-activity",
@@ -78,6 +79,7 @@ const StatsSection = () => {
             label={card.label}
             value={card.value}
             icon={<Icon className={cn("h-5 w-5", card.iconColor)} />}
+            variant={card.variant ?? "default"}
             hint={card.hint}
             hintClassName={
               card.hintTone === "positive" ? "text-[#059669]" : "text-[#9DA1A7]"
