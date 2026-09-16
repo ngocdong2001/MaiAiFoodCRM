@@ -103,22 +103,25 @@ export const ReportsModel = {
     const prevStart = new Date(prevEnd.getTime() - periodMs);
 
     const [
-      currentPayments,
-      previousPayments,
+      currentRevenueRecords,
+      previousRevenueRecords,
       appointments,
       appointmentServices,
     ] = await Promise.all([
-      db.payment.findMany({
+      // Revenue totals must match the Revenue page: read from the immutable
+      // revenuerecord snapshot (excludes cancelled bookings) instead of the
+      // live payment table, which can drift from actual booking outcomes.
+      db.revenuerecord.findMany({
         where: {
           paidAt: { gte: startDate, lte: endDate },
-          paymentStatus: "paid",
+          status: { not: "cancelled" },
         },
         select: { finalAmount: true, paidAt: true },
       }),
-      db.payment.findMany({
+      db.revenuerecord.findMany({
         where: {
           paidAt: { gte: prevStart, lte: prevEnd },
-          paymentStatus: "paid",
+          status: { not: "cancelled" },
         },
         select: { finalAmount: true },
       }),
@@ -147,12 +150,12 @@ export const ReportsModel = {
     ]);
 
     // ── Metrics ──────────────────────────────────────────────────────────────
-    const totalRevenue = currentPayments.reduce(
-      (s, p) => s + toNum(p.finalAmount),
+    const totalRevenue = currentRevenueRecords.reduce(
+      (s, r) => s + toNum(r.finalAmount),
       0,
     );
-    const prevRevenue = previousPayments.reduce(
-      (s, p) => s + toNum(p.finalAmount),
+    const prevRevenue = previousRevenueRecords.reduce(
+      (s, r) => s + toNum(r.finalAmount),
       0,
     );
     const revDelta = deltaPct(totalRevenue, prevRevenue);
@@ -168,9 +171,13 @@ export const ReportsModel = {
     const bookingsDelta = deltaPct(totalBookings, prevBookingsCount);
 
     const avgTicket =
-      currentPayments.length > 0 ? totalRevenue / currentPayments.length : 0;
+      currentRevenueRecords.length > 0
+        ? totalRevenue / currentRevenueRecords.length
+        : 0;
     const prevAvgTicket =
-      previousPayments.length > 0 ? prevRevenue / previousPayments.length : 0;
+      previousRevenueRecords.length > 0
+        ? prevRevenue / previousRevenueRecords.length
+        : 0;
     const avgDelta = deltaPct(avgTicket, prevAvgTicket);
 
     // Seat utilization: completed appointments / total appointments in period
@@ -224,33 +231,33 @@ export const ReportsModel = {
       monthlyMap.set(key, { current: 0, previous: 0 });
     }
 
-    for (const p of currentPayments) {
-      if (!p.paidAt) continue;
-      const d = new Date(p.paidAt);
+    for (const r of currentRevenueRecords) {
+      if (!r.paidAt) continue;
+      const d = new Date(r.paidAt);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       const entry = monthlyMap.get(key);
-      if (entry) entry.current += toNum(p.finalAmount);
+      if (entry) entry.current += toNum(r.finalAmount);
     }
 
-    // Fetch previous period payments for monthly comparison
-    const prevPeriodPayments = await db.payment.findMany({
+    // Fetch previous-year revenue records for monthly comparison
+    const prevPeriodRevenueRecords = await db.revenuerecord.findMany({
       where: {
         paidAt: {
           gte: new Date(startDate.getFullYear() - 1, startDate.getMonth(), 1),
           lte: new Date(endDate.getFullYear() - 1, endDate.getMonth() + 1, 0),
         },
-        paymentStatus: "paid",
+        status: { not: "cancelled" },
       },
       select: { finalAmount: true, paidAt: true },
     });
 
-    for (const p of prevPeriodPayments) {
-      if (!p.paidAt) continue;
-      const d = new Date(p.paidAt);
+    for (const r of prevPeriodRevenueRecords) {
+      if (!r.paidAt) continue;
+      const d = new Date(r.paidAt);
       // shift by 1 year forward to align with current period months
       const key = `${d.getFullYear() + 1}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       const entry = monthlyMap.get(key);
-      if (entry) entry.previous += toNum(p.finalAmount);
+      if (entry) entry.previous += toNum(r.finalAmount);
     }
 
     const monthlyRevenue: MonthlyRevenuePoint[] = Array.from(

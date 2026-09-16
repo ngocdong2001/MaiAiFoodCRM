@@ -342,6 +342,8 @@
         "ready": "Ready",
         "completed": "Completed",
         "cancelled": "Cancelled",
+        "noShow": "No-Show",
+        "inProgress": "In Progress",
         "updating": "Updating...",
         "error": "Failed to update status. Please try again.",
         "confirmTitle": "Confirm status change",
