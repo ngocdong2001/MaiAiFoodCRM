@@ -6,11 +6,36 @@ import type {
 
 export const settingsNavItems: SettingsNavItem[] = [
   { key: "user-profile", label: "profile", icon: "user" },
-  { key: "business-profile", label: "businessProfile", icon: "building", roles: ["admin"] },
-  { key: "operating-hours", label: "operatingHours", icon: "clock", roles: ["admin"] },
-  { key: "communications", label: "communications", icon: "phone-call", roles: ["admin"] },
-  { key: "security", label: "security", icon: "shield-check", roles: ["admin"] },
-  { key: "system-logs", label: "systemLogs", icon: "scroll-text", roles: ["admin"] },
+  {
+    key: "business-profile",
+    label: "businessProfile",
+    icon: "building",
+    roles: ["admin"],
+  },
+  {
+    key: "operating-hours",
+    label: "operatingHours",
+    icon: "clock",
+    roles: ["admin"],
+  },
+  {
+    key: "communications",
+    label: "communications",
+    icon: "phone-call",
+    roles: ["admin"],
+  },
+  {
+    key: "security",
+    label: "security",
+    icon: "shield-check",
+    roles: ["admin"],
+  },
+  {
+    key: "system-logs",
+    label: "systemLogs",
+    icon: "scroll-text",
+    roles: ["admin"],
+  },
 ];
 
 export const defaultOperatingHours: DayHours[] = [
