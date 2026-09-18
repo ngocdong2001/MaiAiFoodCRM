@@ -206,11 +206,11 @@ const RevenuePage = () => {
   }, [summary, t]);
 
   return (
-    <div className="flex min-h-full flex-col gap-6 px-8 py-8">
+    <div className="flex min-h-full flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0px_2px_4px_0px_#00000012]">
         <div className="absolute right-0 top-0 h-full w-64 bg-[linear-gradient(270deg,#f04cac0d_0%,transparent_100%)]" />
-        <div className="relative px-8 py-8">
+        <div className="relative px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <h1 className="text-[32px] font-bold leading-10 tracking-tight text-[#1A1A1A]">
             {t("dashboard.revenue.title", {
               defaultValue: "Tổng kết doanh thu trong ngày",

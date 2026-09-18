@@ -1,4 +1,5 @@
-import { getPrismaMaster } from './dist/lib/prisma-master.js';
+import { getPrismaMaster } from "./dist/lib/prisma-master.js";
+import { ROLES } from "./dist/types/roles.js";
 
 async function seed() {
   const prisma = getPrismaMaster();
@@ -8,22 +9,22 @@ async function seed() {
     const now = new Date();
     await prisma.tenant.create({
       data: {
-        slug: 'maiai-default',
-        name: 'MaiAI Default Salon',
-        databaseName: 'maiai_crm_1',
-        tier: 'basic',
+        slug: "maiai-default",
+        name: "MaiAI Default Salon",
+        databaseName: "maiai_crm_1",
+        tier: "basic",
         maxUsers: 5,
         maxGuests: 1000,
         isActive: true,
         updatedAt: now,
       },
     });
-    console.log('✅ Default tenant created');
+    console.log("✅ Default tenant created");
   } catch (e: any) {
-    if (e.code === 'P2002') {
-      console.log('ℹ️ Default tenant already exists');
+    if (e.code === "P2002") {
+      console.log("ℹ️ Default tenant already exists");
     } else {
-      console.error('❌ Tenant error:', e.message);
+      console.error("❌ Tenant error:", e.message);
     }
   }
 
@@ -33,25 +34,50 @@ async function seed() {
     await prisma.user.create({
       data: {
         tenantId: 1,
-        email: 'admin@maiai.com',
-        passwordHash: '$2b$10$fbiQ0QjHgP09jhvzbgbwPuIuHAZckAILiYWW2U37fpLd4QfrZ4syK',
-        name: 'Admin User',
-        role: 'owner',
+        email: "admin@maiai.com",
+        passwordHash:
+          "$2b$10$fbiQ0QjHgP09jhvzbgbwPuIuHAZckAILiYWW2U37fpLd4QfrZ4syK",
+        name: "Admin User",
+        role: ROLES.ADMIN,
         isActive: true,
         updatedAt: now,
       },
     });
-    console.log('✅ Admin user created (admin@maiai.com / Admin@123)');
+    console.log("✅ Admin user created (admin@maiai.com / Admin@123)");
   } catch (e: any) {
-    if (e.code === 'P2002') {
-      console.log('ℹ️ Admin user already exists');
+    if (e.code === "P2002") {
+      console.log("ℹ️ Admin user already exists");
     } else {
-      console.error('❌ User error:', e.message);
+      console.error("❌ User error:", e.message);
+    }
+  }
+
+  // Insert staff user
+  try {
+    const now = new Date();
+    await prisma.user.create({
+      data: {
+        tenantId: 1,
+        email: "staff@gmail.com",
+        passwordHash:
+          "$2b$10$4INnaBd2Oc2xDNUkDC8qoupN3IX/KUpe8V4UemgNMuW5YnLEo61xC",
+        name: "Staff User",
+        role: ROLES.STAFF,
+        isActive: true,
+        updatedAt: now,
+      },
+    });
+    console.log("✅ Staff user created (staff@gmail.com / staff@123)");
+  } catch (e: any) {
+    if (e.code === "P2002") {
+      console.log("ℹ️ Staff user already exists");
+    } else {
+      console.error("❌ User error:", e.message);
     }
   }
 
   await prisma.$disconnect();
-  console.log('\n🎉 Seed completed!');
+  console.log("\n🎉 Seed completed!");
 }
 
 seed().catch(console.error);

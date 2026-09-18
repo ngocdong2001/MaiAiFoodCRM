@@ -35,7 +35,9 @@ export const authMiddleware = async (
   if (apiKey && apiKey === VOICE_AGENT_API_KEY) {
     const tenantSlug = req.headers["x-tenant-id"] as string | undefined;
     if (!tenantSlug) {
-      return res.status(400).json({ message: "X-Tenant-ID header required for API key auth" });
+      return res
+        .status(400)
+        .json({ message: "X-Tenant-ID header required for API key auth" });
     }
 
     const tenant = await resolveTenantFromSlug(tenantSlug);
@@ -43,7 +45,10 @@ export const authMiddleware = async (
       return res.status(401).json({ message: "Invalid tenant" });
     }
 
-    const masterUrl = new URL(process.env.DATABASE_URL_MASTER || "mysql://maiai:maiai@localhost:3306/maiai_master");
+    const masterUrl = new URL(
+      process.env.DATABASE_URL_MASTER ||
+        "mysql://maiai:maiai@localhost:3306/maiai_master",
+    );
     const tenantDbUrl = `mysql://${masterUrl.username}:${masterUrl.password}@${masterUrl.hostname}:${masterUrl.port || 3306}/${tenant.databaseName}`;
 
     req.tenant = {
@@ -60,7 +65,7 @@ export const authMiddleware = async (
       tenantId: tenant.id,
       name: "Voice Agent",
       email: "voice-agent@maiai.com",
-      role: "service",
+      role: "admin",
       phone: null,
       avatarUrl: null,
     };
@@ -109,7 +114,10 @@ export const authMiddleware = async (
     }
 
     // Set tenant context — resolve DB host/port from environment
-    const masterUrl = new URL(process.env.DATABASE_URL_MASTER || "mysql://maiai:maiai@localhost:3306/maiai_master");
+    const masterUrl = new URL(
+      process.env.DATABASE_URL_MASTER ||
+        "mysql://maiai:maiai@localhost:3306/maiai_master",
+    );
     const tenantDbUrl = `mysql://${masterUrl.username}:${masterUrl.password}@${masterUrl.hostname}:${masterUrl.port || 3306}/${user.tenant.databaseName}`;
 
     req.tenant = {
@@ -119,10 +127,7 @@ export const authMiddleware = async (
     };
 
     // Create tenant-specific Prisma client
-    req.tenantClient = getPrismaTenant(
-      user.tenant.id,
-      req.tenant.databaseUrl,
-    );
+    req.tenantClient = getPrismaTenant(user.tenant.id, req.tenant.databaseUrl);
 
     // Attach user info
     req.user = {

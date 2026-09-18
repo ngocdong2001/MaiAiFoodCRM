@@ -124,7 +124,7 @@ const CRMGuestProfileSection = ({
         </DropdownMenu>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+      <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-[#E7EBF2] bg-[#FAFBFE] p-3.5">
           <div className="flex items-center justify-between">
             <p className="text-[11px] text-[#8D95A5]">

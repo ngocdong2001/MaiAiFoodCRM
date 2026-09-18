@@ -11,6 +11,8 @@ export interface SettingsNavItem {
   key: SettingsTab;
   label: string;
   icon: string;
+  /** When set, only users holding one of these roles may see the tab. */
+  roles?: string[];
 }
 
 export interface DayHours {

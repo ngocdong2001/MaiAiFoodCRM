@@ -18,6 +18,7 @@ type StaffCardProps = {
   member: StaffMember;
   onEdit: (member: StaffMember) => void;
   onDelete: (member: StaffMember) => void;
+  canManage?: boolean;
 };
 
 const statusDotClass: Record<StaffStatus, string> = {
@@ -35,7 +36,12 @@ const statusTextClass: Record<StaffStatus, string> = {
 const formatShift = (startTime: string, endTime: string) =>
   `${startTime} - ${endTime}`;
 
-const StaffCard = ({ member, onEdit, onDelete }: StaffCardProps) => {
+const StaffCard = ({
+  member,
+  onEdit,
+  onDelete,
+  canManage = true,
+}: StaffCardProps) => {
   const schedule = member.schedules[0];
   return (
     <div className="rounded-xl border border-[#DEE1E7] bg-white p-6 shadow-[0px_2px_4px_0px_#00000012]">
@@ -63,25 +69,27 @@ const StaffCard = ({ member, onEdit, onDelete }: StaffCardProps) => {
             )}
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#8D95A5] hover:bg-[#F3F4F7]"
-            aria-label={`More actions for ${member.name}`}
-          >
-            <EllipsisVertical className="h-4 w-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(member)}>
-              <Edit3 /> Edit staff
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(member)}
-              className="text-destructive"
+        {canManage && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#8D95A5] hover:bg-[#F3F4F7]"
+              aria-label={`More actions for ${member.name}`}
             >
-              <Trash2 /> Delete staff
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <EllipsisVertical className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(member)}>
+                <Edit3 /> Edit staff
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDelete(member)}
+                className="text-destructive"
+              >
+                <Trash2 /> Delete staff
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <p className="mt-4 text-lg font-semibold text-[#171A21]">{member.name}</p>

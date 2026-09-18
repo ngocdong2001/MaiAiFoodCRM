@@ -127,7 +127,7 @@ const WeeklyAppointmentBoard = ({
         </div>
       </header>
 
-      <ScrollArea horizontal className="h-[min(68vh,46rem)]">
+      <ScrollArea horizontal className="max-h-[min(68vh,46rem)]">
         <div className="grid min-w-245 grid-cols-7 divide-x divide-[#E7EAF0]">
           {days.map((date) => {
             const dayEvents = events
@@ -159,7 +159,7 @@ const WeeklyAppointmentBoard = ({
                   </p>
                 </div>
 
-                <div className="flex min-h-90 flex-col gap-2 p-2.5">
+                <div className="flex flex-col gap-2 p-2.5">
                   {dayEvents.map((event) => {
                     const style =
                       STATUS_CARD_STYLE[event.detail.status] ??

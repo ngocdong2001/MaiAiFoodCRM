@@ -89,32 +89,35 @@ const LoginForm = () => {
 
   return (
     <>
-      <div className="flex h-screen w-full overflow-hidden bg-[#f6f7f9]">
+      <div className="flex min-h-screen w-full items-center justify-center overflow-x-hidden overflow-y-auto bg-[#f6f7f9] px-4 py-8 lg:h-screen lg:items-stretch lg:justify-normal lg:overflow-hidden lg:px-0 lg:py-0">
         {/* Left panel — form */}
-        <div className="relative z-[1] flex w-1/2 flex-col justify-center px-6 py-12 shadow-[0_25px_50px_0_#00000040] sm:px-16 lg:px-[159px]">
+        <div className="relative z-[1] flex w-full flex-col justify-center rounded-2xl bg-white p-6 shadow-[0_8px_24px_0_#00000014] sm:p-10 lg:w-1/2 lg:rounded-none lg:bg-[#f6f7f9] lg:p-0 lg:px-[159px] lg:py-12 lg:shadow-[0_25px_50px_0_#00000040]">
           <div className="mx-auto w-full max-w-[440px]">
             {/* Brand */}
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary sm:h-10 sm:w-10">
                 <Activity
-                  className="h-6 w-6 text-[#f6f7f9]"
+                  className="h-5 w-5 text-[#f6f7f9] sm:h-6 sm:w-6"
                   strokeWidth={2.5}
                 />
               </div>
-              <span className="text-[26px] font-bold leading-[26px] text-primary">
+              <span className="text-xl font-bold leading-[26px] text-primary sm:text-[26px]">
                 {t("auth.login.brand")}
               </span>
             </div>
 
             {/* Heading */}
-            <h1 className="mt-8 text-center text-[32px] font-bold leading-10 tracking-[-1px] text-[#1d1f23]">
+            <h1 className="mt-6 text-center text-2xl font-bold leading-tight tracking-[-1px] text-[#1d1f23] sm:mt-8 sm:text-[32px] sm:leading-10">
               {t("auth.login.welcome")}
             </h1>
             <p className="mt-2 text-center text-sm leading-[22px] text-[#9da1a7]">
               {t("auth.login.subtitle")}
             </p>
 
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <form
+              className="mt-6 space-y-5 sm:mt-8 sm:space-y-6"
+              onSubmit={handleSubmit}
+            >
               {/* Username */}
               <div className="space-y-[11px]">
                 <label

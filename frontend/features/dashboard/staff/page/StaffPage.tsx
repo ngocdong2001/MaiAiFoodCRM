@@ -11,6 +11,7 @@ import StaffFormDialog from "../components/StaffFormDialog";
 import StaffGridSection from "../components/sections/StaffGridSection";
 import StaffToolbarSection from "../components/sections/StaffToolbarSection";
 import WeeklyScheduleSection from "../components/sections/WeeklyScheduleSection";
+import { usePermission } from "@/shared/hooks/usePermission";
 import { useAppointments } from "@/features/dashboard/calendar/hooks/useCalendar";
 import {
   useCreateStaff,
@@ -44,6 +45,7 @@ const toDayQueryRange = (dateKey: string) => {
 };
 
 const StaffPage = () => {
+  const { canManage } = usePermission();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | StaffStatus>("All");
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
@@ -125,6 +127,7 @@ const StaffPage = () => {
         selectedDate={selectedDate}
         onSelectedDateChange={setSelectedDate}
         onAdd={openCreate}
+        canManage={canManage}
       />
 
       {staffQuery.isPending ? (
@@ -144,6 +147,7 @@ const StaffPage = () => {
           members={members}
           onEdit={openEdit}
           onDelete={setDeletingMember}
+          canManage={canManage}
         />
       )}
 

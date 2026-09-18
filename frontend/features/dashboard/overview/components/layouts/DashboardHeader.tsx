@@ -48,7 +48,10 @@ const DashboardHeader = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const userName = user?.name ?? t("dashboard.header.userFallback");
-  const navItems = dashboardNavItems;
+  const role = user?.role;
+  const navItems = dashboardNavItems.filter(
+    (item) => !item.roles || (role && item.roles.includes(role)),
+  );
 
   const handleLogout = () => {
     authService.logout();
@@ -200,36 +203,49 @@ const DashboardHeader = () => {
           >
             <Bell className="h-5 w-5" />
           </button>
-          <button
-            type="button"
-            aria-label={t("dashboard.header.settings")}
-            onClick={() => router.push("/dashboard/integrations")}
-            className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
+          {role === "admin" && (
+            <button
+              type="button"
+              aria-label={t("dashboard.header.settings")}
+              onClick={() => router.push("/dashboard/integrations")}
+              className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
+            >
+              <Settings className="h-5 w-5" />
+            </button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger
               className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               aria-label={t("dashboard.header.accountMenu")}
             >
-              <InitialsAvatar name={userName} src={user?.avatarUrl ?? undefined} className="h-9 w-9" online />
+              <InitialsAvatar
+                name={userName}
+                src={user?.avatarUrl ?? undefined}
+                className="h-9 w-9"
+                online
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  {userName}
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>{userName}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push("/dashboard/integrations")}>
-                  <User />
-                  {t("dashboard.header.profile")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/dashboard/integrations")}>
-                  <Settings />
-                  {t("dashboard.header.settings")}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {role === "admin" && (
+                  <>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/dashboard/integrations")}
+                    >
+                      <User />
+                      {t("dashboard.header.profile")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/dashboard/integrations")}
+                    >
+                      <Settings />
+                      {t("dashboard.header.settings")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem variant="destructive" onClick={handleLogout}>
                   <LogOut />
                   {t("dashboard.header.logout")}

@@ -16,6 +16,7 @@ type StaffToolbarSectionProps = {
   selectedDate: string;
   onSelectedDateChange: (value: string) => void;
   onAdd: () => void;
+  canManage?: boolean;
 };
 
 const filters: Array<"All" | StaffStatus> = [
@@ -40,6 +41,7 @@ const StaffToolbarSection = ({
   selectedDate,
   onSelectedDateChange,
   onAdd,
+  canManage = true,
 }: StaffToolbarSectionProps) => {
   return (
     <PageHeader
@@ -80,14 +82,16 @@ const StaffToolbarSection = ({
             />
           </div>
 
-          <Button
-            type="button"
-            onClick={onAdd}
-            className="h-10 gap-2 bg-primary px-4 hover:bg-primary/90"
-          >
-            <Plus className="h-4 w-4" />
-            Add Staff
-          </Button>
+          {canManage && (
+            <Button
+              type="button"
+              onClick={onAdd}
+              className="h-10 gap-2 bg-primary px-4 hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              Add Staff
+            </Button>
+          )}
         </>
       }
     />

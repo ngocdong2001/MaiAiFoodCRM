@@ -25,13 +25,24 @@ export const dashboardNavItems: DashboardNavItem[] = [
   { key: "calendar", label: "Calendar", href: "/dashboard/calendar" },
   { key: "crm", label: "CRM", href: "/dashboard/crm" },
   { key: "staff", label: "Staff", href: "/dashboard/staff" },
-  { key: "services", label: "Services", href: "/dashboard/services" },
+  {
+    key: "services",
+    label: "Services",
+    href: "/dashboard/services",
+    roles: ["admin"],
+  },
   // { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
-  { key: "reports", label: "Reports", href: "/dashboard/reports" },
+  {
+    key: "reports",
+    label: "Reports",
+    href: "/dashboard/reports",
+    roles: ["admin"],
+  },
   {
     key: "revenue",
     label: "Revenue",
     href: "/dashboard/revenue",
+    roles: ["admin"],
   },
   {
     key: "integrations",

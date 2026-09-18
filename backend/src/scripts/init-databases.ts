@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 
 const execAsync = promisify(exec);
 
-const MYSQL_PATH = 'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysql';
+const MYSQL_PATH = "C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysql";
 const MYSQL_HOST = "127.0.0.1";
 const MYSQL_USER = "maiai";
 const MYSQL_PASSWORD = "123";
@@ -43,12 +43,18 @@ async function setup() {
 
     // Step 2: Apply master migration
     console.log("📦 Step 2: Creating master schema...");
-    await runSQL(MASTER_DB, "prisma/migrations/20260804000000_init_master/migration.sql");
+    await runSQL(
+      MASTER_DB,
+      "prisma/migrations/20260804000000_init_master/migration.sql",
+    );
     console.log("✅ Master schema created\n");
 
     // Step 3: Apply tenant migration
     console.log("📦 Step 3: Creating tenant schema...");
-    await runSQL(TENANT_DB, "prisma/migrations_tenant/20260803000100_init_crm/migration.sql");
+    await runSQL(
+      TENANT_DB,
+      "prisma/migrations_tenant/20260803000100_init_crm/migration.sql",
+    );
     console.log("✅ Tenant schema created\n");
 
     // Step 4: Create master DB migration records
@@ -75,7 +81,7 @@ async function setup() {
     // Step 6: Create admin user
     console.log("📦 Step 6: Creating admin user...");
     const passwordHash = await bcrypt.hash("Admin@123", 10);
-    const userInsert = `INSERT INTO user (tenantId, email, passwordHash, name, role, isActive, createdAt, updatedAt) VALUES (1, 'admin@maiai.com', '${passwordHash}', 'Admin User', 'owner', true, NOW(), NOW())`;
+    const userInsert = `INSERT INTO user (tenantId, email, passwordHash, name, role, isActive, createdAt, updatedAt) VALUES (1, 'admin@maiai.com', '${passwordHash}', 'Admin User', 'admin', true, NOW(), NOW())`;
     const userCmd = `& "${MYSQL_PATH}" -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -h ${MYSQL_HOST} ${MASTER_DB} -e "${userInsert}"`;
     await execAsync(userCmd, { shell: "powershell.exe" });
     console.log("✅ Admin user created\n");
