@@ -39,7 +39,9 @@ const CRMGuestsListSection = ({
   return (
     <section className="p-4 sm:p-5 xl:border-r xl:border-[#EEF1F5]">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-[#171A21]">{t("dashboard.crm.list.title")}</h2>
+        <h2 className="text-base font-semibold text-[#171A21]">
+          {t("dashboard.crm.list.title")}
+        </h2>
         <span className="text-xs font-medium text-[#8D95A5]">
           {t("dashboard.crm.list.guestsCount", { count: guests.length })}
         </span>
@@ -69,7 +71,9 @@ const CRMGuestsListSection = ({
                   : "border-[#E7EBF2] bg-white text-[#8D95A5] hover:bg-[#F8FAFC]",
               )}
             >
-              {item === "All" ? t("dashboard.crm.list.allGuests") : t(`dashboard.crm.segments.${item}`)}
+              {item === "All"
+                ? t("dashboard.crm.list.allGuests")
+                : t(`dashboard.crm.segments.${item}`)}
             </button>
           );
         })}

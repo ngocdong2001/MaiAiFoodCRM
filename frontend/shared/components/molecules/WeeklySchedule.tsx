@@ -377,13 +377,6 @@ const WeeklySchedule = ({
                 <div
                   className={`sticky left-0 z-20 flex min-h-[86px] items-center gap-3 border-r ${rowBorder} border-[#DEE1E7] bg-[#F9FAFB] px-4 py-4`}
                 >
-                  {resource.avatarUrl && (
-                    <img
-                      src={resource.avatarUrl}
-                      alt={resource.name}
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                  )}
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-[#171A21]">
                       {resource.name}

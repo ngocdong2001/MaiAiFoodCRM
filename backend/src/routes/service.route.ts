@@ -10,8 +10,16 @@ router.use(authMiddleware);
 
 router.get("/categories", ServiceController.getCategories);
 router.post("/categories", requireManagement, ServiceController.createCategory);
-router.put("/categories/:id", requireManagement, ServiceController.updateCategory);
-router.delete("/categories/:id", requireManagement, ServiceController.deleteCategory);
+router.put(
+  "/categories/:id",
+  requireManagement,
+  ServiceController.updateCategory,
+);
+router.delete(
+  "/categories/:id",
+  requireManagement,
+  ServiceController.deleteCategory,
+);
 
 router.get("/", ServiceController.getAll);
 router.post("/", requireManagement, ServiceController.create);

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Menu, X } from "lucide-react";
 
+import { useAuthStore } from "@/core/store/authStore";
+
 import { defaultOperatingHours, settingsNavItems } from "../data/data";
 import type { SettingsTab } from "../types/settings.types";
 import BusinessProfileSection from "../components/sections/BusinessProfileSection";
@@ -23,8 +25,13 @@ import {
 
 const SettingsPage = () => {
   const { t } = useTranslation();
+  const role = useAuthStore((state) => state.user?.role);
   const [activeTab, setActiveTab] = useState<SettingsTab>("user-profile");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const visibleItems = settingsNavItems.filter(
+    (item) => !item.roles || (role && item.roles.includes(role)),
+  );
 
   const handleChange = (tab: SettingsTab) => {
     setActiveTab(tab);
@@ -78,7 +85,7 @@ const SettingsPage = () => {
 
             <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-5 py-6">
               <SettingsNavSection
-                items={settingsNavItems}
+                items={visibleItems}
                 active={activeTab}
                 onChange={handleChange}
               />
@@ -93,7 +100,7 @@ const SettingsPage = () => {
           {t("dashboard.settings.title")}
         </h1>
         <SettingsNavSection
-          items={settingsNavItems}
+          items={visibleItems}
           active={activeTab}
           onChange={setActiveTab}
         />
@@ -102,13 +109,19 @@ const SettingsPage = () => {
       {/* Main content */}
       <main className="flex-1">
         {activeTab === "user-profile" && <UserProfileSection />}
-        {activeTab === "business-profile" && <BusinessProfileSection />}
-        {activeTab === "operating-hours" && (
+        {activeTab === "business-profile" && role === "admin" && (
+          <BusinessProfileSection />
+        )}
+        {activeTab === "operating-hours" && role === "admin" && (
           <OperatingHoursSection initialHours={defaultOperatingHours} />
         )}
-        {activeTab === "communications" && <CommunicationsSection />}
-        {activeTab === "security" && <SecuritySection />}
-        {activeTab === "system-logs" && <SystemLogsSection />}
+        {activeTab === "communications" && role === "admin" && (
+          <CommunicationsSection />
+        )}
+        {activeTab === "security" && role === "admin" && <SecuritySection />}
+        {activeTab === "system-logs" && role === "admin" && (
+          <SystemLogsSection />
+        )}
       </main>
     </div>
   );

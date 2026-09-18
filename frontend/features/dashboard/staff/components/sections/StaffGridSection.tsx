@@ -5,12 +5,14 @@ type StaffGridSectionProps = {
   members: StaffMember[];
   onEdit: (member: StaffMember) => void;
   onDelete: (member: StaffMember) => void;
+  canManage?: boolean;
 };
 
 const StaffGridSection = ({
   members,
   onEdit,
   onDelete,
+  canManage = true,
 }: StaffGridSectionProps) => {
   if (members.length === 0) {
     return (
@@ -28,6 +30,7 @@ const StaffGridSection = ({
           member={member}
           onEdit={onEdit}
           onDelete={onDelete}
+          canManage={canManage}
         />
       ))}
     </div>

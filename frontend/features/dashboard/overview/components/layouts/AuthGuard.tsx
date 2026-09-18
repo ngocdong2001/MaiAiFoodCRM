@@ -10,7 +10,6 @@ import { useQueueEventsSubscription } from "@/features/dashboard/overview/hooks/
 const RESTRICTED_PREFIXES = [
   "/dashboard/revenue",
   "/dashboard/reports",
-  "/dashboard/integrations",
   "/dashboard/services",
 ];
 
@@ -34,8 +33,8 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     }
 
     // Block non-admin from restricted pages.
-    const isRestricted = RESTRICTED_PREFIXES.some((prefix) =>
-      pathname === prefix || pathname.startsWith(`${prefix}/`),
+    const isRestricted = RESTRICTED_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
     );
     if (isRestricted && user.role !== "admin") {
       router.replace("/dashboard/overview");

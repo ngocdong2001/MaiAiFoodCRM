@@ -6,7 +6,11 @@ import { SettingsController } from "../controllers/settings.controller";
 const router = Router();
 router.use(authMiddleware);
 router.get("/operating-hours", SettingsController.getOperatingHours);
-router.put("/operating-hours", requireManagement, SettingsController.updateOperatingHours);
+router.put(
+  "/operating-hours",
+  requireManagement,
+  SettingsController.updateOperatingHours,
+);
 router.get("/salon", SettingsController.getSalonSettings);
 router.put("/salon", requireManagement, SettingsController.updateSalonSettings);
 router.get("/system-logs", requireManagement, SettingsController.getSystemLogs);

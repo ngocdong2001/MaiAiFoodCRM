@@ -9,8 +9,20 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get("/summary", requireManagement, RevenueController.getSummary);
-router.get("/staff/:staffId", requireManagement, RevenueController.getStaffDetail);
-router.patch("/record/:recordId/cancel-reason", requireManagement, RevenueController.updateCancelReason);
-router.patch("/record/:recordId/restore", requireManagement, RevenueController.restoreBooking);
+router.get(
+  "/staff/:staffId",
+  requireManagement,
+  RevenueController.getStaffDetail,
+);
+router.patch(
+  "/record/:recordId/cancel-reason",
+  requireManagement,
+  RevenueController.updateCancelReason,
+);
+router.patch(
+  "/record/:recordId/restore",
+  requireManagement,
+  RevenueController.restoreBooking,
+);
 
 export default router;

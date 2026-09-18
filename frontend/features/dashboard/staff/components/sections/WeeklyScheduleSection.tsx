@@ -1,9 +1,14 @@
+import { useMemo } from "react";
+
 import WeeklySchedule from "@/shared/components/molecules/WeeklySchedule";
 
 import type { ApiAppointment } from "@/features/dashboard/calendar/types/calendar.types";
 import type { StaffMember } from "../../types/staff.types";
 
-const scheduleHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+// Matches the Calendar day view's default window; both expand to fit
+// whatever shifts/appointments fall outside it so nothing renders off-grid.
+const DEFAULT_START_HOUR = 8;
+const DEFAULT_END_HOUR = 19;
 
 const timeToHour = (value: string) => {
   const [hours, minutes] = value.split(":").map(Number);
@@ -59,6 +64,27 @@ const WeeklyScheduleSection = ({
     { year: "numeric", month: "short", day: "numeric" },
   );
 
+  const hours = useMemo(() => {
+    const apptHours = appointments.flatMap((a) => [
+      toHourFromIso(a.startTime),
+      toHourFromIso(a.endTime),
+    ]);
+    const scheduleBounds = members.flatMap((member) => {
+      const schedule = member.schedules[0];
+      if (!schedule || schedule.isDayOff) return [];
+      return [timeToHour(schedule.startTime), timeToHour(schedule.endTime)];
+    });
+    const allHours = [...apptHours, ...scheduleBounds];
+
+    const firstHour = Math.min(DEFAULT_START_HOUR, ...allHours.map(Math.floor));
+    const lastHour = Math.max(DEFAULT_END_HOUR, ...allHours.map(Math.ceil));
+
+    return Array.from(
+      { length: lastHour - firstHour + 1 },
+      (_, index) => firstHour + index,
+    );
+  }, [appointments, members]);
+
   return (
     <WeeklySchedule
       rangeLabel={rangeLabel}
@@ -67,7 +93,7 @@ const WeeklyScheduleSection = ({
       dateValue={selectedDate}
       onDateChange={onSelectedDateChange}
       isLoading={isLoading}
-      hours={scheduleHours}
+      hours={hours}
       resources={members.map((member) => ({
         key: member.key,
         name: member.name,

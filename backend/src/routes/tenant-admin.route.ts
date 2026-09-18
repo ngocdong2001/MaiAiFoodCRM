@@ -23,14 +23,17 @@ async function createTenantDatabase(databaseName: string): Promise<void> {
 
   // 1. Create the database via raw SQL (maiai has CREATE privilege on *.*)
   const masterAdapter = new PrismaMariaDb({
-    host, port, user, password,
+    host,
+    port,
+    user,
+    password,
     database: "maiai_master",
     connectionLimit: 1,
   });
   const { PrismaClient } = await import("../generated/prisma-master/client.js");
   const prismaMaster = new PrismaClient({ adapter: masterAdapter });
   await prismaMaster.$executeRawUnsafe(
-    `CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+    `CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
   );
   await prismaMaster.$disconnect();
 
@@ -44,12 +47,15 @@ async function createTenantDatabase(databaseName: string): Promise<void> {
         env: { ...process.env, DATABASE_URL_TENANT: tenantUrl },
         timeout: 30000,
         stdio: "pipe",
-      }
+      },
     );
     console.log(`[TenantAdmin] ✅ Migrated tenant DB: ${databaseName}`);
   } catch (migErr: any) {
     const errMsg = migErr.stderr?.toString() || migErr.message;
-    console.error(`[TenantAdmin] ❌ Migration failed for ${databaseName}:`, errMsg);
+    console.error(
+      `[TenantAdmin] ❌ Migration failed for ${databaseName}:`,
+      errMsg,
+    );
     throw new Error(`Database created but migration failed: ${errMsg}`);
   }
 }
@@ -177,7 +183,7 @@ router.get("/tenants", async (_req, res) => {
           role: u.role,
           isActive: u.isActive,
         })),
-      }))
+      })),
     );
   } catch (err) {
     console.error("[TenantAdmin] Error listing tenants:", err);
@@ -205,7 +211,9 @@ router.post("/tenants", async (req, res) => {
     // Check slug uniqueness
     const existing = await prismaMaster.tenant.findUnique({ where: { slug } });
     if (existing) {
-      res.status(409).json({ ok: false, error: `Tenant slug "${slug}" already exists` });
+      res
+        .status(409)
+        .json({ ok: false, error: `Tenant slug "${slug}" already exists` });
       return;
     }
 
@@ -288,7 +296,8 @@ router.patch("/tenants/:id", async (req, res) => {
 
     const data: Record<string, unknown> = {};
     if (name !== undefined) data.name = String(name);
-    if (description !== undefined) data.description = description ? String(description) : null;
+    if (description !== undefined)
+      data.description = description ? String(description) : null;
     if (tier !== undefined) data.tier = String(tier);
     if (isActive !== undefined) data.isActive = Boolean(isActive);
     if (maxUsers !== undefined) data.maxUsers = Number(maxUsers);
@@ -328,7 +337,9 @@ router.delete("/tenants/:id", async (req, res) => {
     }
 
     const prismaMaster = getPrismaMaster();
-    const tenant = await prismaMaster.tenant.findUnique({ where: { id: tenantId } });
+    const tenant = await prismaMaster.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant) {
       res.status(404).json({ ok: false, error: "Tenant not found" });
       return;
@@ -337,7 +348,8 @@ router.delete("/tenants/:id", async (req, res) => {
     // Drop the tenant database
     let databaseDropped: string | undefined;
     try {
-      const { PrismaClient: PrismaTenant } = await import("../generated/prisma-tenant/client.js");
+      const { PrismaClient: PrismaTenant } =
+        await import("../generated/prisma-tenant/client.js");
       const { PrismaMariaDb } = await import("@prisma/adapter-mariadb");
       const dbUrl = process.env.DATABASE_URL_MASTER!;
       const u = new URL(dbUrl);
@@ -350,7 +362,9 @@ router.delete("/tenants/:id", async (req, res) => {
         connectionLimit: 1,
       });
       const tmpPrisma = new PrismaTenant({ adapter });
-      await tmpPrisma.$executeRawUnsafe(`DROP DATABASE IF EXISTS \`${tenant.databaseName}\``);
+      await tmpPrisma.$executeRawUnsafe(
+        `DROP DATABASE IF EXISTS \`${tenant.databaseName}\``,
+      );
       await tmpPrisma.$disconnect();
       databaseDropped = tenant.databaseName;
     } catch (dropErr) {
@@ -434,7 +448,12 @@ router.post("/tenants/:id/users", async (req, res) => {
     const { email, password, name, role, phone } = req.body;
 
     if (!email || !password || !name) {
-      res.status(400).json({ ok: false, error: "Missing required fields: email, password, name" });
+      res
+        .status(400)
+        .json({
+          ok: false,
+          error: "Missing required fields: email, password, name",
+        });
       return;
     }
 
@@ -448,7 +467,9 @@ router.post("/tenants/:id/users", async (req, res) => {
       return;
     }
     if (tenant._count.users >= tenant.maxUsers) {
-      res.status(409).json({ ok: false, error: `User limit reached (${tenant.maxUsers})` });
+      res
+        .status(409)
+        .json({ ok: false, error: `User limit reached (${tenant.maxUsers})` });
       return;
     }
 
@@ -480,7 +501,9 @@ router.post("/tenants/:id/users", async (req, res) => {
     res.status(201).json({ ok: true, user });
   } catch (err: any) {
     if (err?.code === "P2002") {
-      res.status(409).json({ ok: false, error: "Email already exists in this tenant" });
+      res
+        .status(409)
+        .json({ ok: false, error: "Email already exists in this tenant" });
       return;
     }
     console.error("[TenantAdmin] Error creating user:", err);
@@ -507,7 +530,9 @@ router.post("/tenants/:id/users/:userId/reset-password", async (req, res) => {
       where: { id: userId, tenantId },
     });
     if (!user) {
-      res.status(404).json({ ok: false, error: "User not found in this tenant" });
+      res
+        .status(404)
+        .json({ ok: false, error: "User not found in this tenant" });
       return;
     }
 
@@ -551,7 +576,9 @@ router.patch("/tenants/:id/users/:userId", async (req, res) => {
       where: { id: userId, tenantId },
     });
     if (!user) {
-      res.status(404).json({ ok: false, error: "User not found in this tenant" });
+      res
+        .status(404)
+        .json({ ok: false, error: "User not found in this tenant" });
       return;
     }
 
@@ -606,7 +633,9 @@ router.delete("/tenants/:id/users/:userId", async (req, res) => {
       where: { id: userId, tenantId },
     });
     if (!user) {
-      res.status(404).json({ ok: false, error: "User not found in this tenant" });
+      res
+        .status(404)
+        .json({ ok: false, error: "User not found in this tenant" });
       return;
     }
 
@@ -616,7 +645,9 @@ router.delete("/tenants/:id/users/:userId", async (req, res) => {
         where: { tenantId, role: "admin", isActive: true },
       });
       if (adminCount <= 1) {
-        res.status(409).json({ ok: false, error: "Cannot delete the last admin user" });
+        res
+          .status(409)
+          .json({ ok: false, error: "Cannot delete the last admin user" });
         return;
       }
     }
@@ -642,7 +673,9 @@ router.get("/tenants/:id/database-info", async (req, res) => {
     }
 
     const prismaMaster = getPrismaMaster();
-    const tenant = await prismaMaster.tenant.findUnique({ where: { id: tenantId } });
+    const tenant = await prismaMaster.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant) {
       res.status(404).json({ ok: false, error: "Tenant not found" });
       return;
@@ -652,7 +685,8 @@ router.get("/tenants/:id/database-info", async (req, res) => {
     const dbUrl = process.env.DATABASE_URL_MASTER!;
     const u = new URL(dbUrl);
 
-    const { PrismaClient: PrismaTenant } = await import("../generated/prisma-tenant/client.js");
+    const { PrismaClient: PrismaTenant } =
+      await import("../generated/prisma-tenant/client.js");
     const { PrismaMariaDb } = await import("@prisma/adapter-mariadb");
 
     const adapter = new PrismaMariaDb({
@@ -677,18 +711,18 @@ router.get("/tenants/:id/database-info", async (req, res) => {
         update_time: string | null;
       }>
     >(
-      `SELECT table_name, table_rows, data_length, index_length, (data_length + index_length) AS total_size, update_time FROM information_schema.tables WHERE table_schema = '${dbName}' AND table_type = 'BASE TABLE' ORDER BY table_name`
+      `SELECT table_name, table_rows, data_length, index_length, (data_length + index_length) AS total_size, update_time FROM information_schema.tables WHERE table_schema = '${dbName}' AND table_type = 'BASE TABLE' ORDER BY table_name`,
     );
 
     // Get database size
     const dbSize = await tenantPrisma.$queryRawUnsafe<Array<{ total: bigint }>>(
-      `SELECT SUM(data_length + index_length) AS total FROM information_schema.tables WHERE table_schema = '${dbName}'`
+      `SELECT SUM(data_length + index_length) AS total FROM information_schema.tables WHERE table_schema = '${dbName}'`,
     );
 
     // Get version
-    const version = await tenantPrisma.$queryRawUnsafe<Array<{ version: string }>>(
-      `SELECT VERSION() AS version`
-    );
+    const version = await tenantPrisma.$queryRawUnsafe<
+      Array<{ version: string }>
+    >(`SELECT VERSION() AS version`);
 
     await tenantPrisma.$disconnect();
 

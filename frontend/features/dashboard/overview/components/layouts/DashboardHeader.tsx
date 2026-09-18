@@ -218,21 +218,28 @@ const DashboardHeader = () => {
               className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               aria-label={t("dashboard.header.accountMenu")}
             >
-              <InitialsAvatar name={userName} src={user?.avatarUrl ?? undefined} className="h-9 w-9" online />
+              <InitialsAvatar
+                name={userName}
+                src={user?.avatarUrl ?? undefined}
+                className="h-9 w-9"
+                online
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  {userName}
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>{userName}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {role === "admin" && (
                   <>
-                    <DropdownMenuItem onClick={() => router.push("/dashboard/integrations")}>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/dashboard/integrations")}
+                    >
                       <User />
                       {t("dashboard.header.profile")}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push("/dashboard/integrations")}>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/dashboard/integrations")}
+                    >
                       <Settings />
                       {t("dashboard.header.settings")}
                     </DropdownMenuItem>

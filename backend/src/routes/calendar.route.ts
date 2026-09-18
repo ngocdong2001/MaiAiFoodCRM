@@ -9,7 +9,15 @@ router.get("/options", CalendarController.getOptions);
 router.get("/appointments", CalendarController.getAll);
 router.post("/appointments", requireManagement, CalendarController.create);
 router.put("/appointments/:id", requireManagement, CalendarController.update);
-router.patch("/appointments/:id/status", requireManagement, CalendarController.updateStatus);
-router.delete("/appointments/:id", requireManagement, CalendarController.delete);
+router.patch(
+  "/appointments/:id/status",
+  requireManagement,
+  CalendarController.updateStatus,
+);
+router.delete(
+  "/appointments/:id",
+  requireManagement,
+  CalendarController.delete,
+);
 router.get("/availability", CalendarController.getAvailability);
 export default router;

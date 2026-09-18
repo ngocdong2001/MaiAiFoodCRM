@@ -132,7 +132,10 @@ async function createTenantDatabaseAndMigrate(tenantId: number) {
     process.env.DATABASE_URL_TENANT = `mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:3306/${databaseName}`;
     await execAsync(migrationCmd);
   } catch (error) {
-    console.error(`Error running tenant migrations for ${databaseName}:`, error);
+    console.error(
+      `Error running tenant migrations for ${databaseName}:`,
+      error,
+    );
     throw error;
   }
 }

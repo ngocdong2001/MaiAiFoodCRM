@@ -25,9 +25,19 @@ export const dashboardNavItems: DashboardNavItem[] = [
   { key: "calendar", label: "Calendar", href: "/dashboard/calendar" },
   { key: "crm", label: "CRM", href: "/dashboard/crm" },
   { key: "staff", label: "Staff", href: "/dashboard/staff" },
-  { key: "services", label: "Services", href: "/dashboard/services", roles: ["admin"] },
+  {
+    key: "services",
+    label: "Services",
+    href: "/dashboard/services",
+    roles: ["admin"],
+  },
   // { key: "ai-recs", label: "AI Recs", href: "/dashboard/ai-recs" },
-  { key: "reports", label: "Reports", href: "/dashboard/reports", roles: ["admin"] },
+  {
+    key: "reports",
+    label: "Reports",
+    href: "/dashboard/reports",
+    roles: ["admin"],
+  },
   {
     key: "revenue",
     label: "Revenue",
@@ -38,7 +48,6 @@ export const dashboardNavItems: DashboardNavItem[] = [
     key: "integrations",
     label: "Settings",
     href: "/dashboard/integrations",
-    roles: ["admin"],
   },
 ];
 
