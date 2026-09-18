@@ -165,7 +165,7 @@ async function createAdminUser(tenantId: number) {
         email,
         passwordHash,
         name: "Admin User",
-        role: "owner",
+        role: "admin",
         updatedAt: new Date(),
       },
     });

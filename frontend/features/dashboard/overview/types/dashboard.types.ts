@@ -4,6 +4,8 @@ export type DashboardNavItem = {
   key: string;
   label: string;
   href: string;
+  /** When set, only users holding one of these roles may see/access the item. */
+  roles?: string[];
 };
 
 export type StatCardData = {

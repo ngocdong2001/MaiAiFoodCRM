@@ -1,4 +1,5 @@
 import { getPrismaMaster } from './dist/lib/prisma-master.js';
+import { ROLES } from './dist/types/roles.js';
 
 async function seed() {
   const prisma = getPrismaMaster();
@@ -36,7 +37,7 @@ async function seed() {
         email: 'admin@maiai.com',
         passwordHash: '$2b$10$fbiQ0QjHgP09jhvzbgbwPuIuHAZckAILiYWW2U37fpLd4QfrZ4syK',
         name: 'Admin User',
-        role: 'owner',
+        role: ROLES.ADMIN,
         isActive: true,
         updatedAt: now,
       },

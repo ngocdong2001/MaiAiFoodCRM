@@ -75,7 +75,7 @@ async function setup() {
     // Step 6: Create admin user
     console.log("📦 Step 6: Creating admin user...");
     const passwordHash = await bcrypt.hash("Admin@123", 10);
-    const userInsert = `INSERT INTO user (tenantId, email, passwordHash, name, role, isActive, createdAt, updatedAt) VALUES (1, 'admin@maiai.com', '${passwordHash}', 'Admin User', 'owner', true, NOW(), NOW())`;
+    const userInsert = `INSERT INTO user (tenantId, email, passwordHash, name, role, isActive, createdAt, updatedAt) VALUES (1, 'admin@maiai.com', '${passwordHash}', 'Admin User', 'admin', true, NOW(), NOW())`;
     const userCmd = `& "${MYSQL_PATH}" -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -h ${MYSQL_HOST} ${MASTER_DB} -e "${userInsert}"`;
     await execAsync(userCmd, { shell: "powershell.exe" });
     console.log("✅ Admin user created\n");

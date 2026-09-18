@@ -75,7 +75,7 @@ const CRMGuestsListSection = ({
         })}
       </div>
 
-      <ScrollArea className="mt-4 h-[min(55vh,32rem)] pr-3 xl:h-[calc(100vh-19rem)] xl:min-h-96 xl:max-h-180">
+      <ScrollArea className="mt-4 pr-3 xl:h-[calc(100vh-19rem)] xl:min-h-96 xl:max-h-180">
         <ul className="space-y-1.5 pb-1">
           {guests.map((guest) => {
             const isActive = guest.key === selectedGuestKey;

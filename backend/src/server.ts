@@ -20,9 +20,20 @@ import { activityLoggerMiddleware } from "./middleware/activity-logger.middlewar
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust the first proxy hop so req.ip reflects the real client behind
+// Traefik/nginx; rate limiting and logging then key on the true source.
+app.set("trust proxy", 1);
+
 // Middleware
-app.use(cors());
-app.use(express.json());
+const corsOrigin = process.env.CORS_ORIGIN;
+app.use(
+  cors({
+    origin: corsOrigin ? corsOrigin.split(",").map((o) => o.trim()) : true,
+    credentials: true,
+  }),
+);
+// Cap JSON body size to mitigate oversized-payload DoS.
+app.use(express.json({ limit: "1mb" }));
 // Registers a res.on('finish') listener for every mutating request; the
 // listener reads req.user/req.tenantClient once auth middleware (further
 // down the chain) has populated them, then writes an immutable system log.

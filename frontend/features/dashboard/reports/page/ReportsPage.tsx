@@ -191,7 +191,7 @@ const ReportsPage = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-col gap-6 px-12 py-8">
+    <div className="flex min-h-full flex-col gap-6 px-4 py-6 sm:px-6 lg:px-12 lg:py-8">
       <PageHeader
         size="lg"
         title={t("dashboard.reports.title")}

@@ -60,7 +60,7 @@ export const authMiddleware = async (
       tenantId: tenant.id,
       name: "Voice Agent",
       email: "voice-agent@maiai.com",
-      role: "service",
+      role: "admin",
       phone: null,
       avatarUrl: null,
     };

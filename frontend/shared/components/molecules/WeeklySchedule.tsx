@@ -68,6 +68,9 @@ type WeeklyScheduleProps = {
 };
 
 const weekdayLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+// Fixed pixel sizing keeps the grid identical on all screens; overflow-x-auto handles scrolling on narrow viewports.
+const STAFF_COL_WIDTH = 240;
+const HOUR_COL_WIDTH = 96;
 
 const toDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -330,21 +333,26 @@ const WeeklySchedule = ({
       </div>
 
       <div className="overflow-x-auto">
-        <div className="min-w-225">
-          <div className="grid grid-cols-[240px_1fr] border-b border-[#DEE1E7] bg-[#F3F4F7]/50">
-            <div className="sticky left-0 z-20 border-r border-[#DEE1E7] bg-[#F3F4F7] px-4 py-4 text-sm font-medium text-[#8D95A5]">
+        <div
+          className="grid w-full grid-cols-[fit-content(220px)_1fr] lg:grid-cols-[240px_1fr]"
+          style={{
+            minWidth: `${STAFF_COL_WIDTH + (hours.length - 1) * HOUR_COL_WIDTH}px`,
+          }}
+        >
+          <div className="contents">
+            <div className="sticky left-0 z-20 border-r border-b border-[#DEE1E7] bg-[#F3F4F7] px-4 py-4 text-sm font-medium text-[#8D95A5]">
               Staff Member
             </div>
             <div
-              className="grid"
+              className="grid border-b border-[#DEE1E7] bg-[#F3F4F7]/50"
               style={{
-                gridTemplateColumns: `repeat(${hours.length - 1}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${hours.length - 1}, minmax(${HOUR_COL_WIDTH}px, 1fr))`,
               }}
             >
               {hours.slice(0, -1).map((hour) => (
                 <div
                   key={hour}
-                  className="border-l border-[#DEE1E7]/40 px-2 py-4 text-left text-xs font-medium text-[#8D95A5]"
+                  className="whitespace-nowrap border-l border-[#DEE1E7]/40 px-2 py-4 text-left text-xs font-medium text-[#8D95A5]"
                 >
                   {formatHour(hour)}
                 </div>
@@ -352,7 +360,7 @@ const WeeklySchedule = ({
             </div>
           </div>
 
-          {resources.map((resource) => {
+          {resources.map((resource, resourceIndex) => {
             const resourceSlots = positionSlots(
               slots.filter((item) => item.resourceKey === resource.key),
             );
@@ -361,13 +369,14 @@ const WeeklySchedule = ({
               if (!laneGroups[slot.lane]) laneGroups[slot.lane] = [];
               laneGroups[slot.lane].push(slot);
             });
+            const isLastRow = resourceIndex === resources.length - 1;
+            const rowBorder = isLastRow ? "" : "border-b";
 
             return (
-              <div
-                key={resource.key}
-                className="grid min-h-[86px] grid-cols-[240px_1fr] border-b border-[#DEE1E7] last:border-b-0"
-              >
-                <div className="sticky left-0 z-20 flex items-center gap-3 border-r border-[#DEE1E7] bg-[#F9FAFB] px-4 py-4">
+              <div key={resource.key} className="contents">
+                <div
+                  className={`sticky left-0 z-20 flex min-h-[86px] items-center gap-3 border-r ${rowBorder} border-[#DEE1E7] bg-[#F9FAFB] px-4 py-4`}
+                >
                   {resource.avatarUrl && (
                     <img
                       src={resource.avatarUrl}
@@ -387,11 +396,13 @@ const WeeklySchedule = ({
                   </div>
                 </div>
 
-                <div className="relative flex flex-col gap-2 py-4">
+                <div
+                  className={`relative flex min-h-[86px] flex-col gap-2 py-4 ${rowBorder} border-[#DEE1E7]`}
+                >
                   <div
                     className="pointer-events-none absolute inset-0 grid"
                     style={{
-                      gridTemplateColumns: `repeat(${hours.length - 1}, minmax(0, 1fr))`,
+                      gridTemplateColumns: `repeat(${hours.length - 1}, minmax(${HOUR_COL_WIDTH}px, 1fr))`,
                     }}
                   >
                     {hours.slice(0, -1).map((hour) => (

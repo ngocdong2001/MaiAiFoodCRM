@@ -5,6 +5,7 @@ import { execSync } from "child_process";
 import { getPrismaMaster } from "../lib/prisma-master.js";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient as PrismaTenant } from "../generated/prisma-tenant/client.js";
+import { isRole } from "../types/roles.js";
 
 const router = Router();
 
@@ -461,7 +462,7 @@ router.post("/tenants/:id/users", async (req, res) => {
         email: normalizedEmail,
         passwordHash,
         name: String(name).trim(),
-        role: role || "staff",
+        role: isRole(role) ? role : "staff",
         phone: phone ? String(phone).trim() : null,
         updatedAt: userNow,
       },
@@ -557,7 +558,13 @@ router.patch("/tenants/:id/users/:userId", async (req, res) => {
     const { name, role, isActive, phone } = req.body;
     const data: Record<string, unknown> = {};
     if (name !== undefined) data.name = String(name).trim();
-    if (role !== undefined) data.role = String(role);
+    if (role !== undefined) {
+      if (!isRole(role)) {
+        res.status(400).json({ ok: false, error: `Invalid role: ${role}` });
+        return;
+      }
+      data.role = role;
+    }
     if (isActive !== undefined) data.isActive = Boolean(isActive);
     if (phone !== undefined) data.phone = phone ? String(phone).trim() : null;
 
