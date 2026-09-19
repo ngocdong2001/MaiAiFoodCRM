@@ -961,5 +961,13 @@
     "create": "Đã tạo",
     "update": "Đã cập nhật",
     "delete": "Đã xóa"
+  },
+  "errors": {
+    "title": "Đã xảy ra lỗi",
+    "description": "Đã có sự cố bất ngờ khi tải trang này. Bạn thử lại hoặc quay về trang chủ nhé.",
+    "retry": "Thử lại",
+    "home": "Về trang chủ",
+    "notFoundTitle": "Không tìm thấy trang",
+    "notFoundDescription": "Trang bạn tìm không tồn tại hoặc đã bị di chuyển."
   }
 }

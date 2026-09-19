@@ -1018,5 +1018,13 @@
     "create": "Created",
     "update": "Updated",
     "delete": "Deleted"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "We hit an unexpected issue while loading this page. Please try again, or head back to the home page.",
+    "retry": "Try again",
+    "home": "Back to home",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for doesn't exist or has been moved."
   }
 }

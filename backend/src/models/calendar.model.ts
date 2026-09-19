@@ -666,6 +666,20 @@ export const CalendarModel = {
     return this.getById(db, id);
   },
   async update(db: PrismaClient, id: number, input: AppointmentInput) {
+    const existing = await db.appointment.findUnique({
+      where: { id },
+      select: { status: true },
+    });
+    if (!existing)
+      throw new Prisma.PrismaClientKnownRequestError("Appointment not found", {
+        code: "P2025",
+        clientVersion: "6.1.0",
+      });
+    if (existing.status === "completed")
+      throw new CalendarDomainError(
+        "Completed appointments cannot be edited",
+        409,
+      );
     await db.$transaction(async (transaction) => {
       const services = await validateRelationsAndAvailability(
         transaction,
@@ -715,6 +729,20 @@ export const CalendarModel = {
     status: AppointmentStatus,
     cancelReason?: string,
   ) {
+    const existing = await db.appointment.findUnique({
+      where: { id },
+      select: { status: true },
+    });
+    if (!existing)
+      throw new Prisma.PrismaClientKnownRequestError("Appointment not found", {
+        code: "P2025",
+        clientVersion: "6.1.0",
+      });
+    if (existing.status === "completed")
+      throw new CalendarDomainError(
+        "Completed appointments cannot be edited",
+        409,
+      );
     const appointment = await db.$transaction(async (transaction) => {
       const updated = await transaction.appointment.update({
         where: { id },
