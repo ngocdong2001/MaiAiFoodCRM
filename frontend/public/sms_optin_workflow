@@ -1,0 +1,2 @@
+Opt-In Workflow Description:
+Customers verbally provide their phone numbers to our staff while making a booking over the phone or in person. Our staff explicitly asks for their consent: "Do you agree to receive automated booking confirmations and appointment reminders via SMS to this number?". Once the customer agrees, our staff manually checks the "SMS Consent Granted" box in our internal booking system or system automated check is performed before saving the appointment.
