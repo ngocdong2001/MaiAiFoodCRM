@@ -189,15 +189,17 @@ const WeeklyAppointmentBoard = ({
                             {event.detail.stationArea}
                           </p>
                         </div>
-                        {onSelectAppointment && event.appointment && (
-                          <button
-                            type="button"
-                            onClick={() => onSelectAppointment(event)}
-                            className="mt-2 w-full rounded-md border border-[#F7C6E4] bg-white px-2 py-1 text-xs font-medium text-primary hover:bg-[#FFF8FC]"
-                          >
-                            {t("dashboard.calendar.booking.reschedule")}
-                          </button>
-                        )}
+                        {onSelectAppointment &&
+                          event.appointment &&
+                          event.detail.status !== "completed" && (
+                            <button
+                              type="button"
+                              onClick={() => onSelectAppointment(event)}
+                              className="mt-2 w-full rounded-md border border-[#F7C6E4] bg-white px-2 py-1 text-xs font-medium text-primary hover:bg-[#FFF8FC]"
+                            >
+                              {t("dashboard.calendar.booking.reschedule")}
+                            </button>
+                          )}
                       </article>
                     );
                   })}
