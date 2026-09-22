@@ -181,6 +181,28 @@ const WeeklySchedule = ({
     const maxScrollLeft = element.scrollWidth - element.clientWidth;
     if (maxScrollLeft <= 8) return;
 
+    const viewportRight = element.getBoundingClientRect().right;
+    const firstHiddenItem = Array.from(
+      element.querySelectorAll<HTMLElement>("[data-schedule-scroll-item]"),
+    ).find((item) => item.getBoundingClientRect().right > viewportRight + 8);
+
+    if (firstHiddenItem) {
+      const itemLeft = firstHiddenItem.getBoundingClientRect().left;
+      const targetLeft = Math.min(
+        Math.max(
+          element.scrollLeft,
+          element.scrollLeft +
+            itemLeft -
+            element.getBoundingClientRect().left -
+            8,
+        ),
+        maxScrollLeft,
+      );
+
+      element.scrollTo({ left: targetLeft, behavior: "smooth" });
+      return;
+    }
+
     const targetLeft = Math.min(
       element.scrollLeft + element.clientWidth * 0.75,
       maxScrollLeft,
@@ -476,6 +498,7 @@ const WeeklySchedule = ({
                               key={`${slot.resourceKey}-${slot.startHour}-${slot.endHour}-${slot.label ?? "slot"}`}
                             >
                               <PopoverTrigger
+                                data-schedule-scroll-item="true"
                                 className="flex w-max min-w-0 cursor-pointer flex-col justify-center whitespace-nowrap rounded-lg border px-2.5 py-1 text-left shadow-[0px_2px_4px_0px_#00000012] outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                                 style={{
                                   marginLeft: `${marginLeftPct}%`,
@@ -535,10 +558,11 @@ const WeeklySchedule = ({
             type="button"
             aria-label="More schedule content"
             onClick={handleScrollHintClick}
-            className="absolute left-1/2 top-1/2 z-40 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#DEE1E7] bg-white/95 text-lg font-bold text-primary shadow-[0px_6px_16px_0px_#00000014] backdrop-blur-sm transition-transform hover:scale-105"
+            className="absolute right-0 top-1/2 z-40 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-l-full border border-r-0 border-[#DEE1E7] bg-white/95 text-primary shadow-[0px_6px_16px_0px_#00000014] backdrop-blur-sm transition-transform hover:scale-105 active:scale-95 motion-safe:animate-pulse"
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FFF1F2] text-[15px] leading-none">
-              !
+            <span className="flex items-center">
+              <ChevronRight className="h-7 w-7" />
+              <ChevronRight className="-ml-4 h-7 w-7 opacity-45" />
             </span>
           </button>
         )}

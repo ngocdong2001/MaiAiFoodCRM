@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Switch } from "@/shared/components/ui/switch";
 
@@ -13,9 +14,20 @@ interface OperatingHoursSectionProps {
   initialHours: DayHours[];
 }
 
+const DAY_KEY: Record<string, string> = {
+  Monday: "monday",
+  Tuesday: "tuesday",
+  Wednesday: "wednesday",
+  Thursday: "thursday",
+  Friday: "friday",
+  Saturday: "saturday",
+  Sunday: "sunday",
+};
+
 const OperatingHoursSection = ({
   initialHours,
 }: OperatingHoursSectionProps) => {
+  const { t } = useTranslation();
   const [hours, setHours] = useState<DayHours[]>(initialHours);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -47,7 +59,7 @@ const OperatingHoursSection = ({
       setHours(saved);
       setSaveSuccess(true);
     } catch {
-      setSaveError("Failed to save operating hours. Please try again.");
+      setSaveError(t("dashboard.settings.operatingHours.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -55,9 +67,11 @@ const OperatingHoursSection = ({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-[#171A21]">Operating Hours</h2>
+      <h2 className="text-xl font-semibold text-[#171A21]">
+        {t("dashboard.settings.operatingHours.title")}
+      </h2>
       <p className="mt-1 text-sm text-[#8D95A5]">
-        Define your regular business hours for online booking.
+        {t("dashboard.settings.operatingHours.description")}
       </p>
 
       <div className="mt-6 rounded-[14px] border border-[#DEE1E7] bg-white shadow-[0px_2px_4px_0px_#00000012]">
@@ -75,7 +89,9 @@ const OperatingHoursSection = ({
 
               {/* Day name */}
               <span className="w-28 text-base font-medium text-[#171A21]">
-                {row.day}
+                {t(
+                  `dashboard.settings.operatingHours.days.${DAY_KEY[row.day] ?? row.day}`,
+                )}
               </span>
 
               {/* Time pickers or Closed */}
@@ -87,7 +103,9 @@ const OperatingHoursSection = ({
                     onChange={(e) => updateDay(i, { from: e.target.value })}
                     className="min-w-0 flex-1 rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary sm:flex-none"
                   />
-                  <span className="text-sm text-[#8D95A5]">to</span>
+                  <span className="text-sm text-[#8D95A5]">
+                    {t("dashboard.settings.operatingHours.to")}
+                  </span>
                   <input
                     type="time"
                     value={row.to}
@@ -97,7 +115,7 @@ const OperatingHoursSection = ({
                 </div>
               ) : (
                 <span className="ml-auto text-sm italic text-[#8D95A5]">
-                  Closed
+                  {t("dashboard.settings.operatingHours.closed")}
                 </span>
               )}
             </div>
@@ -107,7 +125,9 @@ const OperatingHoursSection = ({
         <div className="flex items-center justify-between border-t border-[#DEE1E7] bg-[#F3F4F7]/30 px-6 py-3">
           {saveError && <p className="text-sm text-destructive">{saveError}</p>}
           {saveSuccess && (
-            <p className="text-sm text-green-600">Saved successfully.</p>
+            <p className="text-sm text-green-600">
+              {t("dashboard.settings.operatingHours.saved")}
+            </p>
           )}
           {!saveError && !saveSuccess && <span />}
           <button
@@ -116,7 +136,9 @@ const OperatingHoursSection = ({
             disabled={isSaving}
             className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90 disabled:opacity-60"
           >
-            {isSaving ? "Saving…" : "Save Changes"}
+            {isSaving
+              ? t("dashboard.settings.operatingHours.saving")
+              : t("dashboard.settings.operatingHours.save")}
           </button>
         </div>
       </div>

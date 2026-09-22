@@ -25,6 +25,12 @@ export const settingsNavItems: SettingsNavItem[] = [
     roles: ["admin"],
   },
   {
+    key: "team",
+    label: "team",
+    icon: "users",
+    roles: ["admin"],
+  },
+  {
     key: "security",
     label: "security",
     icon: "shield-check",

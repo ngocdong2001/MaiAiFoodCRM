@@ -309,6 +309,7 @@
       "previousMonth": "Tháng trước",
       "nextMonth": "Tháng sau",
       "noAppointments": "Không có lịch hẹn",
+      "moreContentRight": "Còn nội dung ở bên phải",
       "filtersAndStaff": "Bộ lọc và nhân viên",
       "filterStaff": "Lọc theo {{name}}",
       "queue": {
@@ -739,6 +740,7 @@
         "operatingHours": "Giờ hoạt động",
         "integrations": "Tích hợp",
         "communications": "Liên lạc",
+        "team": "Nhân viên",
         "security": "Bảo mật và truy cập",
         "systemLogs": "Nhật ký hệ thống"
       },
@@ -758,6 +760,129 @@
         "emailInUse": "Email này đã được sử dụng.",
         "saveError": "Không thể cập nhật hồ sơ.",
         "loading": "Đang tải hồ sơ..."
+      },
+      "businessProfile": {
+        "title": "Thông tin doanh nghiệp",
+        "description": "Quản lý thông tin cốt lõi của salon hiển thị cho khách hàng.",
+        "logo": "Logo salon",
+        "changeLogo": "Đổi logo",
+        "salonName": "Tên salon",
+        "salonNamePlaceholder": "VD: Luxe Mane Studio",
+        "businessType": "Loại hình kinh doanh",
+        "email": "Email liên hệ",
+        "emailPlaceholder": "hello@example.com",
+        "phone": "Số điện thoại chính",
+        "phonePlaceholder": "(555) 123-4567",
+        "timezone": "Múi giờ của salon",
+        "timezoneHint": "Được trợ lý giọng nói dùng để chuyển đổi giờ đặt lịch chính xác.",
+        "address": "Địa chỉ",
+        "addressPlaceholder": "123 Đường chính, Tầng 10, Thành phố, Tỉnh",
+        "saving": "Đang lưu…",
+        "save": "Lưu thay đổi",
+        "businessTypes": {
+          "hairSalon": "Salon tóc",
+          "nailSalon": "Salon nail",
+          "spa": "Spa",
+          "barbershop": "Tiệm cắt tóc nam",
+          "beautyStudio": "Studio làm đẹp"
+        }
+      },
+      "operatingHours": {
+        "title": "Giờ hoạt động",
+        "description": "Thiết lập giờ hoạt động thường xuyên cho việc đặt lịch trực tuyến.",
+        "to": "đến",
+        "closed": "Đóng cửa",
+        "saved": "Đã lưu thành công.",
+        "saveError": "Lưu giờ hoạt động thất bại. Vui lòng thử lại.",
+        "saving": "Đang lưu…",
+        "save": "Lưu thay đổi",
+        "days": {
+          "monday": "Thứ Hai",
+          "tuesday": "Thứ Ba",
+          "wednesday": "Thứ Tư",
+          "thursday": "Thứ Năm",
+          "friday": "Thứ Sáu",
+          "saturday": "Thứ Bảy",
+          "sunday": "Chủ Nhật"
+        }
+      },
+      "communications": {
+        "title": "Liên lạc",
+        "description": "Cấu hình tin nhắn tự động gửi đến khách hàng.",
+        "save": "Lưu thay đổi",
+        "items": {
+          "bookingConfirmation": {
+            "label": "Xác nhận đặt lịch",
+            "desc": "Gửi xác nhận khi có lịch hẹn được tạo."
+          },
+          "reminderSms": {
+            "label": "Nhắc qua SMS",
+            "desc": "Gửi nhắc hẹn qua SMS trước buổi hẹn."
+          },
+          "reminderEmail": {
+            "label": "Nhắc qua Email",
+            "desc": "Gửi nhắc hẹn qua email trước buổi hẹn."
+          },
+          "followUp": {
+            "label": "Tin nhắn sau buổi hẹn",
+            "desc": "Gửi lời cảm ơn sau khi kết thúc buổi hẹn."
+          },
+          "marketingEmails": {
+            "label": "Email tiếp thị",
+            "desc": "Gửi ưu đãi khuyến mãi và bản tin."
+          }
+        }
+      },
+      "team": {
+        "title": "Nhân viên",
+        "description": "Tạo và quản lý tài khoản nhân viên có thể đăng nhập vào salon này.",
+        "loading": "Đang tải danh sách nhân viên...",
+        "empty": "Chưa có nhân viên nào.",
+        "loadError": "Không thể tải danh sách nhân viên.",
+        "createError": "Không thể tạo tài khoản này.",
+        "deleteError": "Không thể xóa tài khoản này.",
+        "create": "Thêm tài khoản nhân viên",
+        "creating": "Đang tạo...",
+        "createTitle": "Tài khoản nhân viên mới",
+        "createDescription": "Tạo thông tin đăng nhập cho nhân viên của salon.",
+        "name": "Họ và tên",
+        "email": "Email",
+        "password": "Mật khẩu",
+        "phone": "Số điện thoại",
+        "cancel": "Hủy bỏ",
+        "delete": "Xóa",
+        "deleting": "Đang xóa...",
+        "deleteTitle": "Xóa tài khoản nhân viên",
+        "deleteDescription": "Thao tác này sẽ xóa vĩnh viễn tài khoản của {{name}} và không thể hoàn tác.",
+        "roles": {
+          "staff": "Nhân viên",
+          "admin": "Quản trị"
+        }
+      },
+      "security": {
+        "title": "Bảo mật và truy cập",
+        "description": "Quản lý mật khẩu, vai trò và quyền truy cập.",
+        "changePassword": "Đổi mật khẩu",
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu mới",
+        "updatePassword": "Cập nhật mật khẩu",
+        "staffAccess": "Vai trò truy cập của nhân viên",
+        "staffAccessDescription": "Kiểm soát những gì mỗi nhân viên có thể xem và chỉnh sửa.",
+        "roles": {
+          "owner": {
+            "name": "Chủ salon",
+            "desc": "Toàn quyền truy cập mọi tính năng"
+          },
+          "manager": {
+            "name": "Quản lý",
+            "desc": "Quản lý nhân viên, lịch hẹn và báo cáo"
+          },
+          "stylist": {
+            "name": "Thợ",
+            "desc": "Chỉ xem lịch của mình và ghi chú khách hàng"
+          }
+        }
       },
       "systemLogs": {
         "title": "Nhật ký hệ thống",
@@ -810,6 +935,9 @@
           "service.deleteService": "Xóa dịch vụ",
           "settings.updateOperatingHours": "Cập nhật giờ hoạt động",
           "settings.updateSalonSettings": "Cập nhật thông tin doanh nghiệp",
+          "settings.createUser": "Tạo tài khoản nhân viên",
+          "settings.updateUser": "Cập nhật tài khoản nhân viên",
+          "settings.deleteUser": "Xóa tài khoản nhân viên",
           "auth.updateProfile": "Cập nhật hồ sơ cá nhân"
         },
         "resources": {

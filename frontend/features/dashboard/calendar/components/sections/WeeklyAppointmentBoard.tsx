@@ -2,6 +2,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
+import { useHorizontalScrollIndicator } from "@/shared/hooks/useHorizontalScrollIndicator";
 
 import type { CalendarAppointment } from "../../types/calendar.types";
 
@@ -81,6 +82,9 @@ const WeeklyAppointmentBoard = ({
   });
   const today = new Date();
 
+  const { ref: scrollRef, hasMoreRight, scrollToNext } =
+    useHorizontalScrollIndicator([events]);
+
   return (
     <section className="overflow-hidden rounded-xl border border-[#DEE1E7] bg-white shadow-[0px_2px_4px_0px_#00000012]">
       <header className="flex flex-col gap-3 border-b border-[#DEE1E7] p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -127,8 +131,13 @@ const WeeklyAppointmentBoard = ({
         </div>
       </header>
 
-      <ScrollArea horizontal className="max-h-[min(68vh,46rem)]">
-        <div className="grid min-w-245 grid-cols-7 divide-x divide-[#E7EAF0]">
+      <div className="relative">
+        <ScrollArea
+          horizontal
+          viewportRef={scrollRef}
+          className="max-h-[min(68vh,46rem)]"
+        >
+          <div className="grid min-w-245 grid-cols-7 divide-x divide-[#E7EAF0]">
           {days.map((date) => {
             const dayEvents = events
               .filter((event) => sameDay(event, date))
@@ -214,7 +223,18 @@ const WeeklyAppointmentBoard = ({
             );
           })}
         </div>
-      </ScrollArea>
+        </ScrollArea>
+        {hasMoreRight && (
+          <button
+            type="button"
+            aria-label={t("dashboard.calendar.moreContentRight")}
+            onClick={scrollToNext}
+            className="absolute right-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-l-full bg-white/90 text-primary shadow-[0px_2px_8px_0px_#0000001a] ring-1 ring-[#DEE1E7] backdrop-blur-sm transition-transform hover:scale-105 active:scale-95 motion-safe:animate-pulse"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        )}
+      </div>
     </section>
   );
 };

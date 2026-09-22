@@ -1,6 +1,7 @@
 "use client";
 
-import { Activity, Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
+import { Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,6 +13,8 @@ import { dashboardNavItems } from "@/features/dashboard/overview/data/data";
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import LanguageSwitcher from "@/core/lang/components/LanguageSwitcher";
 import { useAuthStore } from "@/core/store/authStore";
+import { useSalonStore } from "@/core/store/salonStore";
+import { useSalonSettings } from "@/features/dashboard/settings/hooks/useSalonSettings";
 import {
   Drawer,
   DrawerContent,
@@ -47,8 +50,13 @@ const DashboardHeader = () => {
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  const salonName = useSalonStore((state) => state.salonName);
+  const logoUrl = useSalonStore((state) => state.logoUrl);
+  useSalonSettings();
+
   const userName = user?.name ?? t("dashboard.header.userFallback");
   const role = user?.role;
+  const brandTitle = salonName || BRAND_TITLE;
   const navItems = dashboardNavItems.filter(
     (item) => !item.roles || (role && item.roles.includes(role)),
   );
@@ -86,7 +94,7 @@ const DashboardHeader = () => {
                 <div className="flex items-center justify-between gap-4">
                   <div className="space-y-1">
                     <DrawerTitle className="text-lg font-bold text-primary">
-                      {BRAND_TITLE}
+                      {brandTitle}
                     </DrawerTitle>
                     <DrawerDescription
                       id="dashboard-mobile-nav-description"
@@ -164,11 +172,16 @@ const DashboardHeader = () => {
             href="/dashboard/overview"
             className="flex shrink-0 items-center gap-3"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <Activity className="h-5 w-5 text-white" />
-            </span>
+            <Image
+              src={logoUrl}
+              alt={brandTitle}
+              width={32}
+              height={32}
+              unoptimized
+              className="h-8 w-8 shrink-0 rounded-full object-cover"
+            />
             <span className="hidden font-bold text-primary sm:block text-xl tracking-tight">
-              {BRAND_TITLE}
+              {brandTitle} Dashboard
             </span>
           </Link>
         </div>
