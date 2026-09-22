@@ -637,6 +637,8 @@
         "avatarUrl": "Avatar URL",
         "guestTags": "Guest tags",
         "ownerNotes": "Owner notes",
+        "notifications": "Notifications",
+        "smsConsent": "Customer consented to receive SMS reminders and notifications.",
         "cancel": "Cancel",
         "saving": "Saving...",
         "saveGuest": "Save guest"

@@ -171,6 +171,7 @@ export const GuestScalarFieldEnum = {
   loyaltyPoints: 'loyaltyPoints',
   memberSince: 'memberSince',
   isActive: 'isActive',
+  smsConsent: 'smsConsent',
   notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

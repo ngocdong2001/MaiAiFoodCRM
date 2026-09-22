@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import { Badge } from "@/shared/components/ui/badge";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,10 +77,10 @@ const CRMGuestProfileSection = ({
   return (
     <section className="border-t border-[#EEF1F5] p-4 sm:p-5 xl:border-l xl:border-t-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           <InitialsAvatar
             name={guest.name}
-            className="h-13 w-13 text-sm"
+            className="h-13 w-13 shrink-0 text-sm"
             online
           />
           <div className="min-w-0">
@@ -101,6 +102,16 @@ const CRMGuestProfileSection = ({
                 {guest.email ?? t("dashboard.crm.profile.noEmail")}
               </span>
             </div>
+            <label className="mt-2.5 flex items-center gap-2">
+              <Checkbox
+                checked={guest.smsConsent}
+                disabled
+                aria-label={t("dashboard.crm.form.smsConsent")}
+              />
+              <span className="text-xs leading-4 text-[#566074]">
+                {t("dashboard.crm.form.smsConsent")}
+              </span>
+            </label>
           </div>
         </div>
 

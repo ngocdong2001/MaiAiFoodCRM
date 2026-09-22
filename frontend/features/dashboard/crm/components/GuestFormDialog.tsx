@@ -7,6 +7,7 @@ import FormDialog from "@/shared/components/molecules/FormDialog";
 import FormField from "@/shared/components/molecules/FormField";
 import FormSection from "@/shared/components/molecules/FormSection";
 import { Input } from "@/shared/components/ui/input";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Textarea } from "@/shared/components/ui/textarea";
 
 import type { GuestCard, GuestFormValues, GuestTag } from "../types/crm.types";
@@ -29,6 +30,7 @@ const initialValues = (guest: GuestCard | null): GuestFormValues => ({
   gender: guest?.gender ?? "",
   dateOfBirth: guest?.dateOfBirth ?? "",
   loyaltyPoints: guest?.loyaltyPoints.toString() ?? "0",
+  smsConsent: guest?.smsConsent ?? false,
   notes: guest?.notes ?? "",
   tagIds: guest?.tags.map((tag) => tag.id) ?? [],
 });
@@ -168,6 +170,19 @@ const GuestFormContent = ({
           onChange={(event) => update("notes", event.target.value)}
           rows={4}
         />
+      </FormSection>
+
+      <FormSection title={t("dashboard.crm.form.notifications")}>
+        <label className="flex cursor-pointer items-center gap-2">
+          <Checkbox
+            checked={values.smsConsent}
+            onCheckedChange={(checked) => update("smsConsent", Boolean(checked))}
+            aria-label={t("dashboard.crm.form.smsConsent")}
+          />
+          <span className="text-sm text-[#171A21]">
+            {t("dashboard.crm.form.smsConsent")}
+          </span>
+        </label>
       </FormSection>
     </FormDialog>
   );

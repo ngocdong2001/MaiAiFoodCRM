@@ -189,6 +189,7 @@ const guestSeeds = [
     memberSince: "2022-03-12",
     dateOfBirth: "1986-10-12",
     notes: "Prefers a gentle touch and sparkling water with lemon.",
+    smsConsent: true,
     tags: ["VIP", "Sensitive Scalp"],
   },
   {
@@ -202,6 +203,7 @@ const guestSeeds = [
     dateOfBirth: "1991-06-06",
     notes:
       "Prefers organic products and responds well to bundle offers by SMS.",
+    smsConsent: true,
     tags: ["Loyal", "Quiet Chair"],
   },
   {
@@ -214,6 +216,7 @@ const guestSeeds = [
     memberSince: "2024-01-21",
     dateOfBirth: "1994-05-21",
     notes: "Suitable for a win-back offer and birthday campaign.",
+    smsConsent: false,
     tags: ["At Risk", "Morning Appointments"],
   },
   {
@@ -226,6 +229,7 @@ const guestSeeds = [
     memberSince: "2021-08-02",
     dateOfBirth: "1989-02-02",
     notes: "Often buys retail products after service.",
+    smsConsent: true,
     tags: ["VIP", "Retail Buyer"],
   },
 ];
@@ -384,6 +388,7 @@ const main = async () => {
       loyaltyPoints: seed.loyaltyPoints,
       memberSince: new Date(`${seed.memberSince}T00:00:00.000Z`),
       dateOfBirth: new Date(`${seed.dateOfBirth}T00:00:00.000Z`),
+      smsConsent: seed.smsConsent ?? false,
       notes: seed.notes,
       isActive: true,
       updatedAt: now,

@@ -580,6 +580,8 @@
         "avatarUrl": "Đường dẫn ảnh đại diện",
         "guestTags": "Thẻ phân loại khách",
         "ownerNotes": "Ghi chú của chủ salon",
+        "notifications": "Thông báo",
+        "smsConsent": "Khách hàng đồng ý nhận tin nhắn SMS nhắc lịch và thông báo.",
         "cancel": "Hủy",
         "saving": "Đang lưu...",
         "saveGuest": "Lưu khách"

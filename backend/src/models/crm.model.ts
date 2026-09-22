@@ -11,6 +11,7 @@ export type GuestInput = {
   gender?: string | null;
   dateOfBirth?: string | null;
   loyaltyPoints?: number;
+  smsConsent?: boolean;
   notes?: string | null;
   tagIds?: number[];
 };
@@ -76,6 +77,7 @@ const serializeGuest = (guest: any) => {
     loyaltyPoints: guest.loyaltyPoints,
     memberSince: guest.memberSince.toISOString().slice(0, 10),
     isActive: guest.isActive,
+    smsConsent: guest.smsConsent,
     notes: guest.notes,
     tags: guest.guesttagmapping.map((mapping: any) => mapping.guesttag),
     guestNotes: notes,
@@ -105,6 +107,7 @@ const inputData = (input: GuestInput) => ({
   gender: nullableText(input.gender),
   dateOfBirth: input.dateOfBirth ? parseDate(input.dateOfBirth) : null,
   loyaltyPoints: input.loyaltyPoints ?? 0,
+  smsConsent: input.smsConsent ?? false,
   notes: nullableText(input.notes),
   updatedAt: new Date(),
 });

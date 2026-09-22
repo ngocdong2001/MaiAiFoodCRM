@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import {
   CalendarDays,
@@ -145,26 +145,64 @@ const WeeklySchedule = ({
   const endHour = hours[hours.length - 1];
   const totalHours = endHour - startHour;
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const [monthCursor, setMonthCursor] = useState(
-    dateValue ? parseDateKey(dateValue) : new Date(),
+    () => (dateValue ? parseDateKey(dateValue) : new Date()),
   );
 
   useEffect(() => {
-    if (!dateValue) return;
-    const selected = parseDateKey(dateValue);
-    setMonthCursor(new Date(selected.getFullYear(), selected.getMonth(), 1));
-  }, [dateValue]);
+    const element = scrollRef.current;
+    if (!element) return;
+
+    const updateScrollHint = () => {
+      const maxScrollLeft = element.scrollWidth - element.clientWidth;
+      const canScrollRight = maxScrollLeft > 8;
+      const notAtEnd = element.scrollLeft < maxScrollLeft - 8;
+      setShowScrollHint(canScrollRight && notAtEnd);
+    };
+
+    updateScrollHint();
+    element.addEventListener("scroll", updateScrollHint, { passive: true });
+
+    const resizeObserver = new ResizeObserver(updateScrollHint);
+    resizeObserver.observe(element);
+
+    return () => {
+      element.removeEventListener("scroll", updateScrollHint);
+      resizeObserver.disconnect();
+    };
+  }, [hours.length, resources.length, slots.length]);
+
+  const handleScrollHintClick = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    const maxScrollLeft = element.scrollWidth - element.clientWidth;
+    if (maxScrollLeft <= 8) return;
+
+    const targetLeft = Math.min(
+      element.scrollLeft + element.clientWidth * 0.75,
+      maxScrollLeft,
+    );
+
+    element.scrollTo({
+      left: targetLeft,
+      behavior: "smooth",
+    });
+  };
 
   const selectedDate = dateValue ? parseDateKey(dateValue) : null;
   const selectedKey = selectedDate ? toDateKey(selectedDate) : null;
-  const currentMonth = monthCursor.getMonth();
-  const monthLabel = monthCursor.toLocaleDateString([], {
+  const effectiveMonthCursor = selectedDate ?? monthCursor;
+  const currentMonth = effectiveMonthCursor.getMonth();
+  const monthLabel = effectiveMonthCursor.toLocaleDateString([], {
     month: "long",
     year: "numeric",
   });
   const monthDays = useMemo(
-    () => buildCalendarDays(monthCursor),
-    [monthCursor],
+    () => buildCalendarDays(effectiveMonthCursor),
+    [effectiveMonthCursor],
   );
 
   return (
@@ -332,13 +370,14 @@ const WeeklySchedule = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <div
-          className="grid w-full grid-cols-[fit-content(220px)_1fr] lg:grid-cols-[240px_1fr]"
-          style={{
-            minWidth: `${STAFF_COL_WIDTH + (hours.length - 1) * HOUR_COL_WIDTH}px`,
-          }}
-        >
+      <div className="relative">
+        <div ref={scrollRef} className="overflow-x-auto">
+          <div
+            className="grid w-full grid-cols-[fit-content(220px)_1fr] lg:grid-cols-[240px_1fr]"
+            style={{
+              minWidth: `${STAFF_COL_WIDTH + (hours.length - 1) * HOUR_COL_WIDTH}px`,
+            }}
+          >
           <div className="contents">
             <div className="sticky left-0 z-20 border-r border-b border-[#DEE1E7] bg-[#F3F4F7] px-4 py-4 text-sm font-medium text-[#8D95A5]">
               Staff Member
@@ -489,7 +528,20 @@ const WeeklySchedule = ({
               </div>
             );
           })}
+          </div>
         </div>
+        {showScrollHint && (
+          <button
+            type="button"
+            aria-label="More schedule content"
+            onClick={handleScrollHintClick}
+            className="absolute left-1/2 top-1/2 z-40 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#DEE1E7] bg-white/95 text-lg font-bold text-primary shadow-[0px_6px_16px_0px_#00000014] backdrop-blur-sm transition-transform hover:scale-105"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FFF1F2] text-[15px] leading-none">
+              !
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );
