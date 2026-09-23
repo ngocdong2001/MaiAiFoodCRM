@@ -156,10 +156,11 @@ const WeeklySchedule = ({
     if (!element) return;
 
     const updateScrollHint = () => {
-      const maxScrollLeft = element.scrollWidth - element.clientWidth;
-      const canScrollRight = maxScrollLeft > 8;
-      const notAtEnd = element.scrollLeft < maxScrollLeft - 8;
-      setShowScrollHint(canScrollRight && notAtEnd);
+      const viewportRight = element.getBoundingClientRect().right;
+      const hasHiddenItem = Array.from(
+        element.querySelectorAll<HTMLElement>("[data-schedule-scroll-item]"),
+      ).some((item) => item.getBoundingClientRect().right > viewportRight + 8);
+      setShowScrollHint(hasHiddenItem);
     };
 
     updateScrollHint();

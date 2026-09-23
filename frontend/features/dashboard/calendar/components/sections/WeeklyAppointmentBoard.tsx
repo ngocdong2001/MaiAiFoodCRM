@@ -224,7 +224,7 @@ const WeeklyAppointmentBoard = ({
           })}
         </div>
         </ScrollArea>
-        {hasMoreRight && (
+        {events.length > 0 && hasMoreRight && (
           <button
             type="button"
             aria-label={t("dashboard.calendar.moreContentRight")}
