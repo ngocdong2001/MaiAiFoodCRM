@@ -100,6 +100,7 @@ const DEFAULT_FORM = {
 const BusinessProfileSection = () => {
   const { t } = useTranslation();
   const setSalon = useSalonStore((state) => state.setSalon);
+  const cacheSalonProfile = useSalonStore((state) => state.cacheSalonProfile);
   const [form, setForm] = useState(DEFAULT_FORM);
   const [timezone, setTimezone] = useState("UTC");
   const [saving, setSaving] = useState(false);
@@ -115,8 +116,10 @@ const BusinessProfileSection = () => {
       });
       setTimezone(s.timezone || "UTC");
       setSalon(s.salonName || "");
+      // Also keep the localStorage cache in sync
+      cacheSalonProfile(s);
     });
-  }, [setSalon]);
+  }, [setSalon, cacheSalonProfile]);
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -125,11 +128,13 @@ const BusinessProfileSection = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await settingsService.updateSalonSettings({
+      const updated = await settingsService.updateSalonSettings({
         ...form,
         timezone,
       });
-      setSalon(form.salonName);
+      setSalon(updated.salonName || form.salonName);
+      // Persist the updated profile so the login page shows the latest name
+      cacheSalonProfile(updated);
     } finally {
       setSaving(false);
     }

@@ -73,7 +73,7 @@
       "lastNamePlaceholder": "Doe",
       "workEmail": "Work Email",
       "workEmailPlaceholder": "jane@luxurynails.com",
-      "salonName": "Salon Name",
+      "salonName": "Business Name",
       "salonNamePlaceholder": "Luxury Nails & Spa",
       "submitting": "Submitting...",
       "signUp": "Sign up for early access",
@@ -84,7 +84,7 @@
         "lastNameRequired": "Please enter your last name",
         "emailRequired": "Please enter your work email",
         "emailInvalid": "Please enter a valid email address",
-        "salonNameRequired": "Please enter your salon name"
+        "salonNameRequired": "Please enter your Business Name"
       },
       "successMessage": "✅ Success! {{message}}",
       "errorMessage": "❌ Error: {{message}}",
@@ -823,7 +823,9 @@
         "description": "Manage your salon's core information visible to clients.",
         "logo": "Salon Logo",
         "changeLogo": "Change Logo",
-        "salonName": "Salon Name",
+        "logoUrl": "Logo URL",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "salonName": "Business Name",
         "salonNamePlaceholder": "e.g. Luxe Mane Studio",
         "businessType": "Business Type",
         "email": "Contact Email",
