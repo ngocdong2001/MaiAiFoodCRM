@@ -55,6 +55,7 @@ export const ModelName = {
   appointment: 'appointment',
   appointmentservice: 'appointmentservice',
   auditlog: 'auditlog',
+  notification: 'notification',
   guest: 'guest',
   guestnote: 'guestnote',
   guesttag: 'guesttag',
@@ -156,6 +157,21 @@ export const AuditlogScalarFieldEnum = {
 } as const
 
 export type AuditlogScalarFieldEnum = (typeof AuditlogScalarFieldEnum)[keyof typeof AuditlogScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  appointmentId: 'appointmentId',
+  guestName: 'guestName',
+  staffName: 'staffName',
+  serviceNames: 'serviceNames',
+  startTime: 'startTime',
+  createdAt: 'createdAt',
+  readAt: 'readAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const GuestScalarFieldEnum = {
@@ -474,6 +490,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
@@ -529,6 +552,32 @@ export const auditlogOrderByRelevanceFieldEnum = {
 } as const
 
 export type auditlogOrderByRelevanceFieldEnum = (typeof auditlogOrderByRelevanceFieldEnum)[keyof typeof auditlogOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const notificationOrderByRelevanceFieldEnum = {
+  type: 'type',
+  guestName: 'guestName',
+  staffName: 'staffName'
+} as const
+
+export type notificationOrderByRelevanceFieldEnum = (typeof notificationOrderByRelevanceFieldEnum)[keyof typeof notificationOrderByRelevanceFieldEnum]
 
 
 export const guestOrderByRelevanceFieldEnum = {
@@ -594,23 +643,6 @@ export const revenuerecorddetailOrderByRelevanceFieldEnum = {
 } as const
 
 export type revenuerecorddetailOrderByRelevanceFieldEnum = (typeof revenuerecorddetailOrderByRelevanceFieldEnum)[keyof typeof revenuerecorddetailOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const callanalysisOrderByRelevanceFieldEnum = {

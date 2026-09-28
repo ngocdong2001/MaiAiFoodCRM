@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
-import QueryErrorState from "@/shared/components/molecules/QueryErrorState";
 import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 import ServiceCategoryDialog from "../components/ServiceCategoryDialog";
@@ -246,27 +245,19 @@ const ServicesPage = () => {
         onManageCategories={() => setCategoryDialogOpen(true)}
       />
 
-      {servicesQuery.isError ? (
-        <QueryErrorState
-          message={t("dashboard.services.errors.loadFailed")}
-          retryLabel={t("dashboard.services.errors.retry")}
-          onRetry={() => servicesQuery.refetch()}
-        />
-      ) : (
-        <ServicePriceTableSection
-          rows={rows}
-          visibleRows={visibleRows}
-          categories={categories}
-          isLoading={servicesQuery.isPending}
-          isSaving={bulkSave.isPending}
-          isDirty={isDirty}
-          error={error}
-          onChangeRow={changeRow}
-          onAddRow={addRow}
-          onRemoveRow={removeRow}
-          onReset={() => setPendingReset(true)}
-        />
-      )}
+      <ServicePriceTableSection
+        rows={rows}
+        visibleRows={visibleRows}
+        categories={categories}
+        isLoading={servicesQuery.isPending}
+        isSaving={bulkSave.isPending}
+        isDirty={isDirty}
+        error={error}
+        onChangeRow={changeRow}
+        onAddRow={addRow}
+        onRemoveRow={removeRow}
+        onReset={() => setPendingReset(true)}
+      />
 
       <ServiceCategoryDialog
         open={categoryDialogOpen}

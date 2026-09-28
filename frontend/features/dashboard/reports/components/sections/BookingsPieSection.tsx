@@ -27,50 +27,58 @@ const BookingsPieSection = ({ data }: BookingsPieSectionProps) => {
         </p>
       </div>
 
-      <div className="h-[280px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={70}
-              outerRadius={110}
-              paddingAngle={3}
-              dataKey="value"
-            >
-              {data.map((entry) => (
-                <Cell key={entry.name} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                borderRadius: 10,
-                border: "1px solid #DEE1E7",
-                fontSize: 13,
-              }}
-              formatter={(value) => [`${value ?? 0}%`]}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-2">
-        {data.map((item) => (
-          <div key={item.name} className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 shrink-0 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
-              <span className="text-sm text-[#8D95A5]">{item.name}</span>
-            </div>
-            <span className="text-sm font-medium text-[#171A21]">
-              {item.value}%
-            </span>
+      {data.length === 0 ? (
+        <div className="flex h-[280px] w-full items-center justify-center text-sm text-[#8D95A5]">
+          No data available
+        </div>
+      ) : (
+        <>
+          <div className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={110}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {data.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 10,
+                    border: "1px solid #DEE1E7",
+                    fontSize: 13,
+                  }}
+                  formatter={(value) => [`${value ?? 0}%`]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-        ))}
-      </div>
+
+          <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-2">
+            {data.map((item) => (
+              <div key={item.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-sm text-[#8D95A5]">{item.name}</span>
+                </div>
+                <span className="text-sm font-medium text-[#171A21]">
+                  {item.value}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

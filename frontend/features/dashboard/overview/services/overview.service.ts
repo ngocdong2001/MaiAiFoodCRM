@@ -54,6 +54,18 @@ export type OverviewData = {
   staffOnDuty: StaffOnDutyItem[];
 };
 
+export type BookingNotification = {
+  id: number;
+  type: string;
+  appointmentId: number;
+  guestName: string;
+  staffName: string;
+  serviceNames: string[];
+  startTime: string;
+  createdAt: string;
+  readAt: string | null;
+};
+
 type ApiResponse<T> = { success: boolean; data: T };
 
 export type QueueEvent = {
@@ -61,6 +73,12 @@ export type QueueEvent = {
   reason: string;
   appointmentId: number;
   occurredAt: string;
+  booking?: {
+    guestName: string;
+    staffName: string;
+    serviceNames: string[];
+    startTime: string;
+  };
 };
 
 const parseSseBlock = (block: string): QueueEvent | null => {
@@ -90,6 +108,23 @@ export const overviewService = {
     const response =
       await apiClient.get<ApiResponse<OverviewData>>("/overview/stats");
     return response.data.data;
+  },
+
+  async getNotifications(): Promise<BookingNotification[]> {
+    const response =
+      await apiClient.get<ApiResponse<BookingNotification[]>>(
+        "/overview/notifications",
+      );
+    return response.data.data.map((notification) => ({
+      ...notification,
+      serviceNames: Array.isArray(notification.serviceNames)
+        ? notification.serviceNames
+        : [],
+    }));
+  },
+
+  async markAllNotificationsRead(): Promise<void> {
+    await apiClient.patch("/overview/notifications/read-all");
   },
 
   async streamQueue(

@@ -36,7 +36,7 @@ const TeamSection = () => {
         setUsers(data);
         setError(null);
       })
-      .catch(() => setError(t("dashboard.settings.team.loadError")))
+      .catch(() => setUsers([]))
       .finally(() => setLoading(false));
   }, [t]);
 

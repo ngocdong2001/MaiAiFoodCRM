@@ -563,11 +563,6 @@ export const BookingFormContent = ({
             placeholder={t("dashboard.calendar.booking.notesPlaceholder")}
           />
         </FormField>
-        {options.isError && (
-          <p className="text-sm text-destructive">
-            {t("dashboard.calendar.booking.loadOptionsError")}
-          </p>
-        )}
       </FormSection>
     </FormDialog>
   );

@@ -284,6 +284,12 @@
       "openNavigationMenu": "Mở menu điều hướng",
       "closeNavigationMenu": "Đóng menu điều hướng",
       "notifications": "Thông báo",
+      "notificationsPanel": {
+        "title": "Thông báo",
+        "empty": "Chưa có thông báo đặt lịch mới.",
+        "newBooking": "Lịch đặt mới từ {{name}}",
+        "unknownGuest": "Khách hàng"
+      },
       "settings": "Cài đặt",
       "accountMenu": "Menu tài khoản",
       "profile": "Hồ sơ",
@@ -612,6 +618,9 @@
       "filters": "Bộ lọc",
       "exportData": "Xuất dữ liệu",
       "loading": "Đang tải báo cáo…",
+      "errors": {
+        "loadSummary": "Không thể tải báo cáo"
+      },
       "filtersPanel": {
         "title": "Bộ lọc báo cáo",
         "startDate": "Ngày bắt đầu",

@@ -284,6 +284,12 @@
       "openNavigationMenu": "Open navigation menu",
       "closeNavigationMenu": "Close navigation menu",
       "notifications": "Notifications",
+      "notificationsPanel": {
+        "title": "Notifications",
+        "empty": "No new booking notifications.",
+        "newBooking": "New booking from {{name}}",
+        "unknownGuest": "Guest"
+      },
       "settings": "Settings",
       "accountMenu": "Account menu",
       "profile": "Profile",
@@ -669,6 +675,9 @@
       "filters": "Filters",
       "exportData": "Export Data",
       "loading": "Loading reports…",
+      "errors": {
+        "loadSummary": "Failed to load reports"
+      },
       "filtersPanel": {
         "title": "Report Filters",
         "startDate": "Start Date",

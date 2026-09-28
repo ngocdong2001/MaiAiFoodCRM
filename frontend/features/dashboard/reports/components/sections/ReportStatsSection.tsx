@@ -65,6 +65,14 @@ interface ReportStatsSectionProps {
 }
 
 const ReportStatsSection = ({ metrics }: ReportStatsSectionProps) => {
+  if (metrics.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-[#D6DFEB] bg-white p-8 text-center text-sm text-[#8D95A5]">
+        No data available
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {metrics.map((metric) => (

@@ -4,7 +4,6 @@ import { useDeferredValue, useMemo, useState } from "react";
 
 import SkeletonGrid from "@/shared/components/atoms/SkeletonGrid";
 import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
-import QueryErrorState from "@/shared/components/molecules/QueryErrorState";
 import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 import StaffFormDialog from "../components/StaffFormDialog";
@@ -135,12 +134,6 @@ const StaffPage = () => {
           count={4}
           className="sm:grid-cols-2 lg:grid-cols-4"
           itemClassName="h-64"
-        />
-      ) : staffQuery.isError ? (
-        <QueryErrorState
-          message="Could not load staff from the database."
-          retryLabel="Try again"
-          onRetry={() => staffQuery.refetch()}
         />
       ) : (
         <StaffGridSection

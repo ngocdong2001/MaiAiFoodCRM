@@ -35,6 +35,11 @@ const RevenueChartSection = ({ data }: RevenueChartSectionProps) => {
         </button>
       </div>
 
+      {data.length === 0 ? (
+        <div className="flex h-[320px] w-full items-center justify-center text-sm text-[#8D95A5]">
+          No data available
+        </div>
+      ) : (
       <div className="h-[320px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
@@ -112,6 +117,7 @@ const RevenueChartSection = ({ data }: RevenueChartSectionProps) => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
+      )}
     </div>
   );
 };
