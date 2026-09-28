@@ -256,9 +256,6 @@ const ServicePriceTableSection = ({
                       onKeyDown={(event) => handleLastRowKeyDown(event, index)}
                       className={`${cellInput} w-28 font-semibold text-[#171A21]`}
                     />
-                    <span className="text-xs">
-                      {t("dashboard.services.table.currency")}
-                    </span>
                   </div>
                 </td>
 
