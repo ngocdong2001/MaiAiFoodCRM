@@ -2,8 +2,10 @@
 
 import { Mail, MapPin, Phone, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import SelectField from "@/shared/components/molecules/SelectField";
+import { useSalonStore } from "@/core/store/salonStore";
 import { settingsService } from "../../services/settings.service";
 
 /* ── Comprehensive timezone list with UTC offset labels ── */
@@ -70,6 +72,23 @@ const TIMEZONE_OPTIONS = TIMEZONE_ENTRIES.map((tz) => ({
   label: `${tz.utc}  –  ${tz.value.replace(/_/g, " ")}`,
 }));
 
+// The stored value stays the stable English string; labels are localized.
+const BUSINESS_TYPES = [
+  "Hair Salon",
+  "Nail Salon",
+  "Spa",
+  "Barbershop",
+  "Beauty Studio",
+] as const;
+
+const BUSINESS_TYPE_KEYS: Record<string, string> = {
+  "Hair Salon": "hairSalon",
+  "Nail Salon": "nailSalon",
+  "Spa": "spa",
+  "Barbershop": "barbershop",
+  "Beauty Studio": "beautyStudio",
+};
+
 const DEFAULT_FORM = {
   salonName: "",
   businessType: "Hair Salon",
@@ -79,6 +98,9 @@ const DEFAULT_FORM = {
 };
 
 const BusinessProfileSection = () => {
+  const { t } = useTranslation();
+  const setSalon = useSalonStore((state) => state.setSalon);
+  const cacheSalonProfile = useSalonStore((state) => state.cacheSalonProfile);
   const [form, setForm] = useState(DEFAULT_FORM);
   const [timezone, setTimezone] = useState("UTC");
   const [saving, setSaving] = useState(false);
@@ -93,8 +115,11 @@ const BusinessProfileSection = () => {
         address: s.address || "",
       });
       setTimezone(s.timezone || "UTC");
+      setSalon(s.salonName || "");
+      // Also keep the localStorage cache in sync
+      cacheSalonProfile(s);
     });
-  }, []);
+  }, [setSalon, cacheSalonProfile]);
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -103,10 +128,13 @@ const BusinessProfileSection = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await settingsService.updateSalonSettings({
+      const updated = await settingsService.updateSalonSettings({
         ...form,
         timezone,
       });
+      setSalon(updated.salonName || form.salonName);
+      // Persist the updated profile so the login page shows the latest name
+      cacheSalonProfile(updated);
     } finally {
       setSaving(false);
     }
@@ -114,9 +142,11 @@ const BusinessProfileSection = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-[#171A21]">Business Profile</h2>
+      <h2 className="text-xl font-semibold text-[#171A21]">
+        {t("dashboard.settings.businessProfile.title")}
+      </h2>
       <p className="mt-1 text-sm text-[#8D95A5]">
-        Manage your salon's core information visible to clients.
+        {t("dashboard.settings.businessProfile.description")}
       </p>
 
       <div className="mt-6 rounded-[14px] border border-[#DEE1E7] bg-white shadow-[0px_2px_4px_0px_#00000012]">
@@ -128,13 +158,13 @@ const BusinessProfileSection = () => {
               <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-[#DEE1E7] bg-[#F3F4F7]/50">
                 <img
                   src="https://cdn.visily.ai/text2design/images/f9ee91517509e4e6e67d8ada44cd8b7e3ecad22982df622d56bd6d80ad4d0983.webp"
-                  alt="Salon logo"
-                  className="h-full w-full object-cover"
+                  alt={t("dashboard.settings.businessProfile.logo")}
+                  className="h-full w-full rounded-full object-cover"
                 />
               </div>
               <button className="flex items-center gap-1.5 rounded-[10px] border border-[#DEE1E7] bg-[#F9FAFB] px-3 py-1.5 text-xs font-medium text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] hover:bg-[#F3F4F7]">
                 <Upload className="h-3 w-3" />
-                Change Logo
+                {t("dashboard.settings.businessProfile.changeLogo")}
               </button>
             </div>
 
@@ -144,13 +174,15 @@ const BusinessProfileSection = () => {
                 {/* Salon Name */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
-                    Salon Name
+                    {t("dashboard.settings.businessProfile.salonName")}
                   </label>
                   <input
                     type="text"
                     value={form.salonName}
                     onChange={(e) => handleChange("salonName", e.target.value)}
-                    placeholder="e.g. Luxe Mane Studio"
+                    placeholder={t(
+                      "dashboard.settings.businessProfile.salonNamePlaceholder",
+                    )}
                     className="rounded-[10px] border border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012] outline-none focus:border-primary"
                   />
                 </div>
@@ -158,21 +190,22 @@ const BusinessProfileSection = () => {
                 {/* Business Type */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
-                    Business Type
+                    {t("dashboard.settings.businessProfile.businessType")}
                   </label>
                   <SelectField
                     value={form.businessType}
                     onValueChange={(value) =>
                       handleChange("businessType", value)
                     }
-                    options={[
-                      "Hair Salon",
-                      "Nail Salon",
-                      "Spa",
-                      "Barbershop",
-                      "Beauty Studio",
-                    ].map((item) => ({ value: item, label: item }))}
-                    ariaLabel="Business Type"
+                    options={BUSINESS_TYPES.map((item) => ({
+                      value: item,
+                      label: t(
+                        `dashboard.settings.businessProfile.businessTypes.${BUSINESS_TYPE_KEYS[item] ?? item}`,
+                      ),
+                    }))}
+                    ariaLabel={t(
+                      "dashboard.settings.businessProfile.businessType",
+                    )}
                     className="rounded-[10px] border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012]"
                   />
                 </div>
@@ -180,7 +213,7 @@ const BusinessProfileSection = () => {
                 {/* Contact Email */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
-                    Contact Email
+                    {t("dashboard.settings.businessProfile.email")}
                   </label>
                   <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-primary">
                     <Mail className="h-4 w-4 shrink-0 text-[#8D95A5]" />
@@ -188,7 +221,9 @@ const BusinessProfileSection = () => {
                       type="email"
                       value={form.email}
                       onChange={(e) => handleChange("email", e.target.value)}
-                      placeholder="hello@example.com"
+                      placeholder={t(
+                        "dashboard.settings.businessProfile.emailPlaceholder",
+                      )}
                       className="w-full text-sm text-[#171A21] outline-none"
                     />
                   </div>
@@ -197,7 +232,7 @@ const BusinessProfileSection = () => {
                 {/* Primary Phone */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
-                    Primary Phone
+                    {t("dashboard.settings.businessProfile.phone")}
                   </label>
                   <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-primary">
                     <Phone className="h-4 w-4 shrink-0 text-[#8D95A5]" />
@@ -205,7 +240,9 @@ const BusinessProfileSection = () => {
                       type="tel"
                       value={form.phone}
                       onChange={(e) => handleChange("phone", e.target.value)}
-                      placeholder="(555) 123-4567"
+                      placeholder={t(
+                        "dashboard.settings.businessProfile.phonePlaceholder",
+                      )}
                       className="w-full text-sm text-[#171A21] outline-none"
                     />
                   </div>
@@ -216,17 +253,19 @@ const BusinessProfileSection = () => {
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#171A21]">
-                    Salon Timezone
+                    {t("dashboard.settings.businessProfile.timezone")}
                   </label>
                   <SelectField
                     value={timezone}
                     onValueChange={setTimezone}
                     options={TIMEZONE_OPTIONS}
-                    ariaLabel="Salon Timezone"
+                    ariaLabel={t(
+                      "dashboard.settings.businessProfile.timezone",
+                    )}
                     className="rounded-[10px] border-[#DEE1E7] px-3 py-2 text-sm text-[#171A21] shadow-[0px_2px_4px_0px_#00000012]"
                   />
                   <span className="text-xs text-[#8D95A5]">
-                    Used by the voice agent to convert booking times correctly.
+                    {t("dashboard.settings.businessProfile.timezoneHint")}
                   </span>
                 </div>
               </div>
@@ -234,7 +273,7 @@ const BusinessProfileSection = () => {
               {/* Physical Address */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-[#171A21]">
-                  Physical Address
+                  {t("dashboard.settings.businessProfile.address")}
                 </label>
                 <div className="flex items-center gap-2 rounded-[10px] border border-[#DEE1E7] px-3 py-2 shadow-[0px_2px_4px_0px_#00000012] focus-within:border-primary">
                   <MapPin className="h-4 w-4 shrink-0 text-[#8D95A5]" />
@@ -242,7 +281,9 @@ const BusinessProfileSection = () => {
                     type="text"
                     value={form.address}
                     onChange={(e) => handleChange("address", e.target.value)}
-                    placeholder="123 Main St, Suite 100, City, State ZIP"
+                    placeholder={t(
+                      "dashboard.settings.businessProfile.addressPlaceholder",
+                    )}
                     className="w-full text-sm text-[#171A21] outline-none"
                   />
                 </div>
@@ -258,7 +299,9 @@ const BusinessProfileSection = () => {
             disabled={saving}
             className="rounded-[10px] bg-primary px-5 py-2 text-sm font-medium text-white shadow-[0px_1px_3px_0px_#0000001a] hover:opacity-90 disabled:opacity-60"
           >
-            {saving ? "Saving…" : "Save Changes"}
+            {saving
+              ? t("dashboard.settings.businessProfile.saving")
+              : t("dashboard.settings.businessProfile.save")}
           </button>
         </div>
       </div>

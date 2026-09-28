@@ -73,7 +73,7 @@
       "lastNamePlaceholder": "Doe",
       "workEmail": "Work Email",
       "workEmailPlaceholder": "jane@luxurynails.com",
-      "salonName": "Salon Name",
+      "salonName": "Business Name",
       "salonNamePlaceholder": "Luxury Nails & Spa",
       "submitting": "Submitting...",
       "signUp": "Sign up for early access",
@@ -84,7 +84,7 @@
         "lastNameRequired": "Please enter your last name",
         "emailRequired": "Please enter your work email",
         "emailInvalid": "Please enter a valid email address",
-        "salonNameRequired": "Please enter your salon name"
+        "salonNameRequired": "Please enter your Business Name"
       },
       "successMessage": "✅ Success! {{message}}",
       "errorMessage": "❌ Error: {{message}}",
@@ -284,6 +284,12 @@
       "openNavigationMenu": "Open navigation menu",
       "closeNavigationMenu": "Close navigation menu",
       "notifications": "Notifications",
+      "notificationsPanel": {
+        "title": "Notifications",
+        "empty": "No new booking notifications.",
+        "newBooking": "New booking from {{name}}",
+        "unknownGuest": "Guest"
+      },
       "settings": "Settings",
       "accountMenu": "Account menu",
       "profile": "Profile",
@@ -309,6 +315,7 @@
       "previousMonth": "Previous month",
       "nextMonth": "Next month",
       "noAppointments": "No appointments",
+      "moreContentRight": "More content to the right",
       "filtersAndStaff": "Filters & Staff",
       "filterStaff": "Filter {{name}}",
       "queue": {
@@ -637,6 +644,8 @@
         "avatarUrl": "Avatar URL",
         "guestTags": "Guest tags",
         "ownerNotes": "Owner notes",
+        "notifications": "Notifications",
+        "smsConsent": "Customer consented to receive SMS reminders and notifications.",
         "cancel": "Cancel",
         "saving": "Saving...",
         "saveGuest": "Save guest"
@@ -666,6 +675,9 @@
       "filters": "Filters",
       "exportData": "Export Data",
       "loading": "Loading reports…",
+      "errors": {
+        "loadSummary": "Failed to load reports"
+      },
       "filtersPanel": {
         "title": "Report Filters",
         "startDate": "Start Date",
@@ -794,6 +806,7 @@
         "operatingHours": "Operating Hours",
         "integrations": "Integrations",
         "communications": "Communications",
+        "team": "Team",
         "security": "Security & Access",
         "systemLogs": "System Logs"
       },
@@ -813,6 +826,131 @@
         "emailInUse": "This email is already in use.",
         "saveError": "Unable to update your profile.",
         "loading": "Loading your profile..."
+      },
+      "businessProfile": {
+        "title": "Business Profile",
+        "description": "Manage your salon's core information visible to clients.",
+        "logo": "Salon Logo",
+        "changeLogo": "Change Logo",
+        "logoUrl": "Logo URL",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "salonName": "Business Name",
+        "salonNamePlaceholder": "e.g. Luxe Mane Studio",
+        "businessType": "Business Type",
+        "email": "Contact Email",
+        "emailPlaceholder": "hello@example.com",
+        "phone": "Primary Phone",
+        "phonePlaceholder": "(555) 123-4567",
+        "timezone": "Salon Timezone",
+        "timezoneHint": "Used by the voice agent to convert booking times correctly.",
+        "address": "Physical Address",
+        "addressPlaceholder": "123 Main St, Suite 100, City, State ZIP",
+        "saving": "Saving…",
+        "save": "Save Changes",
+        "businessTypes": {
+          "hairSalon": "Hair Salon",
+          "nailSalon": "Nail Salon",
+          "spa": "Spa",
+          "barbershop": "Barbershop",
+          "beautyStudio": "Beauty Studio"
+        }
+      },
+      "operatingHours": {
+        "title": "Operating Hours",
+        "description": "Define your regular business hours for online booking.",
+        "to": "to",
+        "closed": "Closed",
+        "saved": "Saved successfully.",
+        "saveError": "Failed to save operating hours. Please try again.",
+        "saving": "Saving…",
+        "save": "Save Changes",
+        "days": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        }
+      },
+      "communications": {
+        "title": "Communications",
+        "description": "Configure automated messages sent to your clients.",
+        "save": "Save Changes",
+        "items": {
+          "bookingConfirmation": {
+            "label": "Booking Confirmation",
+            "desc": "Send confirmation when a booking is made."
+          },
+          "reminderSms": {
+            "label": "SMS Reminders",
+            "desc": "Send SMS reminder before the appointment."
+          },
+          "reminderEmail": {
+            "label": "Email Reminders",
+            "desc": "Send email reminder before the appointment."
+          },
+          "followUp": {
+            "label": "Follow-up Message",
+            "desc": "Send a thank-you message after the appointment."
+          },
+          "marketingEmails": {
+            "label": "Marketing Emails",
+            "desc": "Send promotional offers and newsletters."
+          }
+        }
+      },
+      "team": {
+        "title": "Team",
+        "description": "Create and manage staff accounts that can sign in to this salon.",
+        "loading": "Loading team members...",
+        "empty": "No team members yet.",
+        "loadError": "Unable to load team members.",
+        "createError": "Unable to create this account.",
+        "deleteError": "Unable to delete this account.",
+        "create": "Add Staff Account",
+        "creating": "Creating...",
+        "createTitle": "New staff account",
+        "createDescription": "Create login credentials for a staff member of your salon.",
+        "name": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "phone": "Phone",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleting": "Deleting...",
+        "deleteTitle": "Delete staff account",
+        "deleteDescription": "This will permanently delete the account of {{name}}. It cannot be undone.",
+        "roles": {
+          "staff": "Staff",
+          "admin": "Admin"
+        }
+      },
+      "security": {
+        "title": "Security & Access",
+        "description": "Manage passwords, roles, and access permissions.",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "updatePassword": "Update Password",
+        "staffAccess": "Staff Access Roles",
+        "staffAccessDescription": "Control what each staff member can view and edit.",
+        "roles": {
+          "owner": {
+            "name": "Owner",
+            "desc": "Full access to all features"
+          },
+          "manager": {
+            "name": "Manager",
+            "desc": "Can manage staff, bookings, and reports"
+          },
+          "stylist": {
+            "name": "Stylist",
+            "desc": "View own schedule and client notes only"
+          }
+        }
       },
       "systemLogs": {
         "title": "System Logs",
@@ -865,6 +1003,9 @@
           "service.deleteService": "Deleted service",
           "settings.updateOperatingHours": "Updated operating hours",
           "settings.updateSalonSettings": "Updated business profile",
+          "settings.createUser": "Created staff account",
+          "settings.updateUser": "Updated staff account",
+          "settings.deleteUser": "Deleted staff account",
           "auth.updateProfile": "Updated personal profile"
         },
         "resources": {

@@ -4,6 +4,7 @@ export type SettingsTab =
   | "operating-hours"
   | "integrations"
   | "communications"
+  | "team"
   | "security"
   | "system-logs";
 

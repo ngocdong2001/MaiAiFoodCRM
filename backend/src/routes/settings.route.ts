@@ -14,4 +14,8 @@ router.put(
 router.get("/salon", SettingsController.getSalonSettings);
 router.put("/salon", requireManagement, SettingsController.updateSalonSettings);
 router.get("/system-logs", requireManagement, SettingsController.getSystemLogs);
+router.get("/users", requireManagement, SettingsController.listUsers);
+router.post("/users", requireManagement, SettingsController.createUser);
+router.put("/users/:id", requireManagement, SettingsController.updateUser);
+router.delete("/users/:id", requireManagement, SettingsController.deleteUser);
 export default router;

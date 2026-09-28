@@ -31,6 +31,7 @@ export type GuestCard = {
   loyaltyPoints: number;
   totalVisits: number;
   totalSpend: number;
+  smsConsent: boolean;
   lastVisit: string | null;
   nextAppointment: string | null;
   notes: string | null;
@@ -57,6 +58,7 @@ export type GuestFormValues = {
   gender: string;
   dateOfBirth: string;
   loyaltyPoints: string;
+  smsConsent: boolean;
   notes: string;
   tagIds: number[];
 };

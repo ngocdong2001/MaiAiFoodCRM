@@ -14,6 +14,7 @@ import OperatingHoursSection from "../components/sections/OperatingHoursSection"
 import SecuritySection from "../components/sections/SecuritySection";
 import SettingsNavSection from "../components/sections/SettingsNavSection";
 import SystemLogsSection from "../components/sections/SystemLogsSection";
+import TeamSection from "../components/sections/TeamSection";
 import UserProfileSection from "../components/sections/UserProfileSection";
 import {
   Drawer,
@@ -118,6 +119,7 @@ const SettingsPage = () => {
         {activeTab === "communications" && role === "admin" && (
           <CommunicationsSection />
         )}
+        {activeTab === "team" && role === "admin" && <TeamSection />}
         {activeTab === "security" && role === "admin" && <SecuritySection />}
         {activeTab === "system-logs" && role === "admin" && (
           <SystemLogsSection />

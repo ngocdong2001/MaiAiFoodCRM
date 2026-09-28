@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import {
-  Activity,
   AlertCircle,
   ChevronRight,
   CircleCheck,
@@ -18,6 +17,8 @@ import { useTranslation } from "react-i18next";
 
 import loginIllustration from "@/assets/images/login_illustration.webp";
 import { useLogin } from "@/features/landing/hooks/useLogin";
+import { useSalonStore, DEFAULT_SALON_LOGO } from "@/core/store/salonStore";
+import { useAuthStore } from "@/core/store/authStore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +49,11 @@ const LoginForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const loginMutation = useLogin();
+  const salonName = useSalonStore((s) => s.salonName);
+  const logoUrl = useSalonStore((s) => s.logoUrl);
+  const tenantName = useAuthStore((s) => s.tenant?.name);
+  // Priority: salon settings name > cached tenant name > generic brand fallback
+  const displayName = salonName || tenantName || t("auth.login.brand");
 
   const getLoginErrorMessage = (error: unknown) => {
     if (axios.isAxiosError(error)) {
@@ -95,14 +101,17 @@ const LoginForm = () => {
           <div className="mx-auto w-full max-w-[440px]">
             {/* Brand */}
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary sm:h-10 sm:w-10">
-                <Activity
-                  className="h-5 w-5 text-[#f6f7f9] sm:h-6 sm:w-6"
-                  strokeWidth={2.5}
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm sm:h-10 sm:w-10">
+                <Image
+                  src={logoUrl || DEFAULT_SALON_LOGO}
+                  alt={displayName}
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
                 />
               </div>
               <span className="text-xl font-bold leading-[26px] text-primary sm:text-[26px]">
-                {t("auth.login.brand")}
+                {displayName} Dashboard
               </span>
             </div>
 

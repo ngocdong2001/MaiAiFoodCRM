@@ -1,6 +1,7 @@
 "use client";
 
-import { Activity, Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
+import { Bell, CalendarClock, LogOut, Menu, Settings, User, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,6 +13,12 @@ import { dashboardNavItems } from "@/features/dashboard/overview/data/data";
 import InitialsAvatar from "@/shared/components/atoms/InitialsAvatar";
 import LanguageSwitcher from "@/core/lang/components/LanguageSwitcher";
 import { useAuthStore } from "@/core/store/authStore";
+import { useSalonStore } from "@/core/store/salonStore";
+import { useSalonSettings } from "@/features/dashboard/settings/hooks/useSalonSettings";
+import {
+  useMarkAllNotificationsRead,
+  useNotifications,
+} from "@/features/dashboard/overview/hooks/useOverview";
 import {
   Drawer,
   DrawerContent,
@@ -42,16 +49,28 @@ const isActiveRoute = (pathname: string, href: string) => {
 const BRAND_TITLE = "MaiAI Owner Dashboard";
 
 const DashboardHeader = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  const salonName = useSalonStore((state) => state.salonName);
+  const logoUrl = useSalonStore((state) => state.logoUrl);
+  useSalonSettings();
+
   const userName = user?.name ?? t("dashboard.header.userFallback");
   const role = user?.role;
+  const brandTitle = salonName || BRAND_TITLE;
   const navItems = dashboardNavItems.filter(
     (item) => !item.roles || (role && item.roles.includes(role)),
   );
+  const notificationsQuery = useNotifications();
+  const markAllNotificationsRead = useMarkAllNotificationsRead();
+  const notifications = notificationsQuery.data ?? [];
+  const unreadCount = notifications.filter(
+    (notification) => !notification.readAt,
+  ).length;
+  const notificationLocale = i18n.language.startsWith("vi") ? "vi-VN" : "en-US";
 
   const handleLogout = () => {
     authService.logout();
@@ -86,7 +105,7 @@ const DashboardHeader = () => {
                 <div className="flex items-center justify-between gap-4">
                   <div className="space-y-1">
                     <DrawerTitle className="text-lg font-bold text-primary">
-                      {BRAND_TITLE}
+                      {brandTitle}
                     </DrawerTitle>
                     <DrawerDescription
                       id="dashboard-mobile-nav-description"
@@ -164,11 +183,16 @@ const DashboardHeader = () => {
             href="/dashboard/overview"
             className="flex shrink-0 items-center gap-3"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <Activity className="h-5 w-5 text-white" />
-            </span>
+            <Image
+              src={logoUrl}
+              alt={brandTitle}
+              width={32}
+              height={32}
+              unoptimized
+              className="h-8 w-8 shrink-0 rounded-full object-cover"
+            />
             <span className="hidden font-bold text-primary sm:block text-xl tracking-tight">
-              {BRAND_TITLE}
+              {brandTitle} Dashboard
             </span>
           </Link>
         </div>
@@ -196,13 +220,69 @@ const DashboardHeader = () => {
 
         <div className="flex shrink-0 items-center gap-2">
           <LanguageSwitcher className="hidden sm:flex" />
-          <button
-            type="button"
-            aria-label={t("dashboard.header.notifications")}
-            className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
+          <DropdownMenu
+            onOpenChange={(open) => {
+              if (open && unreadCount > 0) markAllNotificationsRead.mutate();
+            }}
           >
-            <Bell className="h-5 w-5" />
-          </button>
+            <DropdownMenuTrigger
+              type="button"
+              aria-label={t("dashboard.header.notifications")}
+              className="relative flex h-10 w-10 items-center justify-center rounded-[10px] text-[#8D95A5] transition-colors hover:bg-[#F3F4F6] hover:text-[#1E2128]"
+            >
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E5397F] px-1 text-[10px] font-semibold leading-none text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[min(24rem,calc(100vw-2rem))] p-0">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="px-4 py-3 text-sm">
+                  {t("dashboard.header.notificationsPanel.title")}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notifications.length === 0 ? (
+                  <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    {t("dashboard.header.notificationsPanel.empty")}
+                  </p>
+                ) : (
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="flex gap-3 border-b border-border px-4 py-3 last:border-b-0"
+                      >
+                        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <CalendarClock className="size-4" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground">
+                            {t("dashboard.header.notificationsPanel.newBooking", {
+                              name: notification.guestName || t("dashboard.header.notificationsPanel.unknownGuest"),
+                            })}
+                          </p>
+                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                            {notification.serviceNames.join(", ")}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {notification.staffName} · {new Date(notification.startTime).toLocaleString(notificationLocale, {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })}
+                          </p>
+                        </div>
+                        {!notification.readAt && (
+                          <span className="mt-2 size-2 shrink-0 rounded-full bg-primary" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {role === "admin" && (
             <button
               type="button"

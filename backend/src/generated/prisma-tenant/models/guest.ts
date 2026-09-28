@@ -53,6 +53,7 @@ export type GuestMinAggregateOutputType = {
   loyaltyPoints: number | null
   memberSince: Date | null
   isActive: boolean | null
+  smsConsent: boolean | null
   notes: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -71,6 +72,7 @@ export type GuestMaxAggregateOutputType = {
   loyaltyPoints: number | null
   memberSince: Date | null
   isActive: boolean | null
+  smsConsent: boolean | null
   notes: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -89,6 +91,7 @@ export type GuestCountAggregateOutputType = {
   loyaltyPoints: number
   memberSince: number
   isActive: number
+  smsConsent: number
   notes: number
   createdAt: number
   updatedAt: number
@@ -123,6 +126,7 @@ export type GuestMinAggregateInputType = {
   loyaltyPoints?: true
   memberSince?: true
   isActive?: true
+  smsConsent?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
@@ -141,6 +145,7 @@ export type GuestMaxAggregateInputType = {
   loyaltyPoints?: true
   memberSince?: true
   isActive?: true
+  smsConsent?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
@@ -159,6 +164,7 @@ export type GuestCountAggregateInputType = {
   loyaltyPoints?: true
   memberSince?: true
   isActive?: true
+  smsConsent?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
@@ -264,6 +270,7 @@ export type GuestGroupByOutputType = {
   loyaltyPoints: number
   memberSince: Date
   isActive: boolean
+  smsConsent: boolean
   notes: string | null
   createdAt: Date
   updatedAt: Date
@@ -305,6 +312,7 @@ export type guestWhereInput = {
   loyaltyPoints?: Prisma.IntFilter<"guest"> | number
   memberSince?: Prisma.DateTimeFilter<"guest"> | Date | string
   isActive?: Prisma.BoolFilter<"guest"> | boolean
+  smsConsent?: Prisma.BoolFilter<"guest"> | boolean
   notes?: Prisma.StringNullableFilter<"guest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"guest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"guest"> | Date | string
@@ -328,6 +336,7 @@ export type guestOrderByWithRelationInput = {
   loyaltyPoints?: Prisma.SortOrder
   memberSince?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  smsConsent?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -355,6 +364,7 @@ export type guestWhereUniqueInput = Prisma.AtLeast<{
   loyaltyPoints?: Prisma.IntFilter<"guest"> | number
   memberSince?: Prisma.DateTimeFilter<"guest"> | Date | string
   isActive?: Prisma.BoolFilter<"guest"> | boolean
+  smsConsent?: Prisma.BoolFilter<"guest"> | boolean
   notes?: Prisma.StringNullableFilter<"guest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"guest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"guest"> | Date | string
@@ -378,6 +388,7 @@ export type guestOrderByWithAggregationInput = {
   loyaltyPoints?: Prisma.SortOrder
   memberSince?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  smsConsent?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -404,6 +415,7 @@ export type guestScalarWhereWithAggregatesInput = {
   loyaltyPoints?: Prisma.IntWithAggregatesFilter<"guest"> | number
   memberSince?: Prisma.DateTimeWithAggregatesFilter<"guest"> | Date | string
   isActive?: Prisma.BoolWithAggregatesFilter<"guest"> | boolean
+  smsConsent?: Prisma.BoolWithAggregatesFilter<"guest"> | boolean
   notes?: Prisma.StringNullableWithAggregatesFilter<"guest"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"guest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"guest"> | Date | string
@@ -421,6 +433,7 @@ export type guestCreateInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -444,6 +457,7 @@ export type guestUncheckedCreateInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -466,6 +480,7 @@ export type guestUpdateInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -489,6 +504,7 @@ export type guestUncheckedUpdateInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -512,6 +528,7 @@ export type guestCreateManyInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -529,6 +546,7 @@ export type guestUpdateManyMutationInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -547,6 +565,7 @@ export type guestUncheckedUpdateManyInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -576,6 +595,7 @@ export type guestCountOrderByAggregateInput = {
   loyaltyPoints?: Prisma.SortOrder
   memberSince?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  smsConsent?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -601,6 +621,7 @@ export type guestMaxOrderByAggregateInput = {
   loyaltyPoints?: Prisma.SortOrder
   memberSince?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  smsConsent?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -619,6 +640,7 @@ export type guestMinOrderByAggregateInput = {
   loyaltyPoints?: Prisma.SortOrder
   memberSince?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  smsConsent?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -717,6 +739,7 @@ export type guestCreateWithoutAirecommendationInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -739,6 +762,7 @@ export type guestUncheckedCreateWithoutAirecommendationInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -776,6 +800,7 @@ export type guestUpdateWithoutAirecommendationInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -798,6 +823,7 @@ export type guestUncheckedUpdateWithoutAirecommendationInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -819,6 +845,7 @@ export type guestCreateWithoutAppointmentInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -841,6 +868,7 @@ export type guestUncheckedCreateWithoutAppointmentInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -878,6 +906,7 @@ export type guestUpdateWithoutAppointmentInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -900,6 +929,7 @@ export type guestUncheckedUpdateWithoutAppointmentInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -921,6 +951,7 @@ export type guestCreateWithoutGuestnoteInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -943,6 +974,7 @@ export type guestUncheckedCreateWithoutGuestnoteInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -980,6 +1012,7 @@ export type guestUpdateWithoutGuestnoteInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1002,6 +1035,7 @@ export type guestUncheckedUpdateWithoutGuestnoteInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1023,6 +1057,7 @@ export type guestCreateWithoutGuesttagmappingInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -1045,6 +1080,7 @@ export type guestUncheckedCreateWithoutGuesttagmappingInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -1082,6 +1118,7 @@ export type guestUpdateWithoutGuesttagmappingInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1104,6 +1141,7 @@ export type guestUncheckedUpdateWithoutGuesttagmappingInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1125,6 +1163,7 @@ export type guestCreateWithoutPaymentInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -1147,6 +1186,7 @@ export type guestUncheckedCreateWithoutPaymentInput = {
   loyaltyPoints?: number
   memberSince?: Date | string
   isActive?: boolean
+  smsConsent?: boolean
   notes?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
@@ -1184,6 +1224,7 @@ export type guestUpdateWithoutPaymentInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1206,6 +1247,7 @@ export type guestUncheckedUpdateWithoutPaymentInput = {
   loyaltyPoints?: Prisma.IntFieldUpdateOperationsInput | number
   memberSince?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  smsConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1295,6 +1337,7 @@ export type guestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   loyaltyPoints?: boolean
   memberSince?: boolean
   isActive?: boolean
+  smsConsent?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1321,12 +1364,13 @@ export type guestSelectScalar = {
   loyaltyPoints?: boolean
   memberSince?: boolean
   isActive?: boolean
+  smsConsent?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type guestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone" | "email" | "avatarUrl" | "gender" | "dateOfBirth" | "totalVisits" | "totalSpend" | "loyaltyPoints" | "memberSince" | "isActive" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["guest"]>
+export type guestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone" | "email" | "avatarUrl" | "gender" | "dateOfBirth" | "totalVisits" | "totalSpend" | "loyaltyPoints" | "memberSince" | "isActive" | "smsConsent" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["guest"]>
 export type guestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   airecommendation?: boolean | Prisma.guest$airecommendationArgs<ExtArgs>
   appointment?: boolean | Prisma.guest$appointmentArgs<ExtArgs>
@@ -1358,6 +1402,7 @@ export type $guestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     loyaltyPoints: number
     memberSince: Date
     isActive: boolean
+    smsConsent: boolean
     notes: string | null
     createdAt: Date
     updatedAt: Date
@@ -1747,6 +1792,7 @@ export interface guestFieldRefs {
   readonly loyaltyPoints: Prisma.FieldRef<"guest", 'Int'>
   readonly memberSince: Prisma.FieldRef<"guest", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"guest", 'Boolean'>
+  readonly smsConsent: Prisma.FieldRef<"guest", 'Boolean'>
   readonly notes: Prisma.FieldRef<"guest", 'String'>
   readonly createdAt: Prisma.FieldRef<"guest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"guest", 'DateTime'>

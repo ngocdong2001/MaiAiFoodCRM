@@ -30,6 +30,11 @@ const SeatUtilizationSection = ({ data }: SeatUtilizationSectionProps) => {
       </div>
 
       <div className="h-[280px] w-full">
+        {data.length === 0 ? (
+          <div className="flex h-full w-full items-center justify-center text-sm text-[#8D95A5]">
+            No data available
+          </div>
+        ) : (
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
@@ -73,6 +78,7 @@ const SeatUtilizationSection = ({ data }: SeatUtilizationSectionProps) => {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

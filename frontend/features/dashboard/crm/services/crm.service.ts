@@ -22,6 +22,7 @@ const payload = (values: GuestFormValues) => ({
   gender: values.gender || null,
   dateOfBirth: values.dateOfBirth || null,
   loyaltyPoints: values.loyaltyPoints ? Number(values.loyaltyPoints) : 0,
+  smsConsent: values.smsConsent,
   notes: values.notes || null,
   tagIds: values.tagIds,
 });

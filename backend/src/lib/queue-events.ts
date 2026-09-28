@@ -11,6 +11,12 @@ type QueueEvent = {
   reason: QueueChangeReason;
   appointmentId: number;
   occurredAt: string;
+  booking?: {
+    guestName: string;
+    staffName: string;
+    serviceNames: string[];
+    startTime: string;
+  };
 };
 
 const subscribers = new Map<number, Set<Response>>();
@@ -32,12 +38,18 @@ export const queueEvents = {
     };
   },
 
-  publish(tenantId: number, reason: QueueChangeReason, appointmentId: number) {
+  publish(
+    tenantId: number,
+    reason: QueueChangeReason,
+    appointmentId: number,
+    booking?: QueueEvent["booking"],
+  ) {
     const event: QueueEvent = {
       type: "queue.changed",
       reason,
       appointmentId,
       occurredAt: new Date().toISOString(),
+      ...(booking ? { booking } : {}),
     };
 
     subscribers

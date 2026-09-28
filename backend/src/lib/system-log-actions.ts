@@ -83,6 +83,11 @@ export function resolveActionKey(req: Request): string {
     case "settings": {
       if (sub1 === "operating-hours") return "settings.updateOperatingHours";
       if (sub1 === "salon") return "settings.updateSalonSettings";
+      if (sub1 === "users") {
+        if (!sub2 && method === "POST") return "settings.createUser";
+        if (sub2 && method === "PUT") return "settings.updateUser";
+        if (sub2 && method === "DELETE") return "settings.deleteUser";
+      }
       break;
     }
     case "auth": {

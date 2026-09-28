@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 
 import ConfirmDialog from "@/shared/components/molecules/ConfirmDialog";
 import EmptyState from "@/shared/components/molecules/EmptyState";
-import QueryErrorState from "@/shared/components/molecules/QueryErrorState";
 import LoadingState from "@/shared/components/molecules/LoadingState";
 import { Button } from "@/shared/components/ui/button";
 import { getApiErrorMessage } from "@/shared/lib/apiError";
@@ -130,13 +129,6 @@ const CRMPage = () => {
 
       {guestsQuery.isPending ? (
         <LoadingState className="h-120" label={t("dashboard.crm.loading")} />
-      ) : guestsQuery.isError ? (
-        <QueryErrorState
-          className="m-5"
-          message={t("dashboard.crm.loadError")}
-          retryLabel={t("dashboard.crm.retry")}
-          onRetry={() => guestsQuery.refetch()}
-        />
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-[320px_minmax(0,1fr)]">
           <CRMGuestsListSection

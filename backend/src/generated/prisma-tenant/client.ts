@@ -60,6 +60,11 @@ export type appointmentservice = Prisma.appointmentserviceModel
  */
 export type auditlog = Prisma.auditlogModel
 /**
+ * Model notification
+ * 
+ */
+export type notification = Prisma.notificationModel
+/**
  * Model guest
  * 
  */

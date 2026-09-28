@@ -94,6 +94,22 @@ model auditlog {
   @@index([entityType, entityId], map: "AuditLog_entityType_entityId_idx")
 }
 
+model notification {
+  id           Int       @id @default(autoincrement())
+  type         String    @default("appointment.created") @db.VarChar(50)
+  appointmentId Int
+  guestName    String    @db.VarChar(255)
+  staffName    String    @db.VarChar(255)
+  serviceNames Json
+  startTime    DateTime  @db.DateTime(3)
+  createdAt    DateTime  @default(now()) @db.DateTime(3)
+  readAt       DateTime? @db.DateTime(3)
+
+  @@index([createdAt], map: "Notification_createdAt_idx")
+  @@index([readAt], map: "Notification_readAt_idx")
+  @@index([appointmentId], map: "Notification_appointmentId_idx")
+}
+
 model guest {
   id               Int                @id @default(autoincrement())
   name             String
@@ -107,6 +123,7 @@ model guest {
   loyaltyPoints    Int                @default(0)
   memberSince      DateTime           @default(now())
   isActive         Boolean            @default(true)
+  smsConsent       Boolean            @default(false)
   notes            String?            @db.Text
   createdAt        DateTime           @default(now())
   updatedAt        DateTime

@@ -1,4 +1,8 @@
 import type { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+
+import { getPrismaMaster } from "../lib/prisma-master.js";
+import { isRole } from "../types/roles.js";
 
 type DayHours = { day: string; open: boolean; from: string; to: string };
 
@@ -259,6 +263,232 @@ export const SettingsController = {
     } catch (error) {
       console.error("Failed to load system logs", error);
       res.status(500).json({ success: false, message: "Failed to load system logs" });
+    }
+  },
+
+  // ── Team / staff user accounts (salon-admin scoped) ────────────
+
+  async listUsers(req: Request, res: Response): Promise<void> {
+    const prismaMaster = getPrismaMaster();
+    const tenantId = req.user!.tenantId;
+    try {
+      const users = await prismaMaster.user.findMany({
+        where: { tenantId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          phone: true,
+          avatarUrl: true,
+          lastLoginAt: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "asc" },
+      });
+
+      res.status(200).json({
+        success: true,
+        data: users.map((u) => ({
+          id: u.id,
+          email: u.email,
+          name: u.name,
+          role: u.role,
+          isActive: u.isActive,
+          phone: u.phone,
+          avatarUrl: u.avatarUrl,
+          lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
+          createdAt: u.createdAt?.toISOString() ?? null,
+        })),
+      });
+    } catch (error) {
+      console.error("Failed to list users", error);
+      res.status(500).json({ success: false, message: "Failed to list users" });
+    }
+  },
+
+  async createUser(req: Request, res: Response): Promise<void> {
+    const prismaMaster = getPrismaMaster();
+    const tenantId = req.user!.tenantId;
+
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    const email =
+      typeof req.body?.email === "string"
+        ? req.body.email.trim().toLowerCase()
+        : "";
+    const password = typeof req.body?.password === "string" ? req.body.password : "";
+    const phone =
+      typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
+    const role = req.body?.role;
+
+    if (!name || !email || !password) {
+      return void res
+        .status(400)
+        .json({ success: false, message: "Name, email and password are required" });
+    }
+
+    if (password.length < 6) {
+      return void res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    // Salon admins may only create staff accounts for their own tenant.
+    const resolvedRole = isRole(role) && role === "staff" ? "staff" : "staff";
+
+    try {
+      const tenant = await prismaMaster.tenant.findUnique({
+        where: { id: tenantId },
+        include: { _count: { select: { users: true } } },
+      });
+      if (!tenant) {
+        return void res
+          .status(404)
+          .json({ success: false, message: "Tenant not found" });
+      }
+      if (tenant._count.users >= tenant.maxUsers) {
+        return void res.status(409).json({
+          success: false,
+          message: `User limit reached (${tenant.maxUsers})`,
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 12);
+      const user = await prismaMaster.user.create({
+        data: {
+          tenantId,
+          email,
+          passwordHash,
+          name,
+          role: resolvedRole,
+          phone: phone || null,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          phone: true,
+          createdAt: true,
+        },
+      });
+
+      res.status(201).json({ success: true, data: user });
+    } catch (err) {
+      const code = (err as { code?: string })?.code;
+      if (code === "P2002") {
+        return void res.status(409).json({
+          success: false,
+          message: "Email already exists in this tenant",
+        });
+      }
+      console.error("Failed to create user", err);
+      res.status(500).json({ success: false, message: "Failed to create user" });
+    }
+  },
+
+  async updateUser(req: Request, res: Response): Promise<void> {
+    const prismaMaster = getPrismaMaster();
+    const tenantId = req.user!.tenantId;
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId)) {
+      return void res
+        .status(400)
+        .json({ success: false, message: "Invalid user id" });
+    }
+
+    const data: Record<string, unknown> = {};
+    if (typeof req.body?.name === "string" && req.body.name.trim()) {
+      data.name = req.body.name.trim();
+    }
+    if (typeof req.body?.phone === "string") {
+      data.phone = req.body.phone.trim() || null;
+    }
+    if (typeof req.body?.isActive === "boolean") {
+      data.isActive = req.body.isActive;
+    }
+    if (typeof req.body?.password === "string" && req.body.password) {
+      if (req.body.password.length < 6) {
+        return void res.status(400).json({
+          success: false,
+          message: "Password must be at least 6 characters",
+        });
+      }
+      data.passwordHash = await bcrypt.hash(req.body.password, 12);
+    }
+    if (Object.keys(data).length === 0) {
+      return void res
+        .status(400)
+        .json({ success: false, message: "Nothing to update" });
+    }
+
+    try {
+      // Scope to own tenant and prevent editing the current admin via this path.
+      const target = await prismaMaster.user.findFirst({
+        where: { id: userId, tenantId },
+      });
+      if (!target) {
+        return void res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      const user = await prismaMaster.user.update({
+        where: { id: userId },
+        data: { ...data, updatedAt: new Date() },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          phone: true,
+          createdAt: true,
+        },
+      });
+
+      res.status(200).json({ success: true, data: user });
+    } catch (err) {
+      console.error("Failed to update user", err);
+      res.status(500).json({ success: false, message: "Failed to update user" });
+    }
+  },
+
+  async deleteUser(req: Request, res: Response): Promise<void> {
+    const prismaMaster = getPrismaMaster();
+    const tenantId = req.user!.tenantId;
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId)) {
+      return void res
+        .status(400)
+        .json({ success: false, message: "Invalid user id" });
+    }
+
+    if (userId === req.user!.id) {
+      return void res
+        .status(400)
+        .json({ success: false, message: "You cannot delete your own account" });
+    }
+
+    try {
+      const target = await prismaMaster.user.findFirst({
+        where: { id: userId, tenantId },
+      });
+      if (!target) {
+        return void res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      await prismaMaster.user.delete({ where: { id: userId } });
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Failed to delete user", error);
+      res.status(500).json({ success: false, message: "Failed to delete user" });
     }
   },
 };

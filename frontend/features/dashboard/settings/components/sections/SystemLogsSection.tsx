@@ -23,7 +23,6 @@ const SystemLogsSection = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   // Turns a stored action key (e.g. "calendar.cancelAppointment" or
@@ -65,7 +64,6 @@ const SystemLogsSection = () => {
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
-    setError(null);
     settingsService
       .getSystemLogs({ page, pageSize: PAGE_SIZE, search: search || undefined })
       .then((res) => {
@@ -74,7 +72,7 @@ const SystemLogsSection = () => {
         setTotalPages(res.pagination.totalPages || 1);
       })
       .catch(() => {
-        if (!cancelled) setError(t("dashboard.settings.systemLogs.loadError"));
+        if (!cancelled) setLogs([]);
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -113,8 +111,6 @@ const SystemLogsSection = () => {
           <p className="px-6 py-6 text-sm text-[#8D95A5]">
             {t("dashboard.settings.systemLogs.loading")}
           </p>
-        ) : error ? (
-          <p className="px-6 py-6 text-sm text-destructive">{error}</p>
         ) : logs.length === 0 ? (
           <p className="px-6 py-6 text-sm text-[#8D95A5]">
             {t("dashboard.settings.systemLogs.empty")}

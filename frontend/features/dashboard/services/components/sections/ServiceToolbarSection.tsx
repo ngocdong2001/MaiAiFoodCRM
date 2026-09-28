@@ -8,6 +8,7 @@ import SearchInput from "@/shared/components/molecules/SearchInput";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -52,67 +53,72 @@ const ServiceToolbarSection = ({
       title={t("dashboard.services.title")}
       subtitle={t("dashboard.services.subtitle")}
       actions={
-        <>
+        <div className="flex w-full items-center gap-2">
           <SearchInput
             value={query}
             onValueChange={onQueryChange}
             placeholder={t("dashboard.services.searchPlaceholder")}
+            className="w-full"
           />
 
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label={t("dashboard.services.filterLabel")}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#DEE1E7] bg-white"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#DEE1E7] bg-white"
             >
               <Filter className="h-4 w-4 text-[#8D95A5]" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                {t("dashboard.services.categoryGroup")}
-              </DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={String(categoryFilter)}
-                onValueChange={(value) =>
-                  onCategoryFilterChange(
-                    value === "all" ? "all" : Number(value),
-                  )
-                }
-              >
-                <DropdownMenuRadioItem value="all">
-                  {t("dashboard.services.allCategories")}
-                </DropdownMenuRadioItem>
-                {categories.map((category) => (
-                  <DropdownMenuRadioItem
-                    key={category.id}
-                    value={String(category.id)}
-                  >
-                    {category.name}
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  {t("dashboard.services.categoryGroup")}
+                </DropdownMenuLabel>
+                <DropdownMenuRadioGroup
+                  value={String(categoryFilter)}
+                  onValueChange={(value) =>
+                    onCategoryFilterChange(
+                      value === "all" ? "all" : Number(value),
+                    )
+                  }
+                >
+                  <DropdownMenuRadioItem value="all">
+                    {t("dashboard.services.allCategories")}
                   </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
+                  {categories.map((category) => (
+                    <DropdownMenuRadioItem
+                      key={category.id}
+                      value={String(category.id)}
+                    >
+                      {category.name}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuLabel>
-                {t("dashboard.services.statusGroup")}
-              </DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={statusFilter}
-                onValueChange={(value) =>
-                  onStatusFilterChange(value as ServiceStatusFilter)
-                }
-              >
-                {(Object.keys(statusLabels) as ServiceStatusFilter[]).map(
-                  (status) => (
-                    <DropdownMenuRadioItem key={status} value={status}>
-                      {t(statusLabels[status])}
-                    </DropdownMenuRadioItem>
-                  ),
-                )}
-              </DropdownMenuRadioGroup>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  {t("dashboard.services.statusGroup")}
+                </DropdownMenuLabel>
+                <DropdownMenuRadioGroup
+                  value={statusFilter}
+                  onValueChange={(value) =>
+                    onStatusFilterChange(value as ServiceStatusFilter)
+                  }
+                >
+                  {(Object.keys(statusLabels) as ServiceStatusFilter[]).map(
+                    (status) => (
+                      <DropdownMenuRadioItem key={status} value={status}>
+                        {t(statusLabels[status])}
+                      </DropdownMenuRadioItem>
+                    ),
+                  )}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-        </>
+        </div>
       }
     />
   );

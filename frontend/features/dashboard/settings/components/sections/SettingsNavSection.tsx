@@ -9,6 +9,7 @@ import {
   ScrollText,
   ShieldCheck,
   User,
+  Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -25,6 +26,7 @@ const iconMap = {
   "shield-check": ShieldCheck,
   "scroll-text": ScrollText,
   user: User,
+  users: Users,
 };
 
 interface SettingsNavSectionProps {

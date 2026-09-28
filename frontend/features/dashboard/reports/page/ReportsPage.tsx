@@ -103,7 +103,8 @@ const ReportsPage = () => {
     endDate: appliedFilters.endDate || undefined,
   };
 
-  const { data: summary, isLoading, isFetching } = useReportsSummary(params);
+  const { data: summary, isLoading, isFetching, isError } =
+    useReportsSummary(params);
 
   // Format today's date according to the active UI language.
   const locale = i18n.language.startsWith("vi") ? "vi-VN" : "en-US";
@@ -279,6 +280,12 @@ const ReportsPage = () => {
           </div>
         </div>
       </section>
+
+      {isError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {t("dashboard.reports.errors.loadSummary")}
+        </div>
+      )}
 
       {isLoading ? (
         <LoadingState

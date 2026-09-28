@@ -401,6 +401,7 @@ export const ModelName = {
   appointment: 'appointment',
   appointmentservice: 'appointmentservice',
   auditlog: 'auditlog',
+  notification: 'notification',
   guest: 'guest',
   guestnote: 'guestnote',
   guesttag: 'guesttag',
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "airecommendation" | "appointment" | "appointmentservice" | "auditlog" | "guest" | "guestnote" | "guesttag" | "guesttagmapping" | "payment" | "revenuerecord" | "revenuerecorddetail" | "paymentdetail" | "callanalysis" | "refund" | "service" | "servicecategory" | "setting" | "staff" | "staffschedule" | "staffspecialty" | "staffspecialtymapping" | "upsellcampaign"
+    modelProps: "airecommendation" | "appointment" | "appointmentservice" | "auditlog" | "notification" | "guest" | "guestnote" | "guesttag" | "guesttagmapping" | "payment" | "revenuerecord" | "revenuerecorddetail" | "paymentdetail" | "callanalysis" | "refund" | "service" | "servicecategory" | "setting" | "staff" | "staffschedule" | "staffspecialty" | "staffspecialtymapping" | "upsellcampaign"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -699,6 +700,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.auditlogCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AuditlogCountAggregateOutputType> | number
+        }
+      }
+    }
+    notification: {
+      payload: Prisma.$notificationPayload<ExtArgs>
+      fields: Prisma.notificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.notificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.notificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        findFirst: {
+          args: Prisma.notificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.notificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        findMany: {
+          args: Prisma.notificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>[]
+        }
+        create: {
+          args: Prisma.notificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        createMany: {
+          args: Prisma.notificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.notificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        update: {
+          args: Prisma.notificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.notificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.notificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.notificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotification>
+        }
+        groupBy: {
+          args: Prisma.notificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.notificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationCountAggregateOutputType> | number
         }
       }
     }
@@ -1996,6 +2063,21 @@ export const AuditlogScalarFieldEnum = {
 export type AuditlogScalarFieldEnum = (typeof AuditlogScalarFieldEnum)[keyof typeof AuditlogScalarFieldEnum]
 
 
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  appointmentId: 'appointmentId',
+  guestName: 'guestName',
+  staffName: 'staffName',
+  serviceNames: 'serviceNames',
+  startTime: 'startTime',
+  createdAt: 'createdAt',
+  readAt: 'readAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const GuestScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -2009,6 +2091,7 @@ export const GuestScalarFieldEnum = {
   loyaltyPoints: 'loyaltyPoints',
   memberSince: 'memberSince',
   isActive: 'isActive',
+  smsConsent: 'smsConsent',
   notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -2311,6 +2394,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
@@ -2366,6 +2456,32 @@ export const auditlogOrderByRelevanceFieldEnum = {
 } as const
 
 export type auditlogOrderByRelevanceFieldEnum = (typeof auditlogOrderByRelevanceFieldEnum)[keyof typeof auditlogOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const notificationOrderByRelevanceFieldEnum = {
+  type: 'type',
+  guestName: 'guestName',
+  staffName: 'staffName'
+} as const
+
+export type notificationOrderByRelevanceFieldEnum = (typeof notificationOrderByRelevanceFieldEnum)[keyof typeof notificationOrderByRelevanceFieldEnum]
 
 
 export const guestOrderByRelevanceFieldEnum = {
@@ -2431,23 +2547,6 @@ export const revenuerecorddetailOrderByRelevanceFieldEnum = {
 } as const
 
 export type revenuerecorddetailOrderByRelevanceFieldEnum = (typeof revenuerecorddetailOrderByRelevanceFieldEnum)[keyof typeof revenuerecorddetailOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const callanalysisOrderByRelevanceFieldEnum = {
@@ -2585,13 +2684,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -2602,6 +2694,13 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -2766,6 +2865,7 @@ export type GlobalOmitConfig = {
   appointment?: Prisma.appointmentOmit
   appointmentservice?: Prisma.appointmentserviceOmit
   auditlog?: Prisma.auditlogOmit
+  notification?: Prisma.notificationOmit
   guest?: Prisma.guestOmit
   guestnote?: Prisma.guestnoteOmit
   guesttag?: Prisma.guesttagOmit

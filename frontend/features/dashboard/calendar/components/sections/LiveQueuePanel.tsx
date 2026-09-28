@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import LoadingState from "@/shared/components/molecules/LoadingState";
+import ScrollDownIndicator from "@/shared/components/atoms/ScrollDownIndicator";
 import { NULL_TEXT_KEY } from "@/shared/lib/constants";
 import QueueStatusCell from "@/features/dashboard/overview/components/sections/QueueStatusCell";
 import { useOverviewStats } from "@/features/dashboard/overview/hooks/useOverview";
@@ -11,6 +13,7 @@ const LiveQueuePanel = () => {
   const { t } = useTranslation();
   const { data, isLoading } = useOverviewStats();
   const queue = data?.liveQueue ?? [];
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
     <section className="rounded-xl border border-[#DEE1E7] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000a]">
@@ -38,7 +41,7 @@ const LiveQueuePanel = () => {
           {t("dashboard.calendar.queue.empty")}
         </p>
       ) : (
-        <div className="mt-4 overflow-x-auto">
+        <div ref={scrollRef} className="relative mt-4 max-h-[min(60vh,40rem)] overflow-x-auto overflow-y-auto">
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-[#DEE1E7]">
@@ -84,6 +87,7 @@ const LiveQueuePanel = () => {
               ))}
             </tbody>
           </table>
+          <ScrollDownIndicator containerRef={scrollRef} />
         </div>
       )}
     </section>

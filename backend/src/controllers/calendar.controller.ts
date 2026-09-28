@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { Prisma } from "../generated/prisma-tenant/client.js";
 import { queueEvents } from "../lib/queue-events.js";
+import { NotificationModel } from "../models/notification.model.js";
 import {
   sendAppointmentConfirmation,
   type AppointmentSmsData,
@@ -105,6 +106,25 @@ export const CalendarController = {
     try {
       const appointment = await CalendarModel.create(getDb(req), input);
 
+      if (appointment && req.tenant) {
+        try {
+          await NotificationModel.create(getDb(req), {
+            appointmentId: appointment.id,
+            guestName: appointment.guest?.name ?? "",
+            staffName: appointment.staff?.name ?? "",
+            serviceNames: (appointment.services ?? []).map(
+              (service: { name: string }) => service.name,
+            ),
+            startTime: appointment.startTime,
+          });
+        } catch (notificationError) {
+          console.error(
+            "Failed to persist appointment notification:",
+            notificationError,
+          );
+        }
+      }
+
       res.status(201).json({
         success: true,
         data: appointment,
@@ -118,6 +138,14 @@ export const CalendarController = {
             req.tenant.id,
             "appointment.created",
             appointment.id,
+            {
+              guestName: appointment.guest?.name ?? "",
+              staffName: appointment.staff?.name ?? "",
+              serviceNames: (appointment.services ?? []).map(
+                (service: { name: string }) => service.name,
+              ),
+              startTime: appointment.startTime,
+            },
           );
 
         const smsData: AppointmentSmsData = {

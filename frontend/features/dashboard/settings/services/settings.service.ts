@@ -71,4 +71,48 @@ export const settingsService = {
     );
     return { data: res.data.data, pagination: res.data.pagination };
   },
+  async listUsers(): Promise<TeamUser[]> {
+    const res = await apiClient.get<ApiResponse<TeamUser[]>>("/settings/users");
+    return res.data.data;
+  },
+  async createUser(input: CreateUserInput): Promise<TeamUser> {
+    const res = await apiClient.post<ApiResponse<TeamUser>>(
+      "/settings/users",
+      input,
+    );
+    return res.data.data;
+  },
+  async updateUser(
+    id: number,
+    input: Partial<CreateUserInput> & { isActive?: boolean },
+  ): Promise<TeamUser> {
+    const res = await apiClient.put<ApiResponse<TeamUser>>(
+      `/settings/users/${id}`,
+      input,
+    );
+    return res.data.data;
+  },
+  async deleteUser(id: number): Promise<void> {
+    await apiClient.delete(`/settings/users/${id}`);
+  },
+};
+
+export type TeamUser = {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+  isActive: boolean;
+  phone: string | null;
+  avatarUrl: string | null;
+  lastLoginAt: string | null;
+  createdAt: string | null;
+};
+
+export type CreateUserInput = {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  role?: string;
 };
